@@ -16,7 +16,9 @@
 
 ```
 src/AppleStore.Domain/          entities and enums, zero external dependencies
-src/AppleStore.Infrastructure/  AppDbContext, IEntityTypeConfiguration<T>, migrations
+src/AppleStore.Infrastructure/  AppDbContext, IEntityTypeConfiguration<T>, migrations,
+                                 Services/ (business logic: OtpService,
+                                 RegistrationService, IEmailSender)
 src/AppleStore.Web/             controllers, views, wwwroot, Program.cs
 tests/AppleStore.Tests/         xUnit
 ```
@@ -28,9 +30,17 @@ directly for anything that only needs entity/enum types (view models, mapping).
 Why this split: `Domain` is what every layer including future tests can trust
 without pulling in a database or a web server. `Infrastructure` is the only place
 that knows about EF Core, so switching ORMs or database providers stays contained
-there. `Web` is the only project with UI or HTTP concerns. There is no separate
-`Application`/service layer yet; one gets added when the first real business
-service needs a home, not before.
+there. `Web` is the only project with UI or HTTP concerns.
+
+**Business services live in `AppleStore.Infrastructure/Services/`, not a separate
+`Application` project.** This was a real decision, made when the first service
+(`RegistrationService`) needed a home: a fifth project would have contradicted
+the three-layer split above for the sake of a rule (never let a service touch EF
+Core directly) this project's size does not need yet. Services take `AppDbContext`
+directly as a constructor dependency rather than going through a repository
+abstraction, for the same reason. Revisit this if services grow enough that
+Infrastructure becomes a dumping ground; nothing about the current layout blocks
+extracting an `Application` project later.
 
 ## Why SQLite now
 
@@ -63,3 +73,16 @@ When Docker Desktop (or an Azure SQL Database, which has a free tier) is availab
 No entity, enum, or configuration class changes are needed for this swap. That is
 the point of keeping `HasMaxLength`/`HasPrecision` explicit instead of relying on
 SQLite's default dynamic typing.
+
+## Running locally
+
+`dotnet run --project src/AppleStore.Web` from the repo root, or `dotnet run`
+from inside `src/AppleStore.Web`, picks up `Properties/launchSettings.json`,
+which sets `ASPNETCORE_ENVIRONMENT=Development`. Keep it that way: the scoped-CSS
+bundle (`AppleStore.Web.styles.css`) that the default MVC layout references is
+only served from the Development-time static web assets manifest, not physically
+present in `wwwroot`, so overriding the launch profile (for example passing
+`--no-launch-profile --urls ...` to pin a specific port) without also setting
+`ASPNETCORE_ENVIRONMENT=Development` explicitly produces a working app with a
+500 on every page's stylesheet request. See `docs/verification.md` for how this
+was found.
