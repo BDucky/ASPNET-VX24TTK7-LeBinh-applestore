@@ -1,4 +1,5 @@
 using AppleStore.Infrastructure.Data;
+using AppleStore.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+// DevEmailSender logs instead of sending; swap for a real provider before
+// deploying (see docs/architecture.md).
+builder.Services.AddScoped<IEmailSender, DevEmailSender>();
 
 var app = builder.Build();
 
