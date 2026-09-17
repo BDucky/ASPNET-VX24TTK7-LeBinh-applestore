@@ -37,6 +37,21 @@ Junction, composite PK `(CategoryId, AttributeId)`, both FK.
 ### UserTokens
 `Id (PK)`, `UserId (FK -> Users)`, `Type (int)`, `Token (varchar 100)`, `ExpiredAt`, `UsedAt (nullable)`, `CreatedAt`
 
+**Registration OTP does not use UserTokens.** `UserId` is a required FK, but the
+report's own registration use case creates the `User` row only after OTP
+confirmation succeeds, so there is nothing for a `UserTokens` row to attach to at
+the moment the OTP is generated (see the earlier PLAN discussion, "option A").
+`RegistrationService` instead holds the pending email, phone, full name, hashed
+password, OTP code, and expiry in `IMemoryCache`, keyed by a generated attempt
+id, and only writes to `Users` on confirmation. `UserTokenType.RegisterOtp`
+exists in the enum (matching the schema's implied domain) but nothing in the
+codebase constructs one yet. It stays reserved for a future design that does
+persist a pending registration (which would need `UserTokens.UserId` to become
+nullable, a real schema change, not made here). `UserTokenType.ResetPasswordOtp`
+does not have this problem: forgot-password always has an existing `User` row to
+attach the token to, so it can use `UserTokens` as the schema intends once that
+use case is built (M1, not yet started).
+
 ### Addresses
 `Id (PK)`, `UserId (FK -> Users)`, `Label (nvarchar 60, nullable)`, `FullName (nvarchar 120)`, `Phone (varchar 20)`, `AddressLine (nvarchar 255)`, `Ward/District/City (nvarchar 100, nullable)`, `IsDefault (bit)`
 

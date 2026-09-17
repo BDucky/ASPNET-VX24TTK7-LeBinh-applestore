@@ -14,6 +14,24 @@ update profile). Entities already scaffolded: `User`, `UserToken`, `Address`.
 This is the natural first milestone because almost every other use case requires
 an authenticated user.
 
+**Progress (see `HANDOFF.md` for the session-by-session detail):**
+
+| Piece | Status |
+|---|---|
+| `OtpService` (generate, validate) | done, tested, merged path via PR #2 |
+| `RegistrationService` (duplicate checks, pending state, OTP confirm, hashed password) | done, tested, PR #2 |
+| `IEmailSender` / `DevEmailSender` | done, PR #2 |
+| Register + verify-OTP controller and views | not started |
+| Log in | not started |
+| Forgot password | not started |
+| Change password | not started |
+| Update profile | not started |
+
+The registration flow does not use `UserToken` the way the schema's
+`UserTokenType.RegisterOtp` value implies. See `docs/data-model.md`,
+"Registration OTP does not use UserTokens," for why and what that means for
+`UserTokenType.RegisterOtp` going forward.
+
 ## M2: Catalog browse, search, filter, compare
 
 Use cases 7-10. Entities: `Product`, `ProductVariant`, `Category`,
