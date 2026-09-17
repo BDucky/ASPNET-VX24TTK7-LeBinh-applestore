@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AppleStore.Domain/AppleStore.Domain.csproj" />
+    <Project Path="src/AppleStore.Infrastructure/AppleStore.Infrastructure.csproj" />
+    <Project Path="src/AppleStore.Web/AppleStore.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AppleStore.Tests/AppleStore.Tests.csproj" />
+  </Folder>
+</Solution>
