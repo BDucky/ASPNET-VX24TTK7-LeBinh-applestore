@@ -37,7 +37,10 @@ The registration flow does not use `UserToken` the way the schema's
 Use cases 7-10. Entities: `Product`, `ProductVariant`, `Category`,
 `CategoryAttribute`, `AttributeDefinition`, `ProductAttributeValue`, `OptionType`,
 `OptionValue`, `VariantOption`, `ProductImage`, `Favorite`, `CompareList`,
-`CompareItem`.
+`CompareItem`. See `docs/ux-research.md` for concrete listing/PDP/comparison
+patterns from apple.com and Vietnamese resellers, including the open
+variant-picker decision (separate pages per storage tier vs an in-page
+selector) this milestone needs to settle explicitly.
 
 ## M3: Cart and checkout
 
