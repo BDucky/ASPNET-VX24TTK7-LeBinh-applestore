@@ -84,10 +84,18 @@ The hard rule lives in the global `~/.claude/CLAUDE.md`. In this codebase:
 
 ## Git Workflow
 
-- One feature branch per use case: `feat/<usecase-slug>` (for example
-  `feat/register-account`, `feat/product-search`). Never commit feature work
-  directly to `main` once real feature sessions start; this scaffold session is the
-  documented exception, being the repo's initial setup.
+- Two long-lived branches: `main` (stable, release) and `dev` (integration). Both
+  are meant to be protected on GitHub (no direct pushes, pull request required);
+  see `docs/branching.md` for the exact settings and why the initial scaffold
+  commits are the one documented exception, being the repo's original setup before
+  this rule existed.
+- One feature branch per use case, branched from `dev`: `feat/<usecase-slug>` (for
+  example `feat/register-account`, `feat/product-search`). Bug fixes use
+  `fix/<slug>`, chores use `chore/<slug>`.
+- Open a pull request from the feature branch into `dev`. Never push a feature
+  branch straight into `dev` or `main`.
+- `dev` merges into `main` via its own pull request when a set of features is
+  ready to release. `main` never receives a feature branch directly.
 - Split commits by feature and task, the way this scaffold was built: one entity,
   one configuration, one behavior per commit. Never combine unrelated changes into
   one commit.
