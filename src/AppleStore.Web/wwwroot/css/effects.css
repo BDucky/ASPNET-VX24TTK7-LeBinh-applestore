@@ -14,6 +14,7 @@
   --accent-soft: rgba(79, 127, 255, 0.14);
   --display-font: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body-font: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+  --page-pad: clamp(20px, 5vw, 64px);
 }
 
 html,
@@ -22,9 +23,31 @@ body {
   color: var(--text);
 }
 
+/* Bootstrap's reboot sets this on :root for anchor-link scrolling, but it
+   fights Lenis's JS-driven scroll (both try to own the scroll animation),
+   which is what made scrolling feel janky instead of smooth. Lenis needs
+   native scroll left on "auto". */
+html {
+  scroll-behavior: auto !important;
+}
+
 body {
   font-family: var(--body-font);
   margin-bottom: 0 !important;
+}
+
+main {
+  padding-inline: var(--page-pad);
+  padding-block: clamp(28px, 6vw, 56px);
+}
+
+/* Full-bleed sections escape main's padding for their background, then
+   reapply the same padding to their own content so it lines up with
+   everything else on the page. */
+main > .hero,
+main > .statement,
+main > .usp-strip {
+  margin-inline: calc(var(--page-pad) * -1);
 }
 
 h1, h2, h3, h4, .display-headline {
@@ -52,6 +75,10 @@ p {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
+}
+
+.site-nav .container-fluid {
+  padding-inline: var(--page-pad);
 }
 
 .site-nav .navbar-brand {
@@ -100,6 +127,7 @@ p {
   align-items: center;
   gap: clamp(20px, 4vw, 56px);
   flex-wrap: wrap;
+  padding-inline: var(--page-pad);
 }
 
 .hero-content {
@@ -209,8 +237,12 @@ p {
 /* ---------- Scroll-reveal statement ---------- */
 
 .statement {
-  padding: clamp(60px, 12vw, 140px) 0;
+  padding-block: clamp(60px, 12vw, 140px);
   border-top: 1px solid var(--border);
+}
+
+.statement .container-fluid {
+  padding-inline: var(--page-pad);
 }
 
 .statement-text {
@@ -274,7 +306,7 @@ p {
 /* ---------- USP / counter strip ---------- */
 
 .usp-strip {
-  padding: clamp(48px, 8vw, 90px) 0;
+  padding: clamp(48px, 8vw, 90px) var(--page-pad);
   border-top: 1px solid var(--border);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -299,7 +331,7 @@ p {
 
 .site-footer {
   border-top: 1px solid var(--border);
-  padding: 28px 0;
+  padding: 28px var(--page-pad);
   color: var(--text-muted);
   font-size: 0.85rem;
 }
