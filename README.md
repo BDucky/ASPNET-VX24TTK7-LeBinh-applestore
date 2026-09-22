@@ -1,7 +1,7 @@
 # Apple Store
 
 Website ban san pham cong nghe cua Apple. Do an mon hoc Cong nghe phan mem, HCMUTE,
-Nhom 05, 2025.
+2025, individual project.
 
 An e-commerce web application for selling Apple technology products, built as a
 software engineering course project.
@@ -36,9 +36,10 @@ progress-report/  weekly progress reports (one file per week)
 thesis/           project documents: doc/, pdf/, html/, abs/, refs/ (soft/, docker/ if used)
 ```
 
-## Team contact
+## Contact
 
-<!-- TODO: replace with the full Nhom 05 roster (name, email, phone) once provided -->
+Individual project, one author:
+
 - Le Binh, kbsaigonese@gmail.com
 
 ## Running locally

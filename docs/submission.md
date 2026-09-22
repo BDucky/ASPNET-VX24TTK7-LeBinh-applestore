@@ -1,7 +1,7 @@
 # Course submission requirements
 
 Source: section 4 ("Thuc hien va nop do an") of the HCMUTE "Cong nghe phan mem"
-project brief, Nhom 05, 2025. This document transcribes those requirements and
+project brief, 2025. This document transcribes those requirements and
 tracks the repo's compliance with each one. When this file and the brief
 disagree, the brief wins; update this file, not the other way round.
 

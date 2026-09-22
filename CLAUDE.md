@@ -1,7 +1,7 @@
 # Apple Store
 
 ASP.NET Core MVC web application selling Apple technology products. Course project,
-HCMUTE, Cong nghe phan mem, Nhom 05, 2025. Source requirements live in
+HCMUTE, Cong nghe phan mem, 2025, individual project. Source requirements live in
 `docs/requirements.md`, the schema in `docs/data-model.md`.
 
 ## Writing for Humans

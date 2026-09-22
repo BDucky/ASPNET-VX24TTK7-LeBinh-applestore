@@ -27,7 +27,7 @@ and added a "Course Submission Requirements" section to `CLAUDE.md`.
 | Rename and instructor invite documented but not executed | forced by access, not a choice | the session's authenticated GitHub account (`binhlerowboatsoftware`) has push/triage on `BDucky/apple-store`, not admin (confirmed via the collaborators API); both actions need admin, and the invite also needs the instructor's GitHub username, which isn't known yet |
 | `scr/` kept as a thin pointer folder, not a duplicate source tree | Claude's call, stated in the plan | the brief's own diagram names the source folder `scr`, almost certainly a typo for `src`; duplicating the real source under a second name would drift immediately |
 | `soft/` and `docker/` not created yet | Claude's call, following the brief's own "if any" caveat | nothing exists yet to put in either; per the No Self-Assumption rule, don't scaffold folders nobody asked for |
-| README team-contact section left as a placeholder | forced, not a choice | the user said they'd send the full Nhom 05 roster in a follow-up message; only their own name/email was in hand at write time |
+| README team-contact section left as a placeholder | forced, not a choice | the user hadn't yet clarified this is an individual project, not a group one; resolved in a later session, see the 2026-09-22 course-submission entry above |
 
 **Still open, exactly where to pick up:**
 1. Whoever has admin on `BDucky/apple-store` (BDucky) needs to run the rename
@@ -44,8 +44,10 @@ and added a "Course Submission Requirements" section to `CLAUDE.md`.
 
 **What landed.** The repository did not exist before this session. Built from a
 63-page course report (`docs/requirements.md` has the full transcription):
-HCMUTE, "Cong nghe phan mem," Nhom 05, 2025, an e-commerce site selling Apple
-products, 4 actors, 37 use cases, a 24-table SQL Server schema.
+HCMUTE, "Cong nghe phan mem," 2025, an e-commerce site selling Apple
+products, 4 actors, 37 use cases, a 24-table SQL Server schema. The source
+report's own byline names a group ("Nhom 05"); this is an individual
+submission built from that report's requirements.
 
 1. Solution scaffold: `AppleStore.Domain` / `AppleStore.Infrastructure` /
    `AppleStore.Web` / `AppleStore.Tests`, all 24 entities plus EF Core
