@@ -1,0 +1,176 @@
+using AppleStore.Domain.Entities;
+using AppleStore.Infrastructure.Services;
+
+namespace AppleStore.Tests;
+
+public class ProductCatalogServiceTests
+{
+    private static (ProductCatalogService Sut, SqliteInMemoryFixture Fixture) CreateSut()
+    {
+        var fixture = new SqliteInMemoryFixture();
+        fixture.Context.Database.EnsureCreated();
+        var sut = new ProductCatalogService(fixture.Context);
+        return (sut, fixture);
+    }
+
+    private static Category NewCategory(string name, string slug) =>
+        new() { Name = name, Slug = slug };
+
+    private static Product NewProduct(Category category, string name, string slug, decimal basePrice, bool status = true) =>
+        new()
+        {
+            Category = category,
+            Name = name,
+            Slug = slug,
+            BasePrice = basePrice,
+            Status = status,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+    private static ProductVariant NewVariant(Product product, string sku, decimal price, int stock, bool status = true) =>
+        new()
+        {
+            Product = product,
+            SKU = sku,
+            Price = price,
+            StockQty = stock,
+            Status = status,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+    [Fact]
+    public async Task GetProductsAsync_returns_all_active_products_by_default()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var p1 = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        var p2 = NewProduct(iphone, "iPhone 17 Pro", "iphone-17-pro", 1199m);
+        fixture.Context.AddRange(p1, p2);
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Equal(2, result.Count);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_excludes_inactive_products()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var mac = NewCategory("Mac", "mac");
+        var active = NewProduct(mac, "MacBook Air", "macbook-air", 1099m);
+        var inactive = NewProduct(mac, "Discontinued Mac", "discontinued-mac", 899m, status: false);
+        fixture.Context.AddRange(active, inactive);
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Single(result);
+        Assert.Equal("macbook-air", result[0].Slug);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_filters_by_category_slug()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var mac = NewCategory("Mac", "mac");
+        fixture.Context.AddRange(
+            NewProduct(iphone, "iPhone 17", "iphone-17", 999m),
+            NewProduct(mac, "MacBook Air", "macbook-air", 1099m));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync(categorySlug: "mac");
+
+        Assert.Single(result);
+        Assert.Equal("macbook-air", result[0].Slug);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_filters_by_search_query_case_insensitive()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        fixture.Context.AddRange(
+            NewProduct(iphone, "iPhone 17 Pro", "iphone-17-pro", 1199m),
+            NewProduct(iphone, "iPhone Air", "iphone-air", 999m));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync(query: "PRO");
+
+        Assert.Single(result);
+        Assert.Equal("iphone-17-pro", result[0].Slug);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_from_price_is_lowest_active_variant_price()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        fixture.Context.Add(product);
+        fixture.Context.AddRange(
+            NewVariant(product, "IP17-128", 999m, 10),
+            NewVariant(product, "IP17-256", 1099m, 5),
+            NewVariant(product, "IP17-512-DISC", 899m, 0, status: false));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Equal(999m, result[0].FromPrice);
+    }
+
+    [Fact]
+    public async Task GetBySlugAsync_returns_product_with_variants_and_images()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        product.Description = "The latest iPhone.";
+        fixture.Context.Add(product);
+        fixture.Context.Add(NewVariant(product, "IP17-128", 999m, 10));
+        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/iphone-17.svg", SortOrder = 0 });
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetBySlugAsync("iphone-17");
+
+        Assert.NotNull(result);
+        Assert.Equal("iPhone 17", result!.Name);
+        Assert.Equal("The latest iPhone.", result.Description);
+        Assert.Single(result.Variants);
+        Assert.Single(result.ImageUrls);
+    }
+
+    [Fact]
+    public async Task GetBySlugAsync_returns_null_for_unknown_slug()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+
+        var result = await sut.GetBySlugAsync("does-not-exist");
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetBySlugAsync_returns_null_for_inactive_product()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var mac = NewCategory("Mac", "mac");
+        fixture.Context.Add(NewProduct(mac, "Discontinued Mac", "discontinued-mac", 899m, status: false));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetBySlugAsync("discontinued-mac");
+
+        Assert.Null(result);
+    }
+}
