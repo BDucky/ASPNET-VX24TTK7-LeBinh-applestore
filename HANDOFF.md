@@ -5,6 +5,40 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-09-22: course submission closed out, PRs merged (session 2 continued)
+
+**What landed, on top of the entry below.** Confirmed this is an individual
+project, not a group one, dropped all "Nhom 05" team framing across the repo.
+Repo rename to `ASPNET-VX24TTK7-LeBinh-applestore` confirmed done. Branch
+protection configured on `main` and `dev` (require PR before merge, block
+force pushes, restrict deletions), verified via the rules API. Instructor
+invited as a collaborator (GitHub resolved the email to `nguyennhutlam`),
+pending their acceptance. Removed other-codebase references from
+working-tree files (`.claude/output-styles/*`, `.claude/commands/git/
+summary-merges.md`, this file). PR #2 (M1's `OtpService`/`RegistrationService`)
+and PR #5 (course submission requirements) both merged into `dev`.
+
+**Decision:** left 7 already-merged commit messages as-is for now (they
+still name another codebase in their text, e.g. "port dev workflow hooks
+from corjl-webapp"). Rewriting them needs a `git filter-branch` pass plus a
+force-push to `main`/`dev`, which needs repo admin; this session's account
+doesn't have it and adding it hit GitHub's actual permission model (only an
+existing admin can grant admin, confirmed via a 404 on the collaborators
+API, not a workaround-able limitation). The full runbook (message text per
+commit, filter-branch invocation, ruleset toggle, force-push, cleanup) was
+handed to the user to run themselves as `BDucky`, in their own terminal, no
+session access changes needed. Purely cosmetic, not blocking; skip unless
+asked.
+
+**Still open, exactly where to pick up:**
+1. The 7-commit message rewrite above, if the user still wants it.
+2. Instructor acceptance of the invite, not in anyone's control from here.
+3. Next real task, per `docs/roadmap.md`: finish M1 (Auth/OTP), the
+   register/verify-OTP controller and views, log in, forgot password,
+   change password, update profile are all still unstarted. This is
+   testable service/controller logic, start with the TDD plan-gate per
+   `CLAUDE.md`, in a fresh session.
+
 ## 2026-09-22: course submission requirements (GitHub management, directory tree)
 
 **What landed.** The course brief's section 4 (GitHub project management,
