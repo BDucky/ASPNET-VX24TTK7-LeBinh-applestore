@@ -1,0 +1,403 @@
+/* Site-wide visual language: dark, premium storefront shell used across
+   every page (see docs/architecture.md for why this lives separate from
+   the Bootstrap-generated site.css). Effects (reveal, counters, cursor,
+   hero scene) are driven from effects.js and hero-scene.js. */
+
+:root {
+  --bg: #0a0a0c;
+  --bg-elevated: #131316;
+  --bg-card: #17171b;
+  --text: #f4f3ef;
+  --text-muted: #9c9a93;
+  --border: rgba(255, 255, 255, 0.09);
+  --accent: #4f7fff;
+  --accent-soft: rgba(79, 127, 255, 0.14);
+  --display-font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body-font: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+  --page-pad: clamp(20px, 5vw, 64px);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Bootstrap's reboot sets this on :root for anchor-link scrolling, but it
+   fights Lenis's JS-driven scroll (both try to own the scroll animation),
+   which is what made scrolling feel janky instead of smooth. Lenis needs
+   native scroll left on "auto". */
+html {
+  scroll-behavior: auto !important;
+}
+
+body {
+  font-family: var(--body-font);
+  margin-bottom: 0 !important;
+}
+
+main {
+  padding-inline: var(--page-pad);
+  padding-block: clamp(28px, 6vw, 56px);
+}
+
+/* Full-bleed sections escape main's padding for their background, then
+   reapply the same padding to their own content so it lines up with
+   everything else on the page. */
+main > .hero,
+main > .statement,
+main > .usp-strip {
+  margin-inline: calc(var(--page-pad) * -1);
+}
+
+h1, h2, h3, h4, .display-headline {
+  font-family: var(--display-font);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+a {
+  color: var(--accent);
+}
+
+p {
+  color: var(--text-muted);
+}
+
+/* ---------- Nav ---------- */
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(10, 10, 12, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-nav .container-fluid {
+  padding-inline: var(--page-pad);
+}
+
+.site-nav .navbar-brand {
+  font-family: var(--display-font);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text) !important;
+}
+
+.site-nav .nav-link {
+  color: var(--text-muted) !important;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.site-nav .nav-link:hover,
+.site-nav .nav-link.active {
+  color: var(--text) !important;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  min-height: min(92vh, 820px);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(32px, 8vw, 96px) 0;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 55% at 78% 30%, rgba(79, 127, 255, 0.22), transparent 60%),
+    radial-gradient(40% 40% at 15% 85%, rgba(79, 127, 255, 0.10), transparent 60%);
+  z-index: 0;
+}
+
+.hero .container-fluid {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 4vw, 56px);
+  flex-wrap: wrap;
+  padding-inline: var(--page-pad);
+}
+
+.hero-content {
+  flex: 1 1 420px;
+  min-width: 0;
+  max-width: 640px;
+}
+
+.hero-content h1 {
+  overflow-wrap: break-word;
+}
+
+.hero-visual {
+  position: relative;
+  flex: 1 1 320px;
+  min-width: 0;
+  align-self: stretch;
+  min-height: 320px;
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+}
+
+#hero-canvas.is-ready {
+  opacity: 1;
+}
+
+.hero-eyebrow {
+  font-family: var(--body-font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.hero-eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-size: clamp(2.6rem, 7vw, 5.4rem);
+  line-height: 0.98;
+  margin-bottom: 22px;
+  text-wrap: balance;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  color: var(--text-muted);
+  max-width: 46ch;
+  margin-bottom: 32px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-store-primary {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  font-weight: 700;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.btn-store-primary:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-store-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.btn-store-ghost:hover {
+  border-color: var(--text);
+  color: var(--text);
+  transform: translateY(-2px);
+}
+
+/* ---------- Scroll-reveal statement ---------- */
+
+.statement {
+  padding-block: clamp(60px, 12vw, 140px);
+  border-top: 1px solid var(--border);
+}
+
+.statement .container-fluid {
+  padding-inline: var(--page-pad);
+}
+
+.statement-text {
+  font-family: var(--display-font);
+  font-size: clamp(1.6rem, 4.2vw, 3rem);
+  line-height: 1.18;
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.statement-text .word {
+  color: rgba(244, 243, 239, 0.16);
+  transition: color 0.2s linear;
+}
+
+.statement-text .word.is-filled {
+  color: var(--text);
+}
+
+/* ---------- Category cards ---------- */
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.category-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px 22px;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.category-card.is-revealed {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.category-card .k {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.category-card h3 {
+  font-size: 1.5rem;
+  margin: 10px 0 6px;
+}
+
+.category-card p {
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+/* ---------- USP / counter strip ---------- */
+
+.usp-strip {
+  padding: clamp(48px, 8vw, 90px) var(--page-pad);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.usp-tile .num {
+  font-family: var(--display-font);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.usp-tile .label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 28px var(--page-pad);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.site-footer a {
+  color: var(--text-muted);
+}
+
+.site-footer a:hover {
+  color: var(--text);
+}
+
+/* ---------- Custom cursor (desktop, fine pointer, motion allowed only) ---------- */
+
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid rgba(244, 243, 239, 0.55);
+  transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+}
+
+.cursor-ring.is-active {
+  width: 52px;
+  height: 52px;
+  border-color: var(--accent);
+}
+
+.cursor-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--text);
+}
+
+body.has-custom-cursor,
+body.has-custom-cursor a,
+body.has-custom-cursor button {
+  cursor: none;
+}
+
+/* ---------- Motion & input guards ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .statement-text .word,
+  .category-card {
+    transition: none !important;
+  }
+  #hero-canvas {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .cursor-ring,
+  .cursor-dot {
+    display: none;
+  }
+}
