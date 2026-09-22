@@ -23,12 +23,13 @@ branching rule existed. That is the one documented exception. Everything after
 Branch protection needs admin (or maintain) access on the GitHub repository.
 The account currently pushing this work (`binhlerowboatsoftware`) has `push` and
 `triage` access but not `admin`, so it cannot set protection rules through the
-GitHub API (confirmed: `PUT /repos/BDucky/apple-store/branches/{branch}/protection`
+GitHub API (confirmed: `PUT /repos/BDucky/ASPNET-VX24TTK7-LeBinh-applestore/branches/{branch}/protection`
 returns 404, which is GitHub's way of saying "not visible to you," i.e. not an
-admin here).
+admin here; the repo was `BDucky/apple-store` when this was first checked, and
+was renamed on 2026-09-22 per `docs/submission.md`, same access gap either way).
 
-Whoever has admin on `BDucky/apple-store` (repo owner or an org owner) needs to
-set this up once, in the GitHub web UI:
+Whoever has admin on `BDucky/ASPNET-VX24TTK7-LeBinh-applestore` (repo owner or
+an org owner) needs to set this up once, in the GitHub web UI:
 
 1. Go to **Settings > Branches** on the repository.
 2. Add a branch protection rule for `main`:

@@ -107,9 +107,8 @@ The hard rule lives in the global `~/.claude/CLAUDE.md`. In this codebase:
 Full detail and current compliance status: `docs/submission.md`. Summary, all
 required by the course brief:
 
-- Repository must be named `ASPNET-<malop>-<hotenkhongdau>-<shortname>`
-  (target for this project: `ASPNET-VX24TTK7-LeBinh-applestore`); not yet
-  renamed, blocked on admin access, see `docs/submission.md`.
+- Repository must be named `ASPNET-<malop>-<hotenkhongdau>-<shortname>`.
+  Done: `ASPNET-VX24TTK7-LeBinh-applestore`, see `docs/submission.md`.
 - The instructor (`antonio86doan@gmail.com`) must be a repo collaborator;
   not yet invited, see `docs/submission.md` for why and the exact command.
 - Root `README.md` must be kept continuously current, with full team contact

@@ -25,20 +25,10 @@ delegated to Claude, "choose this yourself for the best shortname"):
 | shortname | `applestore` |
 | **Target repo name** | **`ASPNET-VX24TTK7-LeBinh-applestore`** |
 
-**Status: not yet renamed.** The repo is currently `BDucky/apple-store`.
-Renaming requires admin permission; the account this session pushes as
-(`binhlerowboatsoftware`) has `push`/`triage`, not `admin` (confirmed via
-`gh api repos/BDucky/apple-store/collaborators`, same access gap already
-documented in `docs/branching.md` for branch protection). Whoever holds admin
-(`BDucky`) needs to run:
-
-```bash
-gh repo rename ASPNET-VX24TTK7-LeBinh-applestore --repo BDucky/apple-store
-```
-
-GitHub keeps the old `BDucky/apple-store` URL as a redirect after the rename,
-so existing clones and links keep working. After renaming, update the `origin`
-remote on any local clone:
+**Status: done.** Renamed by `BDucky` (admin) on 2026-09-22, confirmed via
+`gh repo view --json name,owner,url`. The old `BDucky/apple-store` URL
+redirects to the new one, so existing clones and links keep working. Local
+`origin` remotes still need updating manually:
 
 ```bash
 git remote set-url origin git@github.com:BDucky/ASPNET-VX24TTK7-LeBinh-applestore.git
@@ -48,9 +38,10 @@ git remote set-url origin git@github.com:BDucky/ASPNET-VX24TTK7-LeBinh-applestor
 
 Instructor's GitHub-linked email: `antonio86doan@gmail.com`.
 
-**Status: not yet invited.** A `gh api repos/BDucky/apple-store/collaborators`
-check on 2026-09-22 lists only `BDucky` (admin) and `binhlerowboatsoftware`
-(write): the instructor is not on the repo yet.
+**Status: not yet invited.** A re-check of
+`gh api repos/BDucky/ASPNET-VX24TTK7-LeBinh-applestore/collaborators` on
+2026-09-22, after the rename, still lists only `BDucky` (admin) and
+`binhlerowboatsoftware` (write): the instructor is not on the repo yet.
 
 GitHub's collaborator-invite API takes a **username**, not an email, so the
 instructor's GitHub username needs to be found first (ask them directly, or
@@ -141,7 +132,7 @@ points to `src/`.
 
 | Requirement | Status |
 |---|---|
-| Repo named `ASPNET-<malop>-<hotenkhongdau>-<shortname>` | Not done, blocked on admin access (see 4.1a) |
+| Repo named `ASPNET-<malop>-<hotenkhongdau>-<shortname>` | Done, 2026-09-22 (see 4.1a) |
 | Instructor invited as collaborator | Not done, blocked on admin access + username (see 4.1b) |
 | README.md kept current | In progress, ongoing by nature |
 | Weekly commits | Ongoing, see git history |
