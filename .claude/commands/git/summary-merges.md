@@ -7,9 +7,8 @@ allowed-tools: Bash(git:*), Bash(gh:*), AskUserQuestion
 
 Generate a chat-ready summary of all PRs merged into a target branch, categorized by type (Feature, Fix, Performance, Chore).
 
-Adapted from corjl-webapp's version of this command: the Jira-ticket extraction
-and the hardcoded `CorjlSoftware/corjl-webapp` repo are dropped since this
-project has neither Jira nor a fixed org. The repo is resolved dynamically.
+No Jira-ticket extraction and no hardcoded repo: this project has no Jira,
+and the repo is resolved dynamically.
 
 ## Arguments
 

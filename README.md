@@ -1,7 +1,7 @@
 # Apple Store
 
 Website ban san pham cong nghe cua Apple. Do an mon hoc Cong nghe phan mem, HCMUTE,
-Nhom 05, 2025.
+2025, individual project.
 
 An e-commerce web application for selling Apple technology products, built as a
 software engineering course project.
@@ -23,6 +23,24 @@ src/AppleStore.Web/             controllers, views, wwwroot, Program.cs
 tests/AppleStore.Tests/         xUnit tests
 docs/                           requirements, data model, architecture, roadmap
 ```
+
+## Repository organization
+
+This repo also follows the course's required top-level directory tree (see
+`docs/submission.md` for the full requirement and rationale):
+
+```
+setup/            install/run instructions, test data matching the demoed result
+scr/              required folder name per the brief; actual source is in src/, see scr/README.md
+progress-report/  weekly progress reports (one file per week)
+thesis/           project documents: doc/, pdf/, html/, abs/, refs/ (soft/, docker/ if used)
+```
+
+## Contact
+
+Individual project, one author:
+
+- Le Binh, kbsaigonese@gmail.com
 
 ## Running locally
 

@@ -1,8 +1,10 @@
 # Requirements
 
 Source: "Do an mon hoc Cong nghe phan mem, Xay dung website Apple Store", HCMUTE,
-Khoa Cong nghe thong tin, Nhom 05, 2025. This document transcribes the requirements
+Khoa Cong nghe thong tin, 2025. This document transcribes the requirements
 chapters of that report so they live alongside the code instead of only in a PDF.
+The source report's own byline names a group ("Nhom 05"); this repository is an
+individual submission built from that report's requirements, not a group project.
 
 ## Current-state problems the project addresses
 

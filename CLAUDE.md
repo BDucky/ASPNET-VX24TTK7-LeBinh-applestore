@@ -1,7 +1,7 @@
 # Apple Store
 
 ASP.NET Core MVC web application selling Apple technology products. Course project,
-HCMUTE, Cong nghe phan mem, Nhom 05, 2025. Source requirements live in
+HCMUTE, Cong nghe phan mem, 2025, individual project. Source requirements live in
 `docs/requirements.md`, the schema in `docs/data-model.md`.
 
 ## Writing for Humans
@@ -91,7 +91,7 @@ The hard rule lives in the global `~/.claude/CLAUDE.md`. In this codebase:
   this rule existed.
 - One feature branch per use case, branched from `dev`: `feat/<usecase-slug>` (for
   example `feat/register-account`, `feat/product-search`). Bug fixes use
-  `fix/<slug>`, chores use `chore/<slug>`.
+  `fix/<slug>`, chores use `chore/<slug>`, docs-only work uses `docs/<slug>`.
 - Open a pull request from the feature branch into `dev`. Never push a feature
   branch straight into `dev` or `main`.
 - `dev` merges into `main` via its own pull request when a set of features is
@@ -101,6 +101,28 @@ The hard rule lives in the global `~/.claude/CLAUDE.md`. In this codebase:
   one commit.
 - Every commit ends with the attribution line given by the session's system
   reminder at commit time.
+
+## Course Submission Requirements (GitHub management)
+
+Full detail and current compliance status: `docs/submission.md`. Summary, all
+required by the course brief:
+
+- Repository must be named `ASPNET-<malop>-<hotenkhongdau>-<shortname>`.
+  Done: `ASPNET-VX24TTK7-LeBinh-applestore`, see `docs/submission.md`.
+- The instructor (`antonio86doan@gmail.com`) must be a repo collaborator;
+  invited 2026-09-22, pending acceptance, see `docs/submission.md`.
+- Root `README.md` must be kept continuously current, with full team contact
+  info, through the life of the project, not written once and left stale.
+- At least one commit per week, matching the work actually done that week.
+  Commit history is graded directly.
+- `progress-report/` (required) gets one file per week, and per the brief a
+  report only counts if that week's commit history also shows activity.
+- Repo root follows the required directory tree: `setup/`, `scr/`,
+  `progress-report/`, `thesis/{doc,pdf,html,abs,refs,soft,docker}`: see
+  `docs/submission.md` section 4.3 for what belongs in each.
+
+When any of the above is still open, say so plainly rather than reporting the
+task as done; these are graded requirements, not optional polish.
 
 ## Verify Before Delivering
 
