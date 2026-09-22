@@ -95,8 +95,8 @@ For task completion and recommendations:
    - Run `pnpm install`
    - Configure `.env` files
 2. Run specific app
-   - `pnpm --filter @corjl/designer dev`
-   - Or use Nx: `nx serve designer`
+   - `pnpm --filter @your-scope/your-app dev`
+   - Or use Nx: `nx serve your-app`
 3. Run tests
    - `pnpm test:editor` for editor tests
    - `pnpm test:core` for core tests

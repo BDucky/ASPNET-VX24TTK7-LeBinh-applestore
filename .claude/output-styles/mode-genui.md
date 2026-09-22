@@ -68,7 +68,7 @@ code {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[Descriptive Page Title] - Corjl Webapp</title>
+    <title>[Descriptive Page Title] - [Project Name]</title>
     <style>
         /* Complete embedded styles here */
         body { ... }
@@ -80,7 +80,7 @@ code {
     <article>
         <header>
             <h1>[Main Title]</h1>
-            <p class="subtitle">corjl-webapp | Vue 3 + TypeScript</p>
+            <p class="subtitle">[Project Name] | [Stack]</p>
         </header>
         <main>
             [Content sections]

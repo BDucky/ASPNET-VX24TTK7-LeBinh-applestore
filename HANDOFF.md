@@ -52,7 +52,7 @@ submission built from that report's requirements.
 1. Solution scaffold: `AppleStore.Domain` / `AppleStore.Infrastructure` /
    `AppleStore.Web` / `AppleStore.Tests`, all 24 entities plus EF Core
    configuration plus the initial migration, docs, ported dev tooling from
-   `corjl-webapp`. 82 commits, pushed straight to `main` (see below, that was
+   an existing dev-tooling reference. 82 commits, pushed straight to `main` (see below, that was
    before the branching rule existed).
 2. `main` and `dev` branches created; `dev` is now the integration target.
    Branch protection could not be configured (this account has push/triage on
@@ -76,7 +76,7 @@ submission built from that report's requirements.
 | Registration OTP held in `IMemoryCache`, not `UserTokens` (option A) | my recommendation, user said "proceed" | schema's `UserTokens.UserId` FK has nothing to attach to before the `User` row exists; avoids a schema change |
 | OTP: 6 digits, 5-minute expiry; `PasswordHasher<User>` for hashing | my assumption, stated in the PLAN, not corrected | report does not specify a duration; `PasswordHasher` is the ASP.NET Core standard, no new dependency |
 | Business services live in `Infrastructure/Services/`, no separate `Application` project | my call, made when `RegistrationService` needed a home | project size does not justify a 5th project yet, documented as reversible in `docs/architecture.md` |
-| `docs/qa.md`, `workflow/*.md`, `lint/*.md`, `test/e2e.md`/`test/sync.md` from corjl-webapp NOT ported | my call, deviating from what I'd told the background agent to do | all hard-wired to Corjl's own ADWS `.ai/specs/` pipeline, Jira, and Nx-affected tooling; porting "adapted" would have fabricated a whole SDLC system nobody asked for |
+| `docs/qa.md`, `workflow/*.md`, `lint/*.md`, `test/e2e.md`/`test/sync.md` NOT ported | my call, deviating from what I'd told the background agent to do | all hard-wired to a Jira- and Nx-affected-tooling-based SDLC pipeline; porting "adapted" would have fabricated a whole SDLC system nobody asked for |
 
 **Known gaps, still open, do not resolve silently:**
 
