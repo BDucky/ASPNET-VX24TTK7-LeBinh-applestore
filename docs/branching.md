@@ -18,33 +18,28 @@ configuration, docs, ported tooling) were pushed directly to `main` before this
 branching rule existed. That is the one documented exception. Everything after
 `dev` was created follows the flow above.
 
-## Branch protection: requested, not yet configured
+## Branch protection: configured
 
-Branch protection needs admin (or maintain) access on the GitHub repository.
-The account currently pushing this work (`binhlerowboatsoftware`) has `push` and
-`triage` access but not `admin`, so it cannot set protection rules through the
-GitHub API (confirmed: `PUT /repos/BDucky/ASPNET-VX24TTK7-LeBinh-applestore/branches/{branch}/protection`
-returns 404, which is GitHub's way of saying "not visible to you," i.e. not an
-admin here; the repo was `BDucky/apple-store` when this was first checked, and
-was renamed on 2026-09-22 per `docs/submission.md`, same access gap either way).
+Set up by `BDucky` (repo admin) on 2026-09-22 via GitHub's Rulesets UI
+(**Settings > Rules > Rulesets**), one ruleset named `main` targeting both
+`main` and `dev`. The account this session pushes as (`binhlerowboatsoftware`)
+still only has `push`/`triage`, not `admin`, and could not have set this up
+(confirmed earlier via a 404 on the branch-protection API); the ruleset had to
+be created by the admin account instead.
 
-Whoever has admin on `BDucky/ASPNET-VX24TTK7-LeBinh-applestore` (repo owner or
-an org owner) needs to set this up once, in the GitHub web UI:
+Verified active via `gh api repos/BDucky/ASPNET-VX24TTK7-LeBinh-applestore/rules/branches/<branch>`
+for both `main` and `dev`, which lists all three rule types below.
 
-1. Go to **Settings > Branches** on the repository.
-2. Add a branch protection rule for `main`:
-   - Branch name pattern: `main`
-   - Require a pull request before merging (check this)
-   - Required approvals: 0 to start (raise to 1+ once more of the team is
-     actively reviewing; 0 still blocks direct pushes, it just does not gate on
-     a reviewer)
-   - Do not allow force pushes
-   - Do not allow deletions
-3. Repeat for `dev` with the same settings.
-4. Optionally, once a CI workflow exists (none is set up yet, see
-   `docs/roadmap.md`), add "require status checks to pass" for both rules.
+Current rules, both branches:
 
-Until this is configured on GitHub's side, protection is enforced by convention:
-every session working on this repo (human or Claude Code) follows the flow above
-and never pushes directly to `main` or `dev`, even though the platform is not yet
-stopping it.
+- **Require a pull request before merging**, 0 required approvals for now
+  (raise to 1+ once more of the team is actively reviewing; 0 still blocks
+  direct pushes, it just does not gate on a reviewer).
+- **Block force pushes**.
+- **Restrict deletions**.
+
+Not yet added: "require status checks to pass," since no CI workflow exists
+yet (see `docs/roadmap.md`). Add that rule to the same ruleset once CI lands.
+
+To change these settings later: **Settings > Rules > Rulesets > main** on the
+repository.
