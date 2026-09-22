@@ -110,7 +110,7 @@ required by the course brief:
 - Repository must be named `ASPNET-<malop>-<hotenkhongdau>-<shortname>`.
   Done: `ASPNET-VX24TTK7-LeBinh-applestore`, see `docs/submission.md`.
 - The instructor (`antonio86doan@gmail.com`) must be a repo collaborator;
-  not yet invited, see `docs/submission.md` for why and the exact command.
+  invited 2026-09-22, pending acceptance, see `docs/submission.md`.
 - Root `README.md` must be kept continuously current, with full team contact
   info, through the life of the project, not written once and left stale.
 - At least one commit per week, matching the work actually done that week.
