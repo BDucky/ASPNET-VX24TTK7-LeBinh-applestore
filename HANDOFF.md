@@ -5,6 +5,41 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-09-22: course submission requirements (GitHub management, directory tree)
+
+**What landed.** The course brief's section 4 (GitHub project management,
+photographed and pasted by the user) requires: a specific repo naming syntax,
+inviting the instructor as a collaborator, a continuously-updated README, weekly
+commits, a `progress-report/` folder, and a specific top-level directory tree
+(`setup/`, `scr/`, `progress-report/`, `thesis/{doc,pdf,html,abs,refs,soft,docker}`).
+Added `docs/submission.md` transcribing the full requirement and tracking
+compliance, scaffolded the required folders (each with a README explaining its
+purpose; `scr/` points at the real `src/` tree rather than duplicating it, `soft/`
+and `docker/` left uncreated since the brief marks them "if any"), updated
+`README.md` with a repository-organization section and a team-contact section,
+and added a "Course Submission Requirements" section to `CLAUDE.md`.
+
+**Decisions made this session, and whose call each was:**
+
+| Decision | Who decided | Why |
+|---|---|---|
+| Target repo name `ASPNET-VX24TTK7-LeBinh-applestore` | malop (`VX24TTK7`) and name (`LeBinh`), user, asked directly; shortname (`applestore`), Claude's call, explicitly delegated ("choose this yourself") | matches the brief's required syntax |
+| Rename and instructor invite documented but not executed | forced by access, not a choice | the session's authenticated GitHub account (`binhlerowboatsoftware`) has push/triage on `BDucky/apple-store`, not admin (confirmed via the collaborators API); both actions need admin, and the invite also needs the instructor's GitHub username, which isn't known yet |
+| `scr/` kept as a thin pointer folder, not a duplicate source tree | Claude's call, stated in the plan | the brief's own diagram names the source folder `scr`, almost certainly a typo for `src`; duplicating the real source under a second name would drift immediately |
+| `soft/` and `docker/` not created yet | Claude's call, following the brief's own "if any" caveat | nothing exists yet to put in either; per the No Self-Assumption rule, don't scaffold folders nobody asked for |
+| README team-contact section left as a placeholder | forced, not a choice | the user said they'd send the full Nhom 05 roster in a follow-up message; only their own name/email was in hand at write time |
+
+**Still open, exactly where to pick up:**
+1. Whoever has admin on `BDucky/apple-store` (BDucky) needs to run the rename
+   and (once the instructor's GitHub username is known) the collaborator invite;
+   exact commands are in `docs/submission.md`.
+2. The user still owes the full team contact list (name/email/phone per member)
+   for the README "Team contact" section, currently just Le Binh's own email.
+3. First weekly `progress-report/` entry is still due; the folder only has its
+   README so far.
+4. This work sits on branch `docs/github-submission-requirements`, not yet
+   pushed or opened as a PR into `dev`.
+
 ## 2026-09-17: repo init, branching, M1 registration service (session 1)
 
 **What landed.** The repository did not exist before this session. Built from a
