@@ -13,13 +13,18 @@ public class ProductsController : Controller
         _catalog = catalog;
     }
 
-    public Task<IActionResult> Index(string? category, string? q, CancellationToken ct)
+    public async Task<IActionResult> Index(string? category, string? q, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var products = await _catalog.GetProductsAsync(category, q, ct);
+        return View(new ProductListViewModel(products, category, q));
     }
 
-    public Task<IActionResult> Details(string slug, CancellationToken ct)
+    public async Task<IActionResult> Details(string slug, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var product = await _catalog.GetBySlugAsync(slug, ct);
+        if (product is null)
+            return NotFound();
+
+        return View(product);
     }
 }
