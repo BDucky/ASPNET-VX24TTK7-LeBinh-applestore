@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AppleStore.Domain\AppleStore.Domain.csproj" />
     <ProjectReference Include="..\..\src\AppleStore.Infrastructure\AppleStore.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\AppleStore.Web\AppleStore.Web.csproj" />
   </ItemGroup>
 
 </Project>
