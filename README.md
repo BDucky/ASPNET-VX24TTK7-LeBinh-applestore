@@ -24,6 +24,23 @@ tests/AppleStore.Tests/         xUnit tests
 docs/                           requirements, data model, architecture, roadmap
 ```
 
+## Repository organization
+
+This repo also follows the course's required top-level directory tree (see
+`docs/submission.md` for the full requirement and rationale):
+
+```
+setup/            install/run instructions, test data matching the demoed result
+scr/              required folder name per the brief; actual source is in src/, see scr/README.md
+progress-report/  weekly progress reports (one file per week)
+thesis/           project documents: doc/, pdf/, html/, abs/, refs/ (soft/, docker/ if used)
+```
+
+## Team contact
+
+<!-- TODO: replace with the full Nhom 05 roster (name, email, phone) once provided -->
+- Le Binh, kbsaigonese@gmail.com
+
 ## Running locally
 
 ```bash
