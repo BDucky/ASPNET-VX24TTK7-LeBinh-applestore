@@ -15,6 +15,7 @@
   --display-font: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body-font: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
   --page-pad: clamp(20px, 5vw, 64px);
+  --page-pad-block: clamp(28px, 6vw, 56px);
 }
 
 html,
@@ -38,16 +39,33 @@ body {
 
 main {
   padding-inline: var(--page-pad);
-  padding-block: clamp(28px, 6vw, 56px);
+  padding-block: var(--page-pad-block);
 }
 
-/* Full-bleed sections escape main's padding for their background, then
-   reapply the same padding to their own content so it lines up with
-   everything else on the page. */
+/* Full-bleed sections escape main's inline padding for their background,
+   then reapply their own for content. Block (vertical) padding on a parent
+   only inserts space before its first child and after its last child, never
+   between children, so only :first-child/:last-child need to cancel it,
+   cancelling margin-block on every match (an earlier bug) stacked negative
+   margins onto sections that had nothing to cancel, e.g. 56px of main's
+   padding-top plus statement's own 140px = 196px of dead space above the
+   first section on every non-hero page. */
 main > .hero,
 main > .statement,
 main > .usp-strip {
   margin-inline: calc(var(--page-pad) * -1);
+}
+
+main > .hero:first-child,
+main > .statement:first-child,
+main > .usp-strip:first-child {
+  margin-top: calc(var(--page-pad-block) * -1);
+}
+
+main > .hero:last-child,
+main > .statement:last-child,
+main > .usp-strip:last-child {
+  margin-bottom: calc(var(--page-pad-block) * -1);
 }
 
 h1, h2, h3, h4, .display-headline {
@@ -241,6 +259,14 @@ p {
   border-top: 1px solid var(--border);
 }
 
+/* .statement's padding is tuned for the homepage's slow scroll-reveal
+   copy. Reusing that on a utility page (product listing/detail) read as a
+   huge, pointless gap before anything scannable, people want to start
+   browsing immediately, not scroll through empty space first. */
+.statement.is-compact {
+  padding-block: clamp(24px, 4vw, 40px);
+}
+
 .statement .container-fluid {
   padding-inline: var(--page-pad);
 }
@@ -382,30 +408,47 @@ p {
   text-decoration: none;
   color: inherit;
   display: block;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .product-card:hover {
   border-color: var(--accent);
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -16px rgba(79, 127, 255, 0.35);
 }
 
+/* A photo sitting on a dark card reads as murky. Real retail sites (checked
+   CellphoneS live, 2026-09-22) keep a light, near-white well behind the
+   product shot even on an otherwise dark/colorful page, since studio and
+   flatlay photography is lit and white-balanced for a light background. */
 .product-card-media {
   aspect-ratio: 1;
-  background: var(--bg-elevated);
+  background: linear-gradient(160deg, #f4f3ef 0%, #e4e2da 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .product-card-media img {
-  width: 55%;
-  height: 55%;
+  width: 82%;
+  height: 82%;
   object-fit: contain;
 }
 
 .product-card-body {
   padding: 18px 20px 22px;
+  position: relative;
+}
+
+.product-card-body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: var(--border);
 }
 
 .product-card .k {
@@ -432,6 +475,34 @@ p {
   padding: 40px 0;
 }
 
+/* ---------- Credits table ---------- */
+
+.credits-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.credits-table th {
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.credits-table td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+}
+
 /* ---------- Product detail ---------- */
 
 .product-detail {
@@ -442,7 +513,7 @@ p {
 }
 
 .product-detail-media {
-  background: var(--bg-card);
+  background: linear-gradient(160deg, #f4f3ef 0%, #e4e2da 100%);
   border: 1px solid var(--border);
   border-radius: 22px;
   aspect-ratio: 1;
@@ -452,9 +523,10 @@ p {
 }
 
 .product-detail-media img {
-  width: 55%;
-  height: 55%;
+  width: 82%;
+  height: 82%;
   object-fit: contain;
+  border-radius: inherit;
 }
 
 .product-detail h1 {

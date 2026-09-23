@@ -10,7 +10,7 @@
     };
 }
 
-<section class="statement" style="padding-bottom: 0;">
+<section class="statement is-compact" style="padding-bottom: 0;">
     <div class="container-fluid">
         <div class="hero-eyebrow">Shop</div>
         <h1 style="font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 18px;">@ViewData["Title"]</h1>
@@ -39,7 +39,7 @@
     </div>
 </section>
 
-<section class="statement">
+<section class="statement is-compact">
     <div class="container-fluid">
         @if (!Model.Products.Any())
         {
@@ -52,7 +52,7 @@
                 {
                     <a class="product-card" asp-controller="Products" asp-action="Details" asp-route-slug="@product.Slug">
                         <div class="product-card-media">
-                            <img src="~/img/products/@(product.CategorySlug).svg" alt="" />
+                            <img src="~/img/products/@(product.Slug).jpg" asp-append-version="true" alt="@product.Name" />
                         </div>
                         <div class="product-card-body">
                             <div class="k">@product.CategoryName</div>

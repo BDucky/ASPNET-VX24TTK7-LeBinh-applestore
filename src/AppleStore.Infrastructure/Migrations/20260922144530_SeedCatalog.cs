@@ -67,18 +67,18 @@ namespace AppleStore.Infrastructure.Migrations
                 columns: new[] { "Id", "ProductId", "VariantId", "ImageUrl", "SortOrder" },
                 values: new object[,]
                 {
-                    { 1, 1, null, "/img/products/iphone.svg", 0 },
-                    { 2, 2, null, "/img/products/iphone.svg", 0 },
-                    { 3, 3, null, "/img/products/iphone.svg", 0 },
-                    { 4, 4, null, "/img/products/mac.svg", 0 },
-                    { 5, 5, null, "/img/products/mac.svg", 0 },
-                    { 6, 6, null, "/img/products/mac.svg", 0 },
-                    { 7, 7, null, "/img/products/ipad.svg", 0 },
-                    { 8, 8, null, "/img/products/ipad.svg", 0 },
-                    { 9, 9, null, "/img/products/ipad.svg", 0 },
-                    { 10, 10, null, "/img/products/watch.svg", 0 },
-                    { 11, 11, null, "/img/products/watch.svg", 0 },
-                    { 12, 12, null, "/img/products/watch.svg", 0 },
+                    { 1, 1, null, "/img/products/iphone-17.jpg", 0 },
+                    { 2, 2, null, "/img/products/iphone-17-pro.jpg", 0 },
+                    { 3, 3, null, "/img/products/iphone-air.jpg", 0 },
+                    { 4, 4, null, "/img/products/macbook-air.jpg", 0 },
+                    { 5, 5, null, "/img/products/macbook-pro.jpg", 0 },
+                    { 6, 6, null, "/img/products/mac-mini.jpg", 0 },
+                    { 7, 7, null, "/img/products/ipad.jpg", 0 },
+                    { 8, 8, null, "/img/products/ipad-air.jpg", 0 },
+                    { 9, 9, null, "/img/products/ipad-pro.jpg", 0 },
+                    { 10, 10, null, "/img/products/apple-watch-series-11.jpg", 0 },
+                    { 11, 11, null, "/img/products/apple-watch-se.jpg", 0 },
+                    { 12, 12, null, "/img/products/apple-watch-ultra-3.jpg", 0 },
                 });
         }
 

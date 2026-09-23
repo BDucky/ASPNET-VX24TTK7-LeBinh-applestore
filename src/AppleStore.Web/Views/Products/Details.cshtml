@@ -3,7 +3,7 @@
     ViewData["Title"] = Model.Name;
 }
 
-<section class="statement">
+<section class="statement is-compact">
     <div class="container-fluid">
         <div class="product-detail">
             <div class="product-detail-media">
@@ -12,7 +12,10 @@
                 }
                 @if (imageUrl is not null)
                 {
-                    <img src="@Url.Content(imageUrl)" alt="" />
+                    @* Manual cache-bust: the DB stores a plain path, so the Image
+                       Tag Helper's asp-append-version can't apply here (it only
+                       recognizes a literal ~/ src in markup, not a runtime value). *@
+                    <img src="@Url.Content(imageUrl)?v=2" alt="@Model.Name" />
                 }
             </div>
             <div>
