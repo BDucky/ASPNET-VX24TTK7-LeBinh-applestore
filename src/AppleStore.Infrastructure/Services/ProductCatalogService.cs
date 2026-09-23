@@ -35,6 +35,12 @@ public class ProductCatalogService : IProductCatalogService
             .Select(g => new { ProductId = g.Key, MinPrice = g.Min(v => v.Price) })
             .ToDictionaryAsync(x => x.ProductId, x => x.MinPrice, ct);
 
+        var firstImages = await _db.ProductImages
+            .Where(i => productIds.Contains(i.ProductId))
+            .GroupBy(i => i.ProductId)
+            .Select(g => new { ProductId = g.Key, ImageUrl = g.OrderBy(i => i.SortOrder).First().ImageUrl })
+            .ToDictionaryAsync(x => x.ProductId, x => x.ImageUrl, ct);
+
         return list
             .Select(p => new ProductSummary(
                 p.Id,
@@ -43,7 +49,7 @@ public class ProductCatalogService : IProductCatalogService
                 p.Category.Name,
                 p.Category.Slug,
                 lowestActivePrices.TryGetValue(p.Id, out var minPrice) ? minPrice : p.BasePrice,
-                null))
+                firstImages.GetValueOrDefault(p.Id)))
             .ToList();
     }
 
