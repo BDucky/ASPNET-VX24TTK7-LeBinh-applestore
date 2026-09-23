@@ -7,6 +7,8 @@
         "ipad" => "iPad",
         "watch" => "Watch",
         "accessories" => "Accessories",
+        "airpods" => "AirPods",
+        "home" => "Home",
         _ => "All Products",
     };
 }
@@ -38,6 +40,10 @@
                class="filter-pill @(Model.SelectedCategory == "watch" ? "is-active" : "")">Watch</a>
             <a href="@Url.Action("Index", new { category = "accessories", q = Model.Query })"
                class="filter-pill @(Model.SelectedCategory == "accessories" ? "is-active" : "")">Accessories</a>
+            <a href="@Url.Action("Index", new { category = "airpods", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "airpods" ? "is-active" : "")">AirPods</a>
+            <a href="@Url.Action("Index", new { category = "home", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "home" ? "is-active" : "")">Home</a>
         </div>
 
         <div class="listing-toolbar">
