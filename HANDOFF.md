@@ -78,7 +78,7 @@ and added a "Course Submission Requirements" section to `CLAUDE.md`.
 
 **What landed.** The repository did not exist before this session. Built from a
 63-page course report (`docs/requirements.md` has the full transcription):
-HCMUTE, "Cong nghe phan mem," 2025, an e-commerce site selling Apple
+TVU, "Cong nghe phan mem," 2025, an e-commerce site selling Apple
 products, 4 actors, 37 use cases, a 24-table SQL Server schema. The source
 report's own byline names a group ("Nhom 05"); this is an individual
 submission built from that report's requirements.

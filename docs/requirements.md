@@ -1,6 +1,6 @@
 # Requirements
 
-Source: "Do an mon hoc Cong nghe phan mem, Xay dung website Apple Store", HCMUTE,
+Source: "Do an mon hoc Cong nghe phan mem, Xay dung website Apple Store", TVU,
 Khoa Cong nghe thong tin, 2025. This document transcribes the requirements
 chapters of that report so they live alongside the code instead of only in a PDF.
 The source report's own byline names a group ("Nhom 05"); this repository is an
