@@ -11,6 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IProductCatalogService, ProductCatalogService>();
 // DevEmailSender logs instead of sending; swap for a real provider before
 // deploying (see docs/architecture.md).
 builder.Services.AddScoped<IEmailSender, DevEmailSender>();

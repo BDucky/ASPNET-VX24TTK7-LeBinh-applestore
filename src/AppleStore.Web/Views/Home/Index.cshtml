@@ -42,26 +42,26 @@
 <section class="statement" id="categories">
     <div class="container-fluid">
         <div class="category-grid">
-            <div class="category-card">
+            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="iphone">
                 <div class="k">Phone</div>
                 <h3>iPhone</h3>
                 <p>Every current model and storage tier, verified stock only.</p>
-            </div>
-            <div class="category-card">
+            </a>
+            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="mac">
                 <div class="k">Computer</div>
                 <h3>Mac</h3>
-                <p>MacBook Air, MacBook Pro, iMac, Mac mini, Mac Studio.</p>
-            </div>
-            <div class="category-card">
+                <p>MacBook Air, MacBook Pro, and Mac mini.</p>
+            </a>
+            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="ipad">
                 <div class="k">Tablet</div>
                 <h3>iPad</h3>
-                <p>iPad, iPad Air, iPad Pro, and iPad mini, with accessories.</p>
-            </div>
-            <div class="category-card">
+                <p>iPad, iPad Air, and iPad Pro.</p>
+            </a>
+            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="watch">
                 <div class="k">Wearable</div>
                 <h3>Watch</h3>
-                <p>Apple Watch Series, SE, and Ultra, every band and case size.</p>
-            </div>
+                <p>Apple Watch Series, SE, and Ultra.</p>
+            </a>
         </div>
     </div>
 </section>
