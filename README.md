@@ -1,6 +1,6 @@
 # Apple Store
 
-Website ban san pham cong nghe cua Apple. Do an mon hoc Cong nghe phan mem, HCMUTE,
+Website ban san pham cong nghe cua Apple. Do an mon hoc Cong nghe phan mem, TVU,
 2025, individual project.
 
 An e-commerce web application for selling Apple technology products, built as a

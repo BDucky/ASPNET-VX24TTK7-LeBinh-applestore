@@ -1,0 +1,53 @@
+@model AppleStore.Infrastructure.Services.ProductDetail
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<section class="statement is-compact">
+    <div class="container-fluid">
+        <div class="product-detail">
+            <div class="product-detail-media">
+                @{
+                    var imageUrl = Model.ImageUrls.FirstOrDefault();
+                }
+                @if (imageUrl is not null)
+                {
+                    @* Manual cache-bust: the DB stores a plain path, so the Image
+                       Tag Helper's asp-append-version can't apply here (it only
+                       recognizes a literal ~/ src in markup, not a runtime value). *@
+                    <img src="@Url.Content(imageUrl)?v=2" alt="@Model.Name" />
+                }
+            </div>
+            <div>
+                <div class="category-tag">@Model.CategoryName</div>
+                <h1>@Model.Name</h1>
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="description">@Model.Description</p>
+                }
+
+                @if (Model.Variants.Any())
+                {
+                    <div class="variant-list">
+                        @foreach (var variant in Model.Variants)
+                        {
+                            <div class="variant-row">
+                                <div>
+                                    <div class="sku">@variant.SKU</div>
+                                    <div class="stock">@(variant.StockQty > 0 ? $"{variant.StockQty} in stock" : "Out of stock")</div>
+                                </div>
+                                <div class="price">$@variant.Price.ToString("N2")</div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="empty-state">This product is currently unavailable.</p>
+                }
+
+                <a href="@Url.Action("Index", "Products")" class="btn-store-ghost">Back to all products</a>
+            </div>
+        </div>
+    </div>
+</section>

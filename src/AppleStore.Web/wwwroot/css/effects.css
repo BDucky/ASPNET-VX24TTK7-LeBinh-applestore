@@ -15,11 +15,24 @@
   --display-font: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body-font: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
   --page-pad: clamp(20px, 5vw, 64px);
+  --page-pad-block: clamp(28px, 6vw, 56px);
 }
 
-html,
-body {
+html {
   background: var(--bg);
+}
+
+/* Flat black on every page except the hero read as a dead, boring void, the
+   hero's own radial glow only covered its own section. Same treatment, much
+   fainter and fixed to the viewport, now sits behind the whole page so
+   there's atmospheric depth on the shop/detail pages too, not just the
+   homepage. */
+body {
+  background:
+    radial-gradient(60% 45% at 82% 8%, rgba(79, 127, 255, 0.28), transparent 65%),
+    radial-gradient(50% 40% at 8% 92%, rgba(79, 127, 255, 0.20), transparent 65%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
 }
 
@@ -34,20 +47,52 @@ html {
 body {
   font-family: var(--body-font);
   margin-bottom: 0 !important;
+  /* Sticky footer: on a short page (e.g. a single product's Details view)
+     the footer was just sitting wherever content ended, leaving a dead
+     gap of page background between it and the bottom of the viewport
+     whenever the viewport was taller than the content. min-height here
+     plus main flexing to fill the remaining space pins the footer to the
+     bottom of the viewport on short pages, and to the end of content on
+     tall ones, standard sticky-footer flex pattern. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 main {
   padding-inline: var(--page-pad);
-  padding-block: clamp(28px, 6vw, 56px);
+  padding-block: var(--page-pad-block);
+  flex: 1 0 auto;
 }
 
-/* Full-bleed sections escape main's padding for their background, then
-   reapply the same padding to their own content so it lines up with
-   everything else on the page. */
+.site-footer {
+  flex-shrink: 0;
+}
+
+/* Full-bleed sections escape main's inline padding for their background,
+   then reapply their own for content. Block (vertical) padding on a parent
+   only inserts space before its first child and after its last child, never
+   between children, so only :first-child/:last-child need to cancel it,
+   cancelling margin-block on every match (an earlier bug) stacked negative
+   margins onto sections that had nothing to cancel, e.g. 56px of main's
+   padding-top plus statement's own 140px = 196px of dead space above the
+   first section on every non-hero page. */
 main > .hero,
 main > .statement,
 main > .usp-strip {
   margin-inline: calc(var(--page-pad) * -1);
+}
+
+main > .hero:first-child,
+main > .statement:first-child,
+main > .usp-strip:first-child {
+  margin-top: calc(var(--page-pad-block) * -1);
+}
+
+main > .hero:last-child,
+main > .statement:last-child,
+main > .usp-strip:last-child {
+  margin-bottom: calc(var(--page-pad-block) * -1);
 }
 
 h1, h2, h3, h4, .display-headline {
@@ -241,6 +286,14 @@ p {
   border-top: 1px solid var(--border);
 }
 
+/* .statement's padding is tuned for the homepage's slow scroll-reveal
+   copy. Reusing that on a utility page (product listing/detail) read as a
+   huge, pointless gap before anything scannable, people want to start
+   browsing immediately, not scroll through empty space first. */
+.statement.is-compact {
+  padding-block: clamp(24px, 4vw, 40px);
+}
+
 .statement .container-fluid {
   padding-inline: var(--page-pad);
 }
@@ -300,6 +353,387 @@ p {
 
 .category-card p {
   font-size: 0.88rem;
+  margin: 0;
+}
+
+.category-card {
+  text-decoration: none;
+  display: block;
+  color: inherit;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.category-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
+/* ---------- Product search + filter pills ---------- */
+
+.product-search {
+  display: flex;
+  gap: 10px;
+  max-width: 480px;
+  margin-bottom: 20px;
+}
+
+.product-search-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.7rem 1.2rem;
+  color: var(--text);
+  font-family: var(--body-font);
+}
+
+.product-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.filter-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  text-decoration: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.filter-pill:hover {
+  color: var(--text);
+}
+
+.filter-pill.is-active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.listing-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.result-count {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sort-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-form label {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.sort-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  color: var(--text);
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ---------- Product grid + card ---------- */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: border-color 0.25s ease, transform 0.6s ease, box-shadow 0.25s ease, opacity 0.6s ease;
+}
+
+.product-card.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* .is-revealed and :hover tie in specificity (two classes each); without
+   this, whichever rule comes later in the file wins on a revealed+hovered
+   card, silently cancelling the hover lift half the time depending on
+   source order. Pin it explicitly instead of relying on order. */
+.product-card.is-revealed:hover {
+  transform: translateY(-4px);
+}
+
+.product-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -16px rgba(79, 127, 255, 0.35);
+}
+
+/* A photo sitting on a dark card reads as murky. Real retail sites (checked
+   CellphoneS live, 2026-09-22) keep a light, near-white well behind the
+   product shot even on an otherwise dark/colorful page, since studio and
+   flatlay photography is lit and white-balanced for a light background. */
+.product-card-media {
+  aspect-ratio: 1;
+  background: linear-gradient(160deg, #f4f3ef 0%, #e4e2da 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.product-card-media img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+}
+
+.product-card-body {
+  padding: 18px 20px 22px;
+  position: relative;
+}
+
+.product-card-body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: var(--border);
+}
+
+.product-card .k {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.product-card h3 {
+  font-size: 1.15rem;
+  margin: 6px 0 8px;
+}
+
+.product-card .price {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.empty-state {
+  color: var(--text-muted);
+  padding: 40px 0;
+}
+
+/* ---------- Credits table ---------- */
+
+.credits-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.credits-table th {
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.credits-table td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* ---------- Product detail ---------- */
+
+.product-detail {
+  display: grid;
+  grid-template-columns: minmax(260px, 460px) 1fr;
+  gap: clamp(24px, 5vw, 64px);
+  align-items: start;
+}
+
+.product-detail-media {
+  background: linear-gradient(160deg, #f4f3ef 0%, #e4e2da 100%);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-detail-media img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  border-radius: inherit;
+}
+
+.product-detail h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin-bottom: 10px;
+}
+
+.product-detail .category-tag {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.product-detail .description {
+  margin: 18px 0 28px;
+  max-width: 56ch;
+}
+
+.variant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.variant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.variant-row .sku {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.variant-row .price {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.variant-row .stock {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 760px) {
+  .product-detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Homepage featured product ---------- */
+
+.featured-product {
+  display: grid;
+  grid-template-columns: minmax(220px, 380px) 1fr;
+  gap: clamp(24px, 5vw, 56px);
+  align-items: center;
+}
+
+.featured-media {
+  background: linear-gradient(160deg, #f4f3ef 0%, #e4e2da 100%);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featured-media img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+}
+
+.featured-copy h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  margin-bottom: 10px;
+}
+
+.featured-copy p {
+  max-width: 46ch;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 700px) {
+  .featured-product {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Homepage feature grid ---------- */
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.feature-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
   margin: 0;
 }
 

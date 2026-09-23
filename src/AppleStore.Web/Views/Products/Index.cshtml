@@ -1,0 +1,93 @@
+@model AppleStore.Web.Models.Products.ProductListViewModel
+@{
+    ViewData["Title"] = Model.SelectedCategory switch
+    {
+        "iphone" => "iPhone",
+        "mac" => "Mac",
+        "ipad" => "iPad",
+        "watch" => "Watch",
+        "accessories" => "Accessories",
+        _ => "All Products",
+    };
+}
+
+<section class="statement is-compact" style="padding-bottom: 0;">
+    <div class="container-fluid">
+        <div class="hero-eyebrow">Shop</div>
+        <h1 style="font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 18px;">@ViewData["Title"]</h1>
+
+        <form method="get" asp-controller="Products" asp-action="Index" class="product-search" role="search">
+            @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+            {
+                <input type="hidden" name="category" value="@Model.SelectedCategory" />
+            }
+            <input type="search" name="q" value="@Model.Query" placeholder="Search products&hellip;" class="product-search-input" aria-label="Search products" />
+            <button type="submit" class="btn-store-primary">Search</button>
+        </form>
+
+        <div class="filter-pills">
+            <a href="@Url.Action("Index", new { category = (string?)null, q = Model.Query })"
+               class="filter-pill @(string.IsNullOrEmpty(Model.SelectedCategory) ? "is-active" : "")">All</a>
+            <a href="@Url.Action("Index", new { category = "iphone", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "iphone" ? "is-active" : "")">iPhone</a>
+            <a href="@Url.Action("Index", new { category = "mac", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "mac" ? "is-active" : "")">Mac</a>
+            <a href="@Url.Action("Index", new { category = "ipad", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "ipad" ? "is-active" : "")">iPad</a>
+            <a href="@Url.Action("Index", new { category = "watch", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "watch" ? "is-active" : "")">Watch</a>
+            <a href="@Url.Action("Index", new { category = "accessories", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "accessories" ? "is-active" : "")">Accessories</a>
+        </div>
+
+        <div class="listing-toolbar">
+            <span class="result-count">@Model.Products.Count product@(Model.Products.Count == 1 ? "" : "s")</span>
+            <form method="get" asp-controller="Products" asp-action="Index" class="sort-form">
+                @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+                {
+                    <input type="hidden" name="category" value="@Model.SelectedCategory" />
+                }
+                @if (!string.IsNullOrEmpty(Model.Query))
+                {
+                    <input type="hidden" name="q" value="@Model.Query" />
+                }
+                <label for="sort-select">Sort</label>
+                <select id="sort-select" name="sort" class="sort-select" onchange="this.form.submit()">
+                    <option value="Featured" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.Featured)">Featured</option>
+                    <option value="PriceAscending" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.PriceAscending)">Price: low to high</option>
+                    <option value="PriceDescending" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.PriceDescending)">Price: high to low</option>
+                </select>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="statement is-compact">
+    <div class="container-fluid">
+        @if (!Model.Products.Any())
+        {
+            <p class="empty-state">No products match. Try a different search or category.</p>
+        }
+        else
+        {
+            <div class="product-grid">
+                @foreach (var product in Model.Products)
+                {
+                    <a class="product-card" asp-controller="Products" asp-action="Details" asp-route-slug="@product.Slug">
+                        <div class="product-card-media">
+                            @if (product.ImageUrl is not null)
+                            {
+                                <img src="@Url.Content(product.ImageUrl)" alt="@product.Name" loading="lazy" />
+                            }
+                        </div>
+                        <div class="product-card-body">
+                            <div class="k">@product.CategoryName</div>
+                            <h3>@product.Name</h3>
+                            <div class="price">From $@product.FromPrice.ToString("N2")</div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</section>

@@ -69,7 +69,8 @@
       },
       { threshold: 0.2 }
     );
-    document.querySelectorAll(".category-card").forEach(function (el) {
+    document.querySelectorAll(".category-card, .product-card").forEach(function (el, i) {
+      el.style.transitionDelay = (i % 4) * 0.06 + "s";
       revealObserver.observe(el);
     });
 
