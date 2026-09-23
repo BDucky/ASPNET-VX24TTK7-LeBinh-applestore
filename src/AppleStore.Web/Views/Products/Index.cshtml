@@ -39,6 +39,26 @@
             <a href="@Url.Action("Index", new { category = "accessories", q = Model.Query })"
                class="filter-pill @(Model.SelectedCategory == "accessories" ? "is-active" : "")">Accessories</a>
         </div>
+
+        <div class="listing-toolbar">
+            <span class="result-count">@Model.Products.Count product@(Model.Products.Count == 1 ? "" : "s")</span>
+            <form method="get" asp-controller="Products" asp-action="Index" class="sort-form">
+                @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+                {
+                    <input type="hidden" name="category" value="@Model.SelectedCategory" />
+                }
+                @if (!string.IsNullOrEmpty(Model.Query))
+                {
+                    <input type="hidden" name="q" value="@Model.Query" />
+                }
+                <label for="sort-select">Sort</label>
+                <select id="sort-select" name="sort" class="sort-select" onchange="this.form.submit()">
+                    <option value="Featured" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.Featured)">Featured</option>
+                    <option value="PriceAscending" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.PriceAscending)">Price: low to high</option>
+                    <option value="PriceDescending" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.PriceDescending)">Price: high to low</option>
+                </select>
+            </form>
+        </div>
     </div>
 </section>
 

@@ -1,3 +1,4 @@
+@model AppleStore.Infrastructure.Services.ProductDetail?
 @{
     ViewData["Title"] = "Home";
 }
@@ -67,6 +68,59 @@
                 <h3>Accessories</h3>
                 <p>AirPods, HomePod mini, MagSafe, and more.</p>
             </a>
+        </div>
+    </div>
+</section>
+
+@if (Model is not null)
+{
+    <section class="statement is-compact" id="featured">
+        <div class="container-fluid">
+            <div class="hero-eyebrow">Just landed</div>
+            <div class="featured-product">
+                <div class="featured-media">
+                    @{
+                        var featuredImage = Model.ImageUrls.FirstOrDefault();
+                    }
+                    @if (featuredImage is not null)
+                    {
+                        <img src="@Url.Content(featuredImage)" alt="@Model.Name" />
+                    }
+                </div>
+                <div class="featured-copy">
+                    <h2>@Model.Name</h2>
+                    <p>@Model.Description</p>
+                    @{
+                        var featuredPrice = Model.Variants.Select(v => v.Price).DefaultIfEmpty(0).Min();
+                    }
+                    <div class="price" style="font-size: 1.3rem; margin-bottom: 20px;">From $@featuredPrice.ToString("N2")</div>
+                    <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.Slug" class="btn-store-primary">View @Model.Name</a>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<section class="statement is-compact">
+    <div class="container-fluid">
+        <div class="hero-eyebrow">Why Apple Store</div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Verified stock only</h3>
+                <p>Every listing reflects real, counted inventory, no orders placed against a product we don't actually have.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Fair, upfront pricing</h3>
+                <p>The price on the card is the price at checkout. No surprise fees added at the last step.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Fast, tracked shipping</h3>
+                <p>Every order ships with a tracking number and status updates, from confirmation to delivery.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Support that answers</h3>
+                <p>Real people, reachable, who can actually resolve an order issue, not a chatbot loop.</p>
+            </div>
         </div>
     </div>
 </section>

@@ -392,6 +392,50 @@ p {
   border-color: var(--text);
 }
 
+.listing-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.result-count {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sort-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-form label {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.sort-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  color: var(--text);
+  font-family: var(--body-font);
+  font-size: 0.85rem;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* ---------- Product grid + card ---------- */
 
 .product-grid {
@@ -598,6 +642,72 @@ p {
   .product-detail {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------- Homepage featured product ---------- */
+
+.featured-product {
+  display: grid;
+  grid-template-columns: minmax(220px, 380px) 1fr;
+  gap: clamp(24px, 5vw, 56px);
+  align-items: center;
+}
+
+.featured-media {
+  background: linear-gradient(160deg, #f4f3ef 0%, #e4e2da 100%);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featured-media img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+}
+
+.featured-copy h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  margin-bottom: 10px;
+}
+
+.featured-copy p {
+  max-width: 46ch;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 700px) {
+  .featured-product {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Homepage feature grid ---------- */
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.feature-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 /* ---------- USP / counter strip ---------- */
