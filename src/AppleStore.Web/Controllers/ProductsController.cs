@@ -18,10 +18,10 @@ public class ProductsController : Controller
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index(string? category, string? q, CancellationToken ct)
+    public async Task<IActionResult> Index(string? category, string? q, ProductSort sort = ProductSort.Featured, CancellationToken ct = default)
     {
-        var products = await _catalog.GetProductsAsync(category, q, ct);
-        return View(new ProductListViewModel(products, category, q));
+        var products = await _catalog.GetProductsAsync(category, q, sort, ct);
+        return View(new ProductListViewModel(products, category, q, sort));
     }
 
     [HttpGet("{slug}")]

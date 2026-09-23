@@ -159,6 +159,40 @@ public class ProductCatalogServiceTests
     }
 
     [Fact]
+    public async Task GetProductsAsync_sorts_by_price_ascending()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        fixture.Context.AddRange(
+            NewProduct(iphone, "Expensive", "expensive", 1999m),
+            NewProduct(iphone, "Cheap", "cheap", 299m));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync(sort: ProductSort.PriceAscending);
+
+        Assert.Equal("cheap", result[0].Slug);
+        Assert.Equal("expensive", result[1].Slug);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_sorts_by_price_descending()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        fixture.Context.AddRange(
+            NewProduct(iphone, "Cheap", "cheap", 299m),
+            NewProduct(iphone, "Expensive", "expensive", 1999m));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync(sort: ProductSort.PriceDescending);
+
+        Assert.Equal("expensive", result[0].Slug);
+        Assert.Equal("cheap", result[1].Slug);
+    }
+
+    [Fact]
     public async Task GetBySlugAsync_returns_product_with_variants_and_images()
     {
         var (sut, fixture) = CreateSut();

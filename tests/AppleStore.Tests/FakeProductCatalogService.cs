@@ -11,7 +11,7 @@ public class FakeProductCatalogService : IProductCatalogService
     public string? LastQuery { get; private set; }
     public string? LastSlugRequested { get; private set; }
 
-    public Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, CancellationToken ct = default)
+    public Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured, CancellationToken ct = default)
     {
         LastCategorySlug = categorySlug;
         LastQuery = query;
