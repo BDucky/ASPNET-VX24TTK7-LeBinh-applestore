@@ -6,6 +6,7 @@
         "mac" => "Mac",
         "ipad" => "iPad",
         "watch" => "Watch",
+        "accessories" => "Accessories",
         _ => "All Products",
     };
 }
@@ -35,6 +36,8 @@
                class="filter-pill @(Model.SelectedCategory == "ipad" ? "is-active" : "")">iPad</a>
             <a href="@Url.Action("Index", new { category = "watch", q = Model.Query })"
                class="filter-pill @(Model.SelectedCategory == "watch" ? "is-active" : "")">Watch</a>
+            <a href="@Url.Action("Index", new { category = "accessories", q = Model.Query })"
+               class="filter-pill @(Model.SelectedCategory == "accessories" ? "is-active" : "")">Accessories</a>
         </div>
     </div>
 </section>
@@ -52,7 +55,10 @@
                 {
                     <a class="product-card" asp-controller="Products" asp-action="Details" asp-route-slug="@product.Slug">
                         <div class="product-card-media">
-                            <img src="~/img/products/@(product.Slug).jpg" asp-append-version="true" alt="@product.Name" />
+                            @if (product.ImageUrl is not null)
+                            {
+                                <img src="@Url.Content(product.ImageUrl)" alt="@product.Name" loading="lazy" />
+                            }
                         </div>
                         <div class="product-card-body">
                             <div class="k">@product.CategoryName</div>
