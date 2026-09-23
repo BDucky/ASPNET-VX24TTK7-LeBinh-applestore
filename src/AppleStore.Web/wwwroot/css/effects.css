@@ -18,9 +18,21 @@
   --page-pad-block: clamp(28px, 6vw, 56px);
 }
 
-html,
-body {
+html {
   background: var(--bg);
+}
+
+/* Flat black on every page except the hero read as a dead, boring void, the
+   hero's own radial glow only covered its own section. Same treatment, much
+   fainter and fixed to the viewport, now sits behind the whole page so
+   there's atmospheric depth on the shop/detail pages too, not just the
+   homepage. */
+body {
+  background:
+    radial-gradient(70% 50% at 85% 0%, rgba(79, 127, 255, 0.10), transparent 60%),
+    radial-gradient(50% 40% at 5% 100%, rgba(79, 127, 255, 0.06), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
 }
 
