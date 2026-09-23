@@ -29,8 +29,8 @@ html {
    homepage. */
 body {
   background:
-    radial-gradient(70% 50% at 85% 0%, rgba(79, 127, 255, 0.10), transparent 60%),
-    radial-gradient(50% 40% at 5% 100%, rgba(79, 127, 255, 0.06), transparent 60%),
+    radial-gradient(60% 45% at 82% 8%, rgba(79, 127, 255, 0.28), transparent 65%),
+    radial-gradient(50% 40% at 8% 92%, rgba(79, 127, 255, 0.20), transparent 65%),
     var(--bg);
   background-attachment: fixed;
   color: var(--text);
