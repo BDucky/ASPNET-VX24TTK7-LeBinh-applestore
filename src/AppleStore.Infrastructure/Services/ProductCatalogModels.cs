@@ -12,3 +12,14 @@ public record ProductDetail(
     string CategoryName,
     IReadOnlyList<ProductVariantSummary> Variants,
     IReadOnlyList<string> ImageUrls);
+
+public record ProductVariantDetail(
+    int Id,
+    string SKU,
+    decimal Price,
+    int StockQty,
+    int ProductId,
+    string ProductName,
+    string ProductSlug,
+    string CategoryName,
+    string? ImageUrl);

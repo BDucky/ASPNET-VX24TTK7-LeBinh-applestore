@@ -84,4 +84,31 @@ public class ProductCatalogService : IProductCatalogService
 
         return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, variants, imageUrls);
     }
+
+    public async Task<ProductVariantDetail?> GetVariantAsync(string productSlug, string sku, CancellationToken ct = default)
+    {
+        var variant = await _db.ProductVariants
+            .Include(v => v.Product).ThenInclude(p => p.Category)
+            .FirstOrDefaultAsync(v => v.SKU == sku && v.Status && v.Product.Slug == productSlug && v.Product.Status, ct);
+
+        if (variant is null)
+            return null;
+
+        var imageUrl = await _db.ProductImages
+            .Where(i => i.ProductId == variant.ProductId)
+            .OrderBy(i => i.SortOrder)
+            .Select(i => i.ImageUrl)
+            .FirstOrDefaultAsync(ct);
+
+        return new ProductVariantDetail(
+            variant.Id,
+            variant.SKU,
+            variant.Price,
+            variant.StockQty,
+            variant.ProductId,
+            variant.Product.Name,
+            variant.Product.Slug,
+            variant.Product.Category.Name,
+            imageUrl);
+    }
 }

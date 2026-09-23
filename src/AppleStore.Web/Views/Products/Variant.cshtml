@@ -1,0 +1,34 @@
+@model AppleStore.Infrastructure.Services.ProductVariantDetail
+@{
+    ViewData["Title"] = $"{Model.ProductName} ({Model.SKU})";
+}
+
+<section class="statement is-compact">
+    <div class="container-fluid">
+        <div class="product-detail">
+            <div class="product-detail-media">
+                @if (Model.ImageUrl is not null)
+                {
+                    <img src="@Url.Content(Model.ImageUrl)" alt="@Model.ProductName" />
+                }
+            </div>
+            <div>
+                <div class="category-tag">@Model.CategoryName</div>
+                <h1>@Model.ProductName</h1>
+                <p class="description">SKU @Model.SKU</p>
+
+                <div class="variant-list">
+                    <div class="variant-row">
+                        <div class="sku">@(Model.StockQty > 0 ? $"{Model.StockQty} in stock" : "Out of stock")</div>
+                        <div class="price">$@Model.Price.ToString("N2")</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                    <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.ProductSlug" class="btn-store-ghost">All @Model.ProductName options</a>
+                    <a asp-controller="Products" asp-action="Index" class="btn-store-ghost">Back to all products</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

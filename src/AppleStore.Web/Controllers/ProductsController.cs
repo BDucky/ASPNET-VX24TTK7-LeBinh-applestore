@@ -33,4 +33,14 @@ public class ProductsController : Controller
 
         return View(product);
     }
+
+    [HttpGet("{slug}/{sku}")]
+    public async Task<IActionResult> Variant(string slug, string sku, CancellationToken ct)
+    {
+        var variant = await _catalog.GetVariantAsync(slug, sku, ct);
+        if (variant is null)
+            return NotFound();
+
+        return View(variant);
+    }
 }

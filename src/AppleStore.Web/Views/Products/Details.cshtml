@@ -31,13 +31,10 @@
                     <div class="variant-list">
                         @foreach (var variant in Model.Variants)
                         {
-                            <div class="variant-row">
-                                <div>
-                                    <div class="sku">@variant.SKU</div>
-                                    <div class="stock">@(variant.StockQty > 0 ? $"{variant.StockQty} in stock" : "Out of stock")</div>
-                                </div>
-                                <div class="price">$@variant.Price.ToString("N2")</div>
-                            </div>
+                            <a class="variant-row" asp-controller="Products" asp-action="Variant" asp-route-slug="@Model.Slug" asp-route-sku="@variant.SKU">
+                                <div class="sku">@variant.SKU</div>
+                                <div class="price">From $@variant.Price.ToString("N2")</div>
+                            </a>
                         }
                     </div>
                 }

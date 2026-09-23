@@ -648,6 +648,13 @@ p {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.variant-row:hover {
+  border-color: var(--accent);
 }
 
 .variant-row .sku {
