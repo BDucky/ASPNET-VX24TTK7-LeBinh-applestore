@@ -41,7 +41,7 @@ public class ProductCatalogService : IProductCatalogService
             .Select(g => new { ProductId = g.Key, ImageUrl = g.OrderBy(i => i.SortOrder).First().ImageUrl })
             .ToDictionaryAsync(x => x.ProductId, x => x.ImageUrl, ct);
 
-        return list
+        var summaries = list
             .Select(p => new ProductSummary(
                 p.Id,
                 p.Name,
@@ -49,8 +49,16 @@ public class ProductCatalogService : IProductCatalogService
                 p.Category.Name,
                 p.Category.Slug,
                 lowestActivePrices.TryGetValue(p.Id, out var minPrice) ? minPrice : p.BasePrice,
-                firstImages.GetValueOrDefault(p.Id)))
-            .ToList();
+                firstImages.GetValueOrDefault(p.Id)));
+
+        summaries = sort switch
+        {
+            ProductSort.PriceAscending => summaries.OrderBy(p => p.FromPrice),
+            ProductSort.PriceDescending => summaries.OrderByDescending(p => p.FromPrice),
+            _ => summaries,
+        };
+
+        return summaries.ToList();
     }
 
     public async Task<ProductDetail?> GetBySlugAsync(string slug, CancellationToken ct = default)
