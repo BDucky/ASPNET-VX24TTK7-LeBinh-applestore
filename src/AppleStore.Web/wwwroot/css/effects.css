@@ -47,11 +47,26 @@ html {
 body {
   font-family: var(--body-font);
   margin-bottom: 0 !important;
+  /* Sticky footer: on a short page (e.g. a single product's Details view)
+     the footer was just sitting wherever content ended, leaving a dead
+     gap of page background between it and the bottom of the viewport
+     whenever the viewport was taller than the content. min-height here
+     plus main flexing to fill the remaining space pins the footer to the
+     bottom of the viewport on short pages, and to the end of content on
+     tall ones, standard sticky-footer flex pattern. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 main {
   padding-inline: var(--page-pad);
   padding-block: var(--page-pad-block);
+  flex: 1 0 auto;
+}
+
+.site-footer {
+  flex-shrink: 0;
 }
 
 /* Full-bleed sections escape main's inline padding for their background,
