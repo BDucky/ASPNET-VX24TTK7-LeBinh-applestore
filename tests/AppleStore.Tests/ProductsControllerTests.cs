@@ -12,7 +12,7 @@ public class ProductsControllerTests
     {
         var catalog = new FakeProductCatalogService
         {
-            ProductsToReturn = new[] { new ProductSummary(1, "iPhone 17", "iphone-17", "iPhone", "iphone", 999m) },
+            ProductsToReturn = new[] { new ProductSummary(1, "iPhone 17", "iphone-17", "iPhone", "iphone", 999m, "/img/products/iphone-17.jpg") },
         };
         var sut = new ProductsController(catalog);
 

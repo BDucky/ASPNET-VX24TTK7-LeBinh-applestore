@@ -128,6 +128,37 @@ public class ProductCatalogServiceTests
     }
 
     [Fact]
+    public async Task GetProductsAsync_image_url_is_the_lowest_sort_order_image()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        fixture.Context.Add(product);
+        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/products/second.jpg", SortOrder = 1 });
+        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/products/first.jpg", SortOrder = 0 });
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Equal("/img/products/first.jpg", result[0].ImageUrl);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_image_url_is_null_when_product_has_no_image()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        fixture.Context.Add(NewProduct(iphone, "iPhone 17", "iphone-17", 999m));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Null(result[0].ImageUrl);
+    }
+
+    [Fact]
     public async Task GetBySlugAsync_returns_product_with_variants_and_images()
     {
         var (sut, fixture) = CreateSut();

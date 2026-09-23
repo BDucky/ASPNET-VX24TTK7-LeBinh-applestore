@@ -42,7 +42,8 @@ public class ProductCatalogService : IProductCatalogService
                 p.Slug,
                 p.Category.Name,
                 p.Category.Slug,
-                lowestActivePrices.TryGetValue(p.Id, out var minPrice) ? minPrice : p.BasePrice))
+                lowestActivePrices.TryGetValue(p.Id, out var minPrice) ? minPrice : p.BasePrice,
+                null))
             .ToList();
     }
 
