@@ -1,34 +1,66 @@
 @model AppleStore.Infrastructure.Services.ProductVariantDetail
+@using AppleStore.Web.Models.Products
 @{
     ViewData["Title"] = $"{Model.ProductName} ({Model.SKU})";
+    ViewData["NavCategory"] = Model.CategorySlug;
+    var strip = ViewData[ModelStripViewModel.ViewDataKey] as ModelStripViewModel;
 }
 
-<section class="statement is-compact">
-    <div class="container-fluid">
-        <div class="product-detail">
-            <div class="product-detail-media">
-                @if (Model.ImageUrl is not null)
-                {
-                    <img src="@Url.Content(Model.ImageUrl)" alt="@Model.ProductName" />
-                }
-            </div>
-            <div>
-                <div class="category-tag">@Model.CategoryName</div>
-                <h1>@Model.ProductName</h1>
-                <p class="description">SKU @Model.SKU</p>
+@* Laid out like rauvang.com's variant page (live-browsed 2026-09-25):
+   model strip; photo on the left; on the right the title, a red price with
+   the warranty line beside it, a labelled benefits block, a labelled
+   product-information block, and one dark button at the end.
+   Not copied: rauvang's colour and region swatches. Each of our variants
+   has one SKU and one photo, and there is no colour or region data yet
+   (VariantOptions is empty), so a picker would switch nothing. Also not
+   copied: rauvang's promo amounts, since no promotion system exists yet. *@
+<section class="shop-page is-shop">
+    @if (strip is not null)
+    {
+        <partial name="_ModelStrip" model="strip" />
+    }
 
-                <div class="variant-list">
-                    <div class="variant-row">
-                        <div class="sku">@(Model.StockQty > 0 ? $"{Model.StockQty} in stock" : "Out of stock")</div>
-                        <div class="price">$@Model.Price.ToString("N2")</div>
-                    </div>
-                </div>
+    <div class="product-detail">
+        <div class="product-detail-media">
+            @if (Model.ImageUrl is not null)
+            {
+                <img src="@Url.Content(Model.ImageUrl)" alt="@Model.ProductName" />
+            }
+        </div>
+        <div class="product-detail-info">
+            <h1>@Model.ProductName (@Model.SKU)</h1>
 
-                <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                    <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.ProductSlug" class="btn-store-ghost">All @Model.ProductName options</a>
-                    <a asp-controller="Products" asp-action="Index" class="btn-store-ghost">Back to all products</a>
-                </div>
+            <div class="pdp-price-row">
+                <span class="pdp-price-label">Price</span>
+                <span class="pdp-price">$@Model.Price.ToString("N2")</span>
+                <span class="pdp-warranty">Warranty: <span>12 months, 1-for-1 on defects</span></span>
             </div>
+
+            <div class="pdp-block">
+                <div class="pdp-block-label">Store benefits</div>
+                <ul>
+                    <li><strong>12-month warranty</strong>, 1-for-1 replacement on hardware defects.</li>
+                    <li><strong>30-day</strong> return window.</li>
+                    <li><strong>Free</strong> standard shipping.</li>
+                    <li>Pay by <strong>COD, VNPay, or MoMo</strong>.</li>
+                </ul>
+            </div>
+
+            <div class="pdp-block">
+                <div class="pdp-block-label">Product information</div>
+                <ul>
+                    <li>Category: @Model.CategoryName</li>
+                    <li>SKU: <span class="pdp-sku">@Model.SKU</span></li>
+                    <li>
+                        Availability:
+                        <span class="pdp-stock @(Model.StockQty > 0 ? "is-in-stock" : "is-out-of-stock")">
+                            @(Model.StockQty > 0 ? $"{Model.StockQty} in stock" : "Out of stock")
+                        </span>
+                    </li>
+                </ul>
+            </div>
+
+            <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.ProductSlug" class="btn-store-dark">All @Model.ProductName options &raquo;</a>
         </div>
     </div>
 </section>

@@ -15,49 +15,93 @@
     <link rel="stylesheet" href="~/AppleStore.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        // Which top-nav category to mark active. Each shop view sets it
+        // (category page, model page, variant page); other pages leave it null.
+        var navCategory = ViewData["NavCategory"] as string;
+        var navItems = new (string Slug, string Label)[]
+        {
+            ("iphone", "iPhone"), ("ipad", "iPad"), ("mac", "Mac"), ("watch", "Watch"),
+            ("airpods", "AirPods"), ("accessories", "Accessories"), ("home", "TV & Home"),
+        };
+    }
+    @* Nav and footer follow rauvang.com's structure (live-browsed 2026-09-25):
+       wordmark left, category links spread across the bar, a search toggle
+       on the right that opens a search field under the bar; footer with
+       three columns, a divider, then payment methods and a bottom strip. *@
     <header>
-        <nav class="site-nav navbar navbar-expand-sm navbar-toggleable-sm">
+        <nav class="site-nav navbar navbar-expand-lg">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Apple Store</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span>Apple Store</span>
+                    <span class="brand-caption">since 2026</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#site-nav-links" aria-controls="site-nav-links"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Shop</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index" asp-route-category="airpods">AirPods</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index" asp-route-category="home">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                <div class="navbar-collapse collapse" id="site-nav-links">
+                    <ul class="navbar-nav site-nav-links">
+                        @foreach (var item in navItems)
+                        {
+                            var isActive = item.Slug == navCategory;
+                            <li class="nav-item">
+                                <a class="nav-link @(isActive ? "active" : "")" aria-current="@(isActive ? "page" : null)"
+                                   asp-area="" asp-controller="Products" asp-action="Index" asp-route-category="@item.Slug">@item.Label</a>
+                            </li>
+                        }
                     </ul>
+                    <button type="button" class="site-nav-search" data-search-toggle aria-controls="site-search" aria-expanded="false" aria-label="Search products">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
                 </div>
             </div>
         </nav>
+        <form id="site-search" class="site-search" method="get" asp-controller="Products" asp-action="Index" role="search" hidden>
+            <input type="search" name="q" placeholder="Search..." aria-label="Search products" class="site-search-input" />
+            <button type="submit" class="btn-store-primary">Search</button>
+        </form>
     </header>
     <main role="main">
         @RenderBody()
     </main>
 
     <footer class="site-footer">
-        <div class="container-fluid d-flex flex-wrap justify-content-between gap-2">
-            <span>&copy; 2026 Apple Store. Course project, TVU.</span>
-            <span style="display:flex; gap:16px;">
-                <a asp-area="" asp-controller="Home" asp-action="Credits">Photo credits</a>
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </span>
+        <div class="site-footer-cols">
+            <div>
+                <h2 class="site-footer-heading">Apple Store</h2>
+                <p>Course project, TVU, Cong nghe phan mem, 2025.</p>
+                <p>Contact: <a href="mailto:kbsaigonese@gmail.com">kbsaigonese@gmail.com</a></p>
+            </div>
+            <div>
+                <h2 class="site-footer-heading">Shop</h2>
+                <ul class="site-footer-links">
+                    @foreach (var item in navItems)
+                    {
+                        <li><a asp-area="" asp-controller="Products" asp-action="Index" asp-route-category="@item.Slug">@item.Label</a></li>
+                    }
+                </ul>
+            </div>
+            <div>
+                <h2 class="site-footer-heading">Policies</h2>
+                <ul class="site-footer-links">
+                    <li><a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Credits">Photo credits</a></li>
+                </ul>
+            </div>
         </div>
+        <div class="site-footer-pay">
+            <span class="site-footer-pay-label">We accept</span>
+            <span class="pay-chip">COD</span>
+            <span class="pay-chip">VNPay</span>
+            <span class="pay-chip">MoMo</span>
+        </div>
+        <div class="site-footer-bottom">&copy; 2026 Apple Store. Course project, TVU.</div>
     </footer>
+
+    <button type="button" class="back-to-top" data-back-to-top aria-label="Back to top" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+    </button>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

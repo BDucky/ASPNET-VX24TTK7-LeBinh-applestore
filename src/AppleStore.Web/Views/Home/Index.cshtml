@@ -1,145 +1,67 @@
-@model AppleStore.Infrastructure.Services.ProductDetail?
+@model AppleStore.Web.Models.HomeViewModel
 @{
     ViewData["Title"] = "Home";
 }
 
-<section class="hero">
-    <div class="container-fluid">
-        <div class="hero-content">
-            <div class="hero-eyebrow">Apple Store &middot; course project</div>
-            <h1>EVERY DEVICE<br />ONE PLACE<br />YOU TRUST</h1>
-            <p class="hero-sub">
-                iPhone, Mac, iPad, Watch, and AirPods, genuine hardware, fast
-                shipping, and support that actually answers.
-            </p>
-            <div class="hero-cta">
-                <a href="#categories" class="btn-store-primary">Explore categories</a>
-                <a href="#why" class="btn-store-ghost">Why Apple Store</a>
-            </div>
-        </div>
-        <div class="hero-visual">
+@* rauvang.com's homepage (live-browsed 2026-09-25): a rotating top banner,
+   a promo banner, then a stack of full-width product banners, each one a
+   link to that model's page. The 3D scene from the old hero stays behind
+   the top banner, and the page keeps the site's dark gradient. *@
+
+@if (Model.Carousel.Any())
+{
+    <section class="home-carousel" aria-roledescription="carousel" aria-label="Featured products" data-carousel>
+        <div class="home-carousel-scene">
             <canvas id="hero-canvas" aria-hidden="true"></canvas>
         </div>
-    </div>
-</section>
-
-<section class="statement" id="why">
-    <div class="container-fluid">
-        <p class="statement-text">
-            <span class="word">Genuine</span> <span class="word">hardware,</span>
-            <span class="word">fair</span> <span class="word">pricing,</span>
-            <span class="word">fast</span> <span class="word">shipping,</span>
-            <span class="word">and</span> <span class="word">support</span>
-            <span class="word">that</span> <span class="word">actually</span>
-            <span class="word">answers,</span> <span class="word">this</span>
-            <span class="word">is</span> <span class="word">how</span>
-            <span class="word">Apple</span> <span class="word">products</span>
-            <span class="word">should</span> <span class="word">be</span>
-            <span class="word">sold.</span>
-        </p>
-    </div>
-</section>
-
-<section class="statement" id="categories">
-    <div class="container-fluid">
-        <div class="category-grid">
-            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="iphone">
-                <div class="k">Phone</div>
-                <h3>iPhone</h3>
-                <p>Every current model and storage tier, verified stock only.</p>
+        @for (var i = 0; i < Model.Carousel.Count; i++)
+        {
+            var slide = Model.Carousel[i];
+            var image = slide.ImageUrls.FirstOrDefault();
+            <a class="home-slide @(i == 0 ? "is-active" : "")" asp-controller="Products" asp-action="Details" asp-route-slug="@slide.Slug"
+               aria-roledescription="slide" aria-label="@(i + 1) of @Model.Carousel.Count: @slide.Name" aria-hidden="@(i == 0 ? "false" : "true")" tabindex="@(i == 0 ? 0 : -1)">
+                <h2 class="home-slide-title">@slide.Name</h2>
+                <p class="home-slide-tagline">@slide.Description</p>
+                @if (image is not null)
+                {
+                    <span class="home-slide-media"><img src="@Url.Content(image)" alt="@slide.Name" /></span>
+                }
             </a>
-            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="mac">
-                <div class="k">Computer</div>
-                <h3>Mac</h3>
-                <p>MacBook Air, MacBook Pro, and Mac mini.</p>
-            </a>
-            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="ipad">
-                <div class="k">Tablet</div>
-                <h3>iPad</h3>
-                <p>iPad, iPad Air, and iPad Pro.</p>
-            </a>
-            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="watch">
-                <div class="k">Wearable</div>
-                <h3>Watch</h3>
-                <p>Apple Watch Series, SE, and Ultra.</p>
-            </a>
-            <a class="category-card" asp-controller="Products" asp-action="Index" asp-route-category="accessories">
-                <div class="k">Extras</div>
-                <h3>Accessories</h3>
-                <p>AirPods, HomePod mini, MagSafe, and more.</p>
-            </a>
-        </div>
-    </div>
-</section>
-
-@if (Model is not null)
-{
-    <section class="statement is-compact" id="featured">
-        <div class="container-fluid">
-            <div class="hero-eyebrow">Just landed</div>
-            <div class="featured-product">
-                <div class="featured-media">
-                    @{
-                        var featuredImage = Model.ImageUrls.FirstOrDefault();
-                    }
-                    @if (featuredImage is not null)
-                    {
-                        <img src="@Url.Content(featuredImage)" alt="@Model.Name" />
-                    }
-                </div>
-                <div class="featured-copy">
-                    <h2>@Model.Name</h2>
-                    <p>@Model.Description</p>
-                    @{
-                        var featuredPrice = Model.Variants.Select(v => v.Price).DefaultIfEmpty(0).Min();
-                    }
-                    <div class="price" style="font-size: 1.3rem; margin-bottom: 20px;">From $@featuredPrice.ToString("N2")</div>
-                    <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.Slug" class="btn-store-primary">View @Model.Name</a>
-                </div>
+        }
+        @if (Model.Carousel.Count > 1)
+        {
+            <button type="button" class="home-carousel-arrow is-prev" data-carousel-prev aria-label="Previous slide">&#8249;</button>
+            <button type="button" class="home-carousel-arrow is-next" data-carousel-next aria-label="Next slide">&#8250;</button>
+            <div class="home-carousel-dots">
+                @for (var i = 0; i < Model.Carousel.Count; i++)
+                {
+                    <button type="button" class="home-carousel-dot @(i == 0 ? "is-active" : "")" data-carousel-dot="@i" aria-label="Go to slide @(i + 1)"></button>
+                }
             </div>
-        </div>
+        }
     </section>
 }
 
-<section class="statement is-compact">
-    <div class="container-fluid">
-        <div class="hero-eyebrow">Why Apple Store</div>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <h3>Verified stock only</h3>
-                <p>Every listing reflects real, counted inventory, no orders placed against a product we don't actually have.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Fair, upfront pricing</h3>
-                <p>The price on the card is the price at checkout. No surprise fees added at the last step.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Fast, tracked shipping</h3>
-                <p>Every order ships with a tracking number and status updates, from confirmation to delivery.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Support that answers</h3>
-                <p>Real people, reachable, who can actually resolve an order issue, not a chatbot loop.</p>
-            </div>
-        </div>
-    </div>
-</section>
+<h1 class="visually-hidden">Apple Store</h1>
 
-<section class="usp-strip container-fluid">
-    <div class="usp-tile">
-        <div class="num" data-count-to="100" data-count-suffix="%">0%</div>
-        <div class="label">Genuine products</div>
-    </div>
-    <div class="usp-tile">
-        <div class="num" data-count-to="5">0</div>
-        <div class="label">Product categories</div>
-    </div>
-    <div class="usp-tile">
-        <div class="num" data-count-to="24" data-count-suffix="/7">0</div>
-        <div class="label">Customer support</div>
-    </div>
-    <div class="usp-tile">
-        <div class="num" data-count-to="30" data-count-suffix="-day">0</div>
-        <div class="label">Returns window</div>
-    </div>
-</section>
+<div class="home-promo">
+    <partial name="_PromoBanner" />
+</div>
+
+@foreach (var banner in Model.Banners)
+{
+    var image = banner.ImageUrls.FirstOrDefault();
+    var fromPrice = banner.Variants.Select(v => v.Price).DefaultIfEmpty(0).Min();
+    <a class="home-banner" asp-controller="Products" asp-action="Details" asp-route-slug="@banner.Slug">
+        <h2 class="home-banner-title">@banner.Name</h2>
+        <p class="home-banner-tagline">@banner.Description</p>
+        @if (fromPrice > 0)
+        {
+            <span class="home-banner-price">From $@fromPrice.ToString("N2")</span>
+        }
+        @if (image is not null)
+        {
+            <span class="home-banner-media"><img src="@Url.Content(image)" alt="@banner.Name" loading="lazy" /></span>
+        }
+    </a>
+}

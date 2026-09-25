@@ -1,0 +1,17 @@
+@model AppleStore.Web.Models.Products.ShopCardViewModel
+<a class="product-card" href="@Model.Href">
+    <div class="product-card-media">
+        @if (Model.ImageUrl is not null)
+        {
+            <img src="@Url.Content(Model.ImageUrl)" alt="@Model.Title" loading="lazy" />
+        }
+    </div>
+    @if (Model.Badge is not null)
+    {
+        <span class="product-card-badge">@Model.Badge</span>
+    }
+    <div class="product-card-body">
+        <h3>@Model.Title</h3>
+        <div class="price"><span class="price-label">From:</span> $@Model.Price.ToString("N2")</div>
+    </div>
+</a>
