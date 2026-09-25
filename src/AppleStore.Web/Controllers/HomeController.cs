@@ -16,11 +16,22 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index(CancellationToken ct)
     {
-        // The newest, most-asked-about product gets a homepage spotlight, not
-        // buried in the grid. Null-safe: if the slug ever moves or the product
-        // is deactivated, the section just doesn't render, nothing breaks.
-        var featured = await _catalog.GetBySlugAsync("iphone-18-pro", ct);
-        return View(featured);
+        var carousel = await LoadAsync(HomeViewModel.CarouselSlugs, ct);
+        var banners = await LoadAsync(HomeViewModel.BannerSlugs, ct);
+        return View(new HomeViewModel(carousel, banners));
+    }
+
+    // Null-safe: a slug that moved or a deactivated product just drops out.
+    private async Task<IReadOnlyList<ProductDetail>> LoadAsync(IEnumerable<string> slugs, CancellationToken ct)
+    {
+        var found = new List<ProductDetail>();
+        foreach (var slug in slugs)
+        {
+            var product = await _catalog.GetBySlugAsync(slug, ct);
+            if (product is not null)
+                found.Add(product);
+        }
+        return found;
     }
 
     public IActionResult Privacy()

@@ -1,53 +1,39 @@
 @model AppleStore.Infrastructure.Services.ProductDetail
+@using AppleStore.Web.Models.Products
 @{
     ViewData["Title"] = Model.Name;
+    ViewData["NavCategory"] = Model.CategorySlug;
+    var imageUrl = Model.ImageUrls.FirstOrDefault();
+    var strip = ViewData[ModelStripViewModel.ViewDataKey] as ModelStripViewModel;
 }
 
-<section class="statement is-compact">
-    <div class="container-fluid">
-        <div class="product-detail">
-            <div class="product-detail-media">
-                @{
-                    var imageUrl = Model.ImageUrls.FirstOrDefault();
-                }
-                @if (imageUrl is not null)
-                {
-                    @* Manual cache-bust: the DB stores a plain path, so the Image
-                       Tag Helper's asp-append-version can't apply here (it only
-                       recognizes a literal ~/ src in markup, not a runtime value). *@
-                    <img src="@Url.Content(imageUrl)?v=2" alt="@Model.Name" />
-                }
-            </div>
-            <div>
-                <div class="category-tag">@Model.CategoryName</div>
-                <h1>@Model.Name</h1>
-                @if (!string.IsNullOrWhiteSpace(Model.Description))
-                {
-                    <p class="description">@Model.Description</p>
-                }
+@* rauvang.com's model page (live-browsed 2026-09-25): the category's model
+   strip, then one card per storage/region variant, each linking to its own
+   page. No heading block, no description, no back button. *@
+<section class="shop-page is-shop">
+    @if (strip is not null)
+    {
+        <partial name="_ModelStrip" model="strip" />
+    }
+    <h1 class="visually-hidden">@Model.Name</h1>
 
-                @if (Model.Variants.Any())
-                {
-                    <div class="variant-list">
-                        @foreach (var variant in Model.Variants)
-                        {
-                            <div class="variant-row">
-                                <div>
-                                    <div class="sku">@variant.SKU</div>
-                                    <div class="stock">@(variant.StockQty > 0 ? $"{variant.StockQty} in stock" : "Out of stock")</div>
-                                </div>
-                                <div class="price">$@variant.Price.ToString("N2")</div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <p class="empty-state">This product is currently unavailable.</p>
-                }
-
-                <a href="@Url.Action("Index", "Products")" class="btn-store-ghost">Back to all products</a>
-            </div>
+    @if (Model.Variants.Any())
+    {
+        <div class="product-grid">
+            @foreach (var variant in Model.Variants)
+            {
+                var card = new ShopCardViewModel(
+                    Url.Action("Variant", "Products", new { slug = Model.Slug, sku = variant.SKU })!,
+                    imageUrl,
+                    $"{Model.Name} ({variant.SKU})",
+                    variant.StockQty > 0 ? "In stock" : "Out of stock",
+                    variant.Price);
+                <partial name="_ShopCard" model="card" />
+            }
         </div>
-    </div>
+    }
+    else
+    {
+        <p class="empty-state">This product is currently unavailable.</p>
+    }
 </section>
