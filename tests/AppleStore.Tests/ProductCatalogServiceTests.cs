@@ -212,6 +212,7 @@ public class ProductCatalogServiceTests
         Assert.Equal("The latest iPhone.", result.Description);
         Assert.Single(result.Variants);
         Assert.Single(result.ImageUrls);
+        Assert.Equal("iphone", result.CategorySlug);
     }
 
     [Fact]
@@ -259,6 +260,7 @@ public class ProductCatalogServiceTests
         Assert.Equal("iPhone 17", result.ProductName);
         Assert.Equal("iphone-17", result.ProductSlug);
         Assert.Equal("iPhone", result.CategoryName);
+        Assert.Equal("iphone", result.CategorySlug);
         Assert.Equal("/img/products/iphone-17.jpg", result.ImageUrl);
     }
 

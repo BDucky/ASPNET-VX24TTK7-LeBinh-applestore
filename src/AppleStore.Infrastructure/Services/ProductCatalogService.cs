@@ -82,7 +82,7 @@ public class ProductCatalogService : IProductCatalogService
             .Select(i => i.ImageUrl)
             .ToListAsync(ct);
 
-        return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, variants, imageUrls);
+        return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, "", variants, imageUrls);
     }
 
     public async Task<ProductVariantDetail?> GetVariantAsync(string productSlug, string sku, CancellationToken ct = default)
@@ -109,6 +109,7 @@ public class ProductCatalogService : IProductCatalogService
             variant.Product.Name,
             variant.Product.Slug,
             variant.Product.Category.Name,
+            "",
             imageUrl);
     }
 }

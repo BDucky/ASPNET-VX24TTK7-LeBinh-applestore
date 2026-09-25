@@ -10,6 +10,7 @@ public record ProductDetail(
     string Slug,
     string? Description,
     string CategoryName,
+    string CategorySlug,
     IReadOnlyList<ProductVariantSummary> Variants,
     IReadOnlyList<string> ImageUrls);
 
@@ -22,4 +23,5 @@ public record ProductVariantDetail(
     string ProductName,
     string ProductSlug,
     string CategoryName,
+    string CategorySlug,
     string? ImageUrl);
