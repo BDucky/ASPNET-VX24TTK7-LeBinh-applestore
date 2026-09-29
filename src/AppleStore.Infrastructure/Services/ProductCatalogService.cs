@@ -70,46 +70,11 @@ public class ProductCatalogService : IProductCatalogService
         if (product is null)
             return null;
 
-        var variants = await _db.ProductVariants
-            .Where(v => v.ProductId == product.Id && v.Status)
-            .OrderBy(v => v.Price)
-            .Select(v => new ProductVariantSummary(v.Id, v.SKU, v.Price, v.StockQty))
-            .ToListAsync(ct);
-
-        var imageUrls = await _db.ProductImages
-            .Where(i => i.ProductId == product.Id)
-            .OrderBy(i => i.SortOrder)
-            .Select(i => i.ImageUrl)
-            .ToListAsync(ct);
-
-        return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, product.Category.Slug, variants, imageUrls);
+        return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, product.Category.Slug, Array.Empty<ConfigurationSummary>(), Array.Empty<string>());
     }
 
-    public async Task<ProductVariantDetail?> GetVariantAsync(string productSlug, string sku, CancellationToken ct = default)
+    public Task<ConfigurationDetail?> GetConfigurationAsync(string productSlug, string configurationSlug, CancellationToken ct = default)
     {
-        var variant = await _db.ProductVariants
-            .Include(v => v.Product).ThenInclude(p => p.Category)
-            .FirstOrDefaultAsync(v => v.SKU == sku && v.Status && v.Product.Slug == productSlug && v.Product.Status, ct);
-
-        if (variant is null)
-            return null;
-
-        var imageUrl = await _db.ProductImages
-            .Where(i => i.ProductId == variant.ProductId)
-            .OrderBy(i => i.SortOrder)
-            .Select(i => i.ImageUrl)
-            .FirstOrDefaultAsync(ct);
-
-        return new ProductVariantDetail(
-            variant.Id,
-            variant.SKU,
-            variant.Price,
-            variant.StockQty,
-            variant.ProductId,
-            variant.Product.Name,
-            variant.Product.Slug,
-            variant.Product.Category.Name,
-            variant.Product.Category.Slug,
-            imageUrl);
+        return Task.FromResult<ConfigurationDetail?>(null);
     }
 }

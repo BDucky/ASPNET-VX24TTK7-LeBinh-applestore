@@ -42,7 +42,7 @@ public class ProductsControllerTests
     [Fact]
     public async Task Details_returns_view_with_product_when_found()
     {
-        var detail = new ProductDetail(1, "iPhone 17", "iphone-17", "desc", "iPhone", "iphone", Array.Empty<ProductVariantSummary>(), Array.Empty<string>());
+        var detail = new ProductDetail(1, "iPhone 17", "iphone-17", "desc", "iPhone", "iphone", Array.Empty<ConfigurationSummary>(), Array.Empty<string>());
         var catalog = new FakeProductCatalogService { DetailToReturn = detail };
         var sut = new ProductsController(catalog);
 
@@ -58,7 +58,7 @@ public class ProductsControllerTests
     [Fact]
     public async Task Details_loads_the_model_strip_for_the_products_category()
     {
-        var detail = new ProductDetail(1, "iPhone 17", "iphone-17", "desc", "iPhone", "iphone", Array.Empty<ProductVariantSummary>(), Array.Empty<string>());
+        var detail = new ProductDetail(1, "iPhone 17", "iphone-17", "desc", "iPhone", "iphone", Array.Empty<ConfigurationSummary>(), Array.Empty<string>());
         var models = new[] { new ProductSummary(1, "iPhone 17", "iphone-17", "iPhone", "iphone", 999m, null) };
         var catalog = new FakeProductCatalogService { DetailToReturn = detail, ProductsToReturn = models };
         var sut = new ProductsController(catalog);
@@ -86,27 +86,27 @@ public class ProductsControllerTests
     [Fact]
     public async Task Variant_returns_view_with_variant_when_found()
     {
-        var variant = new ProductVariantDetail(1, "IP17-128", 999m, 10, 1, "iPhone 17", "iphone-17", "iPhone", "iphone", "/img/products/iphone-17.jpg");
-        var catalog = new FakeProductCatalogService { VariantToReturn = variant };
+        var config = new ConfigurationDetail(1, "iPhone 17", "iphone-17", "iPhone", "iphone", null, "iPhone 17 128GB ( VN )", "iphone-17-128gb-vn", new[] { new VariantChoice("IP17-128-BLACK", "Black", "VN", 22_900_000m, 4) });
+        var catalog = new FakeProductCatalogService { ConfigurationToReturn = config };
         var sut = new ProductsController(catalog);
 
-        var result = await sut.Variant("iphone-17", "IP17-128", ct: default);
+        var result = await sut.Variant("iphone-17", "iphone-17-128gb-vn", ct: default);
 
         var view = Assert.IsType<ViewResult>(result);
-        Assert.Same(variant, view.Model);
-        Assert.Equal("iphone-17", catalog.LastVariantProductSlugRequested);
-        Assert.Equal("IP17-128", catalog.LastVariantSkuRequested);
+        Assert.Same(config, view.Model);
+        Assert.Equal("iphone-17", catalog.LastConfigurationProductSlugRequested);
+        Assert.Equal("iphone-17-128gb-vn", catalog.LastConfigurationSlugRequested);
     }
 
     [Fact]
     public async Task Variant_loads_the_model_strip_for_the_products_category()
     {
-        var variant = new ProductVariantDetail(1, "IP17-128", 999m, 10, 1, "iPhone 17", "iphone-17", "iPhone", "iphone", null);
+        var config = new ConfigurationDetail(1, "iPhone 17", "iphone-17", "iPhone", "iphone", null, "iPhone 17 128GB ( VN )", "iphone-17-128gb-vn", new[] { new VariantChoice("IP17-128-BLACK", "Black", "VN", 22_900_000m, 4) });
         var models = new[] { new ProductSummary(1, "iPhone 17", "iphone-17", "iPhone", "iphone", 999m, null) };
-        var catalog = new FakeProductCatalogService { VariantToReturn = variant, ProductsToReturn = models };
+        var catalog = new FakeProductCatalogService { ConfigurationToReturn = config, ProductsToReturn = models };
         var sut = new ProductsController(catalog);
 
-        var result = await sut.Variant("iphone-17", "IP17-128", ct: default);
+        var result = await sut.Variant("iphone-17", "iphone-17-128gb-vn", ct: default);
 
         var view = Assert.IsType<ViewResult>(result);
         Assert.Equal("iphone", catalog.LastCategorySlug);
@@ -118,7 +118,7 @@ public class ProductsControllerTests
     [Fact]
     public async Task Variant_returns_not_found_when_catalog_returns_null()
     {
-        var catalog = new FakeProductCatalogService { VariantToReturn = null };
+        var catalog = new FakeProductCatalogService { ConfigurationToReturn = null };
         var sut = new ProductsController(catalog);
 
         var result = await sut.Variant("iphone-17", "does-not-exist", ct: default);

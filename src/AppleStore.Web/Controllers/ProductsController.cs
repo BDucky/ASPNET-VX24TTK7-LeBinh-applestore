@@ -35,15 +35,15 @@ public class ProductsController : Controller
         return View(product);
     }
 
-    [HttpGet("{slug}/{sku}")]
-    public async Task<IActionResult> Variant(string slug, string sku, CancellationToken ct)
+    // One page per configuration, the way rauvang.com has one page per
+    // storage/region card. Colour and region are picked on the page; the
+    // optional query values only choose which one it opens on, so every
+    // choice stays linkable.
+    [HttpGet("{slug}/{config}")]
+    public async Task<IActionResult> Variant(string slug, string config, string? color = null, string? region = null, CancellationToken ct = default)
     {
-        var variant = await _catalog.GetVariantAsync(slug, sku, ct);
-        if (variant is null)
-            return NotFound();
-
-        await LoadModelStripAsync(variant.CategorySlug, variant.ProductSlug, ct);
-        return View(variant);
+        await Task.CompletedTask;
+        return NotFound();
     }
 
     // One owner for the model strip both the model and variant pages show.

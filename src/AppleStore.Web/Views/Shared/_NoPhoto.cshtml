@@ -1,0 +1,14 @@
+@model string?
+@* Shown where a model has no licensed photo of that exact model yet (see
+   setup/rauvang-sync/photos.json). A labelled line drawing, so an empty
+   well never looks like a broken image. The model argument is an extra
+   class, for example "is-compact" in the model row. *@
+<span class="no-photo @Model" role="img" aria-label="Photo coming soon">
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="12" y="4" width="24" height="40" rx="5"></rect>
+        <line x1="21" y1="9" x2="27" y2="9"></line>
+        <circle cx="24" cy="26" r="5"></circle>
+        <line x1="4" y1="44" x2="44" y2="4" stroke-opacity="0.35"></line>
+    </svg>
+    <span class="no-photo-label">Photo coming soon</span>
+</span>

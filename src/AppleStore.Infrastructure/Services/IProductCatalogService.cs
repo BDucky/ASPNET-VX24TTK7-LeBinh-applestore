@@ -18,11 +18,10 @@ public interface IProductCatalogService
     // either way: an inactive product isn't reachable by direct link.
     Task<ProductDetail?> GetBySlugAsync(string slug, CancellationToken ct = default);
 
-    // Null when the SKU doesn't exist, doesn't belong to the product at
-    // productSlug, or either the variant or its parent product is inactive.
-    // productSlug is required, not just a courtesy: a SKU is unique on its
-    // own, but the route is /Products/{slug}/{sku}, and a mismatched pair
-    // (a real SKU under the wrong product's URL) must 404, not silently
-    // serve the variant under someone else's product page.
-    Task<ProductVariantDetail?> GetVariantAsync(string productSlug, string sku, CancellationToken ct = default);
+    // One configuration (a card on the model page) with its colour and region
+    // choices. Null when the configuration slug doesn't exist, belongs to a
+    // different product, or the product or all its variants are inactive. A
+    // real configuration under the wrong product's URL must 404, not be served
+    // under someone else's page.
+    Task<ConfigurationDetail?> GetConfigurationAsync(string productSlug, string configurationSlug, CancellationToken ct = default);
 }

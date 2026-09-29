@@ -34,6 +34,8 @@ Junction, composite PK `(CategoryId, AttributeId)`, both FK.
 ### Products
 `Id (PK)`, `CategoryId (FK -> Categories)`, `Name (nvarchar 200)`, `Slug (nvarchar 220)`, `Description (nvarchar max, nullable)`, `BasePrice (decimal(12,2), > 0)`, `Status (bit)`, `CreatedAt`, `UpdatedAt`
 
+**Deviation (2026-09-25, `feat/variant-sync`):** `BasePrice` is nullable, null meaning no price yet ("Contact for price", the user's decision), instead of a fake 0. Added `SortOrder (int)`, the display order within a category, so models list in the reference store's order (newest first).
+
 ### UserTokens
 `Id (PK)`, `UserId (FK -> Users)`, `Type (int)`, `Token (varchar 100)`, `ExpiredAt`, `UsedAt (nullable)`, `CreatedAt`
 
@@ -67,6 +69,8 @@ Composite PK `(ProductId, AttributeId)`, `ValueText (nvarchar 255, nullable)`, `
 ### ProductVariants
 `Id (PK)`, `ProductId (FK -> Products)`, `SKU (nvarchar 80)`, `Price (decimal(12,2), > 0)`, `StockQty (int, >= 0)`, `Status (bit)`, `CreatedAt`, `UpdatedAt`
 
+**Deviation (2026-09-25, `feat/variant-sync`):** `Price` is nullable for the same reason as `Products.BasePrice`. When set it is still > 0. Checkout (M3) must refuse a variant with no price.
+
 ### Favorites
 Composite PK `(UserId, ProductId)`.
 
@@ -81,6 +85,8 @@ Composite PK `(ListId, ProductId)`, `ListId (FK -> CompareLists)`.
 
 ### VariantOptions
 Composite PK `(VariantId, OptionTypeId)`, `OptionValueId (FK -> OptionValues, not part of the key)`.
+
+Option type codes in use (seeded 2026-09-25): `config` (the configuration card a variant belongs to, e.g. "iPhone 18 Pro Max 256GB ( VN )"), `color`, `region`. A variant with no `config` option belongs to one configuration named after its product.
 
 ### ProductImages
 `Id (PK)`, `ProductId (FK -> Products)`, `VariantId (FK -> ProductVariants, nullable)`, `ImageUrl (nvarchar 255)`, `SortOrder (int, >= 0)`
