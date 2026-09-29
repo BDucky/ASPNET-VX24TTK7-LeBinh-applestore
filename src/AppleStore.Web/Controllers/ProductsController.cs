@@ -42,8 +42,12 @@ public class ProductsController : Controller
     [HttpGet("{slug}/{config}")]
     public async Task<IActionResult> Variant(string slug, string config, string? color = null, string? region = null, CancellationToken ct = default)
     {
-        await Task.CompletedTask;
-        return NotFound();
+        var configuration = await _catalog.GetConfigurationAsync(slug, config, ct);
+        if (configuration is null)
+            return NotFound();
+
+        await LoadModelStripAsync(configuration.CategorySlug, configuration.ProductSlug, ct);
+        return View(configuration);
     }
 
     // One owner for the model strip both the model and variant pages show.
