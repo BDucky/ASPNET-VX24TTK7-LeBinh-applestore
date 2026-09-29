@@ -1,0 +1,2784 @@
+{
+ "iphone": [
+  {
+   "model": "iPhone Duo",
+   "url": "danh-muc-san-pham/212-iphone-duo.htm",
+   "variants": [
+    {
+     "name": "iPhone Duo 256GB ( Mỹ )",
+     "url": "chi-tiet/3463-iphone-duo-256gb-my-.htm",
+     "options": [
+      "Night Sky / Mỹ - 0",
+      "Star White / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    },
+    {
+     "name": "iPhone Duo 512GB ( Mỹ )",
+     "url": "chi-tiet/3462-iphone-duo-512gb-my-.htm",
+     "options": [
+      "Star White / Mỹ - 0",
+      "Night Sky / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    },
+    {
+     "name": "iPhone Duo 1TB ( Mỹ )",
+     "url": "chi-tiet/3461-iphone-duo-1tb-my-.htm",
+     "options": [
+      "Night Sky / Mỹ - 0",
+      "Star White / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    },
+    {
+     "name": "iPhone Duo 2TB ( Mỹ )",
+     "url": "chi-tiet/3460-iphone-duo-2tb-my-.htm",
+     "options": [
+      "Star White / Mỹ - 0",
+      "Night Sky / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    },
+    {
+     "name": "iPhone Duo 256GB ( VN )",
+     "url": "chi-tiet/3459-iphone-duo-256gb-vn-.htm",
+     "options": [
+      "Star White / VN - 0",
+      "Night Sky / VN - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    },
+    {
+     "name": "iPhone Duo 512GB ( VN )",
+     "url": "chi-tiet/3458-iphone-duo-512gb-vn-.htm",
+     "options": [
+      "Star White / VN - 0",
+      "Night Sky / VN - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    },
+    {
+     "name": "iPhone Duo 1TB ( VN )",
+     "url": "chi-tiet/3457-iphone-duo-1tb-vn-.htm",
+     "options": [
+      "Night Sky / VN - 0",
+      "Star White / VN - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    },
+    {
+     "name": "iPhone Duo 2TB ( VN )",
+     "url": "chi-tiet/3456-iphone-duo-2tb-vn-.htm",
+     "options": [
+      "Star White / VN - 0",
+      "Night Sky / VN - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 5
+    }
+   ]
+  },
+  {
+   "model": "iPhone 18 Pro Max",
+   "url": "danh-muc-san-pham/213-iphone-18-pro-max.htm",
+   "variants": [
+    {
+     "name": "iPhone 18 Pro Max 256GB ( VN )",
+     "url": "chi-tiet/3467-iphone-18-pro-max-256gb-vn-.htm",
+     "options": [
+      "Black / Active Online - 41600000",
+      "Black / Chưa Active - 42300000",
+      "Silver / Active Online - 43600000",
+      "Silver / Chưa Active - 44300000",
+      "Burgundy / Active Online - 44900000",
+      "Burgundy / Chưa Active - 45800000",
+      "Glacier / Active Online - 46600000",
+      "Glacier / Chưa Active - 46900000"
+     ],
+     "pagePrice": "41.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro Max 512GB ( VN )",
+     "url": "chi-tiet/3466-iphone-18-pro-max-512gb-vn-.htm",
+     "options": [
+      "Black / Active Online - 46600000",
+      "Black / Chưa Active - 48800000",
+      "Silver / Active Online - 48900000",
+      "Burgundy / Active Online - 50300000",
+      "Silver / Chưa Active - 50300000",
+      "Glacier / Active Online - 50600000",
+      "Glacier / Chưa Active - 51600000",
+      "Burgundy / Chưa Active - 51600000"
+     ],
+     "pagePrice": "46.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro Max 1TB ( VN )",
+     "url": "chi-tiet/3465-iphone-18-pro-max-1tb-vn-.htm",
+     "options": [
+      "Black / Active Online - 58900000",
+      "Silver / Active Online - 58900000",
+      "Black / Chưa Active - 59600000",
+      "Glacier / Active Online - 59900000",
+      "Silver / Chưa Active - 60800000",
+      "Burgundy / Active Online - 60900000",
+      "Glacier / Chưa Active - 61600000",
+      "Burgundy / Chưa Active - 61900000"
+     ],
+     "pagePrice": "58.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro Max 2TB ( VN )",
+     "url": "chi-tiet/3464-iphone-18-pro-max-2tb-vn-.htm",
+     "options": [
+      "Burgundy / Active Online - 78600000",
+      "Silver / Chưa Active - 79600000",
+      "Glacier / Chưa Active - 79600000",
+      "Black / Chưa Active - 79600000",
+      "Burgundy / Chưa Active - 80600000"
+     ],
+     "pagePrice": "78.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro Max 256GB ( Mỹ )",
+     "url": "chi-tiet/3471-iphone-18-pro-max-256gb-my-.htm",
+     "options": [
+      "Silver / Mỹ - 45900000",
+      "Black / Mỹ - 46800000",
+      "Burgundy / Mỹ - 46800000",
+      "Glacier / Mỹ - 46800000"
+     ],
+     "pagePrice": "45.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro Max 512GB ( Mỹ )",
+     "url": "chi-tiet/3470-iphone-18-pro-max-512gb-my-.htm",
+     "options": [
+      "Black / Mỹ - 52600000",
+      "Burgundy / Mỹ - 52600000",
+      "Glacier / Mỹ - 52900000",
+      "Silver / Mỹ - 52900000"
+     ],
+     "pagePrice": "52.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro Max 1TB ( Mỹ )",
+     "url": "chi-tiet/3469-iphone-18-pro-max-1tb-my-.htm",
+     "options": [
+      "Black / Mỹ - 62900000",
+      "Glacier / Mỹ - 62900000",
+      "Silver / Mỹ - 64900000",
+      "Burgundy / Mỹ - 65900000"
+     ],
+     "pagePrice": "62.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro Max 2TB ( Mỹ )",
+     "url": "chi-tiet/3468-iphone-18-pro-max-2tb-my-.htm",
+     "options": [
+      "Burgundy / Mỹ - 85600000"
+     ],
+     "pagePrice": "85.600.000 VNĐ",
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPhone 18 Pro",
+   "url": "danh-muc-san-pham/214-iphone-18-pro.htm",
+   "variants": [
+    {
+     "name": "iPhone 18 Pro 256GB ( VN )",
+     "url": "chi-tiet/3475-iphone-18-pro-256gb-vn-.htm",
+     "options": [
+      "Black / Active Online - 36600000",
+      "Burgundy / Active Online - 37300000",
+      "Black / Chưa Active - 37300000",
+      "Burgundy / Chưa Active - 37600000",
+      "Silver / Chưa Active - 37900000",
+      "Glacier / Active Online - 37900000",
+      "Glacier / Chưa Active - 38600000"
+     ],
+     "pagePrice": "36.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro 512GB ( VN )",
+     "url": "chi-tiet/3474-iphone-18-pro-512gb-vn-.htm",
+     "options": [
+      "Black / Chưa Active - 43600000",
+      "Burgundy / Chưa Active - 44300000",
+      "Silver / Chưa Active - 44900000",
+      "Glacier / Chưa Active - 45600000"
+     ],
+     "pagePrice": "43.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro 1TB ( VN )",
+     "url": "chi-tiet/3473-iphone-18-pro-1tb-vn-.htm",
+     "options": [
+      "Silver / Chưa Active - 56600000",
+      "Burgundy / Chưa Active - 56600000",
+      "Black / Chưa Active - 56600000",
+      "Glacier / Chưa Active - 56900000"
+     ],
+     "pagePrice": "56.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro 2TB ( VN )",
+     "url": "chi-tiet/3472-iphone-18-pro-2tb-vn-.htm",
+     "options": [
+      "Silver / Chưa Active - 74600000",
+      "Black / Chưa Active - 75300000",
+      "Glacier / Chưa Active - 75600000",
+      "Burgundy / Chưa Active - 75600000"
+     ],
+     "pagePrice": "74.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro 256GB ( Mỹ )",
+     "url": "chi-tiet/3479-iphone-18-pro-256gb-my-.htm",
+     "options": [
+      "Burgundy / Mỹ - 0",
+      "Glacier / Mỹ - 0",
+      "Silver / Mỹ - 0",
+      "Black / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro 512GB ( Mỹ )",
+     "url": "chi-tiet/3478-iphone-18-pro-512gb-my-.htm",
+     "options": [
+      "Glacier / Mỹ - 0",
+      "Silver / Mỹ - 0",
+      "Burgundy / Mỹ - 0",
+      "Black / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro 1TB ( Mỹ )",
+     "url": "chi-tiet/3477-iphone-18-pro-1tb-my-.htm",
+     "options": [
+      "Glacier / Mỹ - 0",
+      "Silver / Mỹ - 0",
+      "Burgundy / Mỹ - 0",
+      "Black / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 18 Pro 2TB ( Mỹ )",
+     "url": "chi-tiet/3476-iphone-18-pro-2tb-my-.htm",
+     "options": [
+      "Glacier / Mỹ - 0",
+      "Burgundy / Mỹ - 0",
+      "Black / Mỹ - 0",
+      "Silver / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPhone 17 Pro Max",
+   "url": "danh-muc-san-pham/202-iphone-17-pro-max.htm",
+   "variants": [
+    {
+     "name": "iPhone 17 Pro Max 256GB ( VN )",
+     "url": "chi-tiet/3148-iphone-17-pro-max-256gb-vn-.htm",
+     "options": [
+      "Orange / Active Online - 32600000",
+      "Silver / Active Online - 32900000",
+      "Blue / Chưa Active - 33300000",
+      "Orange / Chưa Active - 33300000",
+      "Silver / Chưa Active - 33800000"
+     ],
+     "pagePrice": "32.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro Max 512GB ( VN )",
+     "url": "chi-tiet/3147-iphone-17-pro-max-512gb-vn-.htm",
+     "options": [
+      "Blue / Active Online - 37900000",
+      "Silver / Active Online - 38900000",
+      "Orange / Chưa Active - 39300000",
+      "Silver / Chưa Active - 39800000",
+      "Blue / Chưa Active - 40200000"
+     ],
+     "pagePrice": "37.900.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro Max 1TB ( VN )",
+     "url": "chi-tiet/3146-iphone-17-pro-max-1tb-vn-.htm",
+     "options": [
+      "Silver / Active Online - 44800000",
+      "Orange / Chưa Active - 45200000",
+      "Blue / Chưa Active - 46600000",
+      "Silver / Chưa Active - 46800000"
+     ],
+     "pagePrice": "44.800.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro Max 2TB ( VN )",
+     "url": "chi-tiet/3145-iphone-17-pro-max-2tb-vn-.htm",
+     "options": [
+      "Orange / Chưa Active - 55600000",
+      "Silver / Chưa Active - 56300000",
+      "Blue / Chưa Active - 59900000"
+     ],
+     "pagePrice": "55.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro Max 256GB ( Mỹ )",
+     "url": "chi-tiet/3152-iphone-17-pro-max-256gb-my-.htm",
+     "options": [
+      "Blue / Mỹ - 32600000",
+      "Orange / Mỹ - 32900000",
+      "Silver / Mỹ - 33600000"
+     ],
+     "pagePrice": "32.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro Max 512GB ( Mỹ )",
+     "url": "chi-tiet/3151-iphone-17-pro-max-512gb-my-.htm",
+     "options": [
+      "Orange / Mỹ - 37900000",
+      "Blue / Mỹ - 37900000",
+      "Silver / Mỹ - 39200000"
+     ],
+     "pagePrice": "37.900.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro Max 1TB ( Mỹ )",
+     "url": "chi-tiet/3150-iphone-17-pro-max-1tb-my-.htm",
+     "options": [
+      "Blue / Mỹ - 41600000",
+      "Orange / Mỹ - 41600000",
+      "Silver / Mỹ - 42800000"
+     ],
+     "pagePrice": "41.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro Max 2TB ( Mỹ )",
+     "url": "chi-tiet/3149-iphone-17-pro-max-2tb-my-.htm",
+     "options": [
+      "Blue / Mỹ - 47200000",
+      "Orange / Mỹ - 47300000",
+      "Silver / Mỹ - 48900000"
+     ],
+     "pagePrice": "47.200.000 VNĐ",
+     "productImgs": 9
+    }
+   ]
+  },
+  {
+   "model": "iPhone 17 Pro",
+   "url": "danh-muc-san-pham/201-iphone-17-pro.htm",
+   "variants": [
+    {
+     "name": "iPhone 17 Pro 256GB ( VN )",
+     "url": "chi-tiet/3156-iphone-17-pro-256gb-vn-.htm",
+     "options": [
+      "Orange / VN - 30900000",
+      "Blue / VN - 30900000",
+      "Silver / VN - 31600000"
+     ],
+     "pagePrice": "30.900.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro 512GB ( VN )",
+     "url": "chi-tiet/3155-iphone-17-pro-512gb-vn-.htm",
+     "options": [
+      "Blue / VN - 37800000",
+      "Orange / VN - 37800000",
+      "Silver / VN - 37800000"
+     ],
+     "pagePrice": "37.800.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro 1TB ( VN )",
+     "url": "chi-tiet/3154-iphone-17-pro-1tb-vn-.htm",
+     "options": [
+      "Blue / VN - 43800000",
+      "Orange / VN - 43800000",
+      "Silver / VN - 43800000"
+     ],
+     "pagePrice": "43.800.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro 256GB ( Mỹ )",
+     "url": "chi-tiet/3160-iphone-17-pro-256gb-my-.htm",
+     "options": [
+      "Blue / Mỹ - 29600000",
+      "Orange / Mỹ - 29900000",
+      "Silver / Mỹ - 31200000"
+     ],
+     "pagePrice": "29.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro 512GB ( Mỹ )",
+     "url": "chi-tiet/3159-iphone-17-pro-512gb-my-.htm",
+     "options": [
+      "Blue / Mỹ - 34900000",
+      "Orange / Mỹ - 34900000",
+      "Silver / Mỹ - 35900000"
+     ],
+     "pagePrice": "34.900.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 Pro 1TB ( Mỹ )",
+     "url": "chi-tiet/3158-iphone-17-pro-1tb-my-.htm",
+     "options": [
+      "Orange / Mỹ - 38200000",
+      "Blue / Mỹ - 38200000",
+      "Silver / Mỹ - 39300000"
+     ],
+     "pagePrice": "38.200.000 VNĐ",
+     "productImgs": 9
+    }
+   ]
+  },
+  {
+   "model": "iPhone 17 / 17e",
+   "url": "danh-muc-san-pham/199-iphone-17-17e.htm",
+   "variants": [
+    {
+     "name": "iPhone 17e 256GB",
+     "url": "chi-tiet/3354-iphone-17e-256gb.htm",
+     "options": [
+      "Black / Mỹ - 17200000",
+      "White / Mỹ - 17300000",
+      "Pink / Mỹ - 17600000",
+      "Black / VN - 18600000",
+      "Pink / VN - 18600000",
+      "White / VN - 18600000"
+     ],
+     "pagePrice": "17.200.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17e 512GB",
+     "url": "chi-tiet/3353-iphone-17e-512gb.htm",
+     "options": [
+      "Black / Mỹ - 21600000",
+      "Pink / Mỹ - 21600000",
+      "White / Mỹ - 21600000",
+      "Black / VN - 22600000",
+      "Pink / VN - 22600000",
+      "White / VN - 22600000"
+     ],
+     "pagePrice": "21.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "iPhone 17 256GB ( VN )",
+     "url": "chi-tiet/3168-iphone-17-256gb-vn-.htm",
+     "options": [
+      "Purple / VN - 24900000",
+      "Green / VN - 24900000",
+      "Blue / VN - 24900000",
+      "Black / VN - 24900000",
+      "White / VN - 24900000"
+     ],
+     "pagePrice": "24.900.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 17 512GB ( VN )",
+     "url": "chi-tiet/3167-iphone-17-512gb-vn-.htm",
+     "options": [
+      "Purple / VN - 29900000",
+      "Green / VN - 29900000",
+      "Blue / VN - 29900000",
+      "Black / VN - 29900000",
+      "White / VN - 29900000"
+     ],
+     "pagePrice": "29.900.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 17 256GB ( Mỹ )",
+     "url": "chi-tiet/3170-iphone-17-256gb-my-.htm",
+     "options": [
+      "Black / Mỹ - 23800000",
+      "Blue / Mỹ - 24300000",
+      "White / Mỹ - 24300000",
+      "Green / Mỹ - 24600000",
+      "Purple / Mỹ - 24600000"
+     ],
+     "pagePrice": "23.800.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 17 512GB ( Mỹ )",
+     "url": "chi-tiet/3169-iphone-17-512gb-my-.htm",
+     "options": [
+      "Black / Mỹ - 29600000",
+      "Blue / Mỹ - 29600000",
+      "Green / Mỹ - 29600000",
+      "Purple / Mỹ - 29600000",
+      "White / Mỹ - 29600000"
+     ],
+     "pagePrice": "29.600.000 VNĐ",
+     "productImgs": 13
+    }
+   ]
+  },
+  {
+   "model": "iPhone Air",
+   "url": "danh-muc-san-pham/200-iphone-air.htm",
+   "variants": [
+    {
+     "name": "iPhone Air 256GB ( VN )",
+     "url": "chi-tiet/3163-iphone-air-256gb-vn-.htm",
+     "options": [
+      "Black / VN - 22900000",
+      "Gold / VN - 22900000",
+      "Blue / VN - 23200000",
+      "White / VN - 23200000"
+     ],
+     "pagePrice": "22.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone Air 512GB ( VN )",
+     "url": "chi-tiet/3162-iphone-air-512gb-vn-.htm",
+     "options": [
+      "Black / VN - 28600000",
+      "Gold / VN - 28600000",
+      "White / VN - 28600000",
+      "Blue / VN - 28600000"
+     ],
+     "pagePrice": "28.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone Air 1TB ( VN )",
+     "url": "chi-tiet/3161-iphone-air-1tb-vn-.htm",
+     "options": [
+      "Black / VN - 33200000",
+      "Blue / VN - 33200000",
+      "Gold / VN - 33200000",
+      "White / VN - 33200000"
+     ],
+     "pagePrice": "33.200.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone Air 256GB ( Mỹ )",
+     "url": "chi-tiet/3166-iphone-air-256gb-my-.htm",
+     "options": [
+      "White / Mỹ - 23800000",
+      "Blue / Mỹ - 23900000",
+      "Gold / Mỹ - 23900000",
+      "Black / Mỹ - 23900000"
+     ],
+     "pagePrice": "23.800.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone Air 512GB ( Mỹ )",
+     "url": "chi-tiet/3165-iphone-air-512gb-my-.htm",
+     "options": [
+      "White / Mỹ - 29300000",
+      "Black / Mỹ - 29300000",
+      "Blue / Mỹ - 29300000",
+      "Gold / Mỹ - 29300000"
+     ],
+     "pagePrice": "29.300.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone Air 1TB ( Mỹ )",
+     "url": "chi-tiet/3164-iphone-air-1tb-my-.htm",
+     "options": [
+      "Black / Mỹ - 32900000",
+      "Blue / Mỹ - 32900000",
+      "Gold / Mỹ - 32900000",
+      "White / Mỹ - 32900000"
+     ],
+     "pagePrice": "32.900.000 VNĐ",
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPhone 16 Pro Max",
+   "url": "danh-muc-san-pham/186-iphone-16-pro-max.htm",
+   "variants": [
+    {
+     "name": "iPhone 16 Pro Max 256GB ( VN )",
+     "url": "chi-tiet/2897-iphone-16-pro-max-256gb-vn-.htm",
+     "options": [
+      "Desert / VN - 31900000",
+      "White / VN - 31900000",
+      "Black / VN - 32600000",
+      "Natural / VN - 32900000"
+     ],
+     "pagePrice": "31.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 16 Pro Max 512GB ( VN )",
+     "url": "chi-tiet/2896-iphone-16-pro-max-512gb-vn-.htm",
+     "options": [
+      "Desert / VN - 35900000",
+      "Black / VN - 35900000",
+      "Natural / VN - 36800000",
+      "White / VN - 36800000"
+     ],
+     "pagePrice": "35.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 16 Pro Max 1TB ( VN )",
+     "url": "chi-tiet/2895-iphone-16-pro-max-1tb-vn-.htm",
+     "options": [
+      "Desert / VN - 41800000",
+      "Natural / VN - 41800000",
+      "White / VN - 41800000",
+      "Black / VN - 41800000"
+     ],
+     "pagePrice": "41.800.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 16 Pro Max 256GB",
+     "url": "chi-tiet/2881-iphone-16-pro-max-256gb.htm",
+     "options": [
+      "Black / Mỹ - 30600000",
+      "Desert / Mỹ - 32300000",
+      "Natural / Mỹ - 32600000",
+      "White / Mỹ - 32600000",
+      "Desert / ZA - 34300000",
+      "Natural / ZA - 34300000",
+      "White / ZA - 34300000",
+      "Black / ZA - 34300000"
+     ],
+     "pagePrice": "30.600.000 VNĐ",
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPhone 16 Pro",
+   "url": "danh-muc-san-pham/188-iphone-16-pro.htm",
+   "variants": [
+    {
+     "name": "iPhone 16 Pro 128GB ( VN )",
+     "url": "chi-tiet/2901-iphone-16-pro-128gb-vn-.htm",
+     "options": [
+      "Natural / VN - 25900000",
+      "Desert / VN - 25900000",
+      "White / VN - 25900000",
+      "Black / VN - 25900000"
+     ],
+     "pagePrice": "25.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 16 Pro 256GB ( VN )",
+     "url": "chi-tiet/2900-iphone-16-pro-256gb-vn-.htm",
+     "options": [
+      "Desert / VN - 30900000",
+      "Natural / VN - 30900000",
+      "White / VN - 30900000",
+      "Black / VN - 30900000"
+     ],
+     "pagePrice": "30.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPhone 16 Pro 256GB ( Mỹ )",
+     "url": "chi-tiet/2885-iphone-16-pro-256gb-my-.htm",
+     "options": [
+      "Natural / Mỹ - 28600000",
+      "Desert / Mỹ - 28600000",
+      "White / Mỹ - 28600000",
+      "Black / Mỹ - 28600000"
+     ],
+     "pagePrice": "28.600.000 VNĐ",
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPhone 16 Plus",
+   "url": "danh-muc-san-pham/189-iphone-16-plus.htm",
+   "variants": [
+    {
+     "name": "iPhone 16 Plus 128GB ( VN )",
+     "url": "chi-tiet/2905-iphone-16-plus-128gb-vn-.htm",
+     "options": [
+      "Black / VN - 23600000",
+      "Blue / VN - 23600000",
+      "Green / VN - 23600000",
+      "Pink / VN - 23600000",
+      "White / VN - 23600000"
+     ],
+     "pagePrice": "23.600.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16 Plus 256GB ( VN )",
+     "url": "chi-tiet/2904-iphone-16-plus-256gb-vn-.htm",
+     "options": [
+      "Black / VN - 25900000",
+      "White / VN - 25900000",
+      "Blue / VN - 26300000",
+      "Green / VN - 26300000",
+      "Pink / VN - 26300000"
+     ],
+     "pagePrice": "25.900.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16 Plus 512GB ( VN )",
+     "url": "chi-tiet/2903-iphone-16-plus-512gb-vn-.htm",
+     "options": [
+      "Pink / VN - 32900000",
+      "Black / VN - 32900000",
+      "Blue / VN - 32900000",
+      "White / VN - 32900000",
+      "Green / VN - 32900000"
+     ],
+     "pagePrice": "32.900.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16 Plus 128GB ( Mỹ )",
+     "url": "chi-tiet/2889-iphone-16-plus-128gb-my-.htm",
+     "options": [
+      "Black / Mỹ - 19600000",
+      "Blue / Mỹ - 20900000",
+      "Pink / Mỹ - 21600000",
+      "White / Mỹ - 21900000",
+      "Green / Mỹ - 22900000"
+     ],
+     "pagePrice": "19.600.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16 Plus 256GB ( Mỹ )",
+     "url": "chi-tiet/2888-iphone-16-plus-256gb-my-.htm",
+     "options": [
+      "White / Mỹ - 0",
+      "Pink / Mỹ - 0",
+      "Green / Mỹ - 0",
+      "Black / Mỹ - 0",
+      "Blue / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16 Plus 512GB ( Mỹ )",
+     "url": "chi-tiet/2887-iphone-16-plus-512gb-my-.htm",
+     "options": [
+      "Pink / Mỹ - 0",
+      "Green / Mỹ - 0",
+      "Black / Mỹ - 0",
+      "Blue / Mỹ - 0",
+      "White / Mỹ - 0"
+     ],
+     "pagePrice": null,
+     "productImgs": 13
+    }
+   ]
+  },
+  {
+   "model": "iPhone 16 /16e",
+   "url": "danh-muc-san-pham/190-iphone-16-16e.htm",
+   "variants": [
+    {
+     "name": "iPhone 16 128GB ( VN )",
+     "url": "chi-tiet/2908-iphone-16-128gb-vn-.htm",
+     "options": [
+      "Pink / VN - 20600000",
+      "Green / VN - 20600000",
+      "Blue / VN - 20600000",
+      "Black / VN - 20600000",
+      "White / VN - 20600000"
+     ],
+     "pagePrice": "20.600.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16 256GB ( VN )",
+     "url": "chi-tiet/2907-iphone-16-256gb-vn-.htm",
+     "options": [
+      "White / VN - 22600000",
+      "Pink / VN - 22900000",
+      "Blue / VN - 22900000",
+      "Black / VN - 22900000",
+      "Green / VN - 23900000"
+     ],
+     "pagePrice": "22.600.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16 128GB ( Mỹ )",
+     "url": "chi-tiet/2892-iphone-16-128gb-my-.htm",
+     "options": [
+      "White / Mỹ - 19600000",
+      "Pink / Mỹ - 19600000",
+      "Green / Mỹ - 19600000",
+      "Black / Mỹ - 19600000",
+      "Blue / Mỹ - 19600000"
+     ],
+     "pagePrice": "19.600.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "iPhone 16e 128GB ( VN )",
+     "url": "chi-tiet/5-iphone-16e-128gb-vn-.htm",
+     "options": [
+      "Black / VN - 15900000",
+      "White / VN - 15900000"
+     ],
+     "pagePrice": "15.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPhone 16e 256GB ( VN )",
+     "url": "chi-tiet/6-iphone-16e-256gb-vn-.htm",
+     "options": [
+      "Black / VN - 17900000",
+      "White / VN - 17900000"
+     ],
+     "pagePrice": "17.900.000 VNĐ",
+     "productImgs": 7
+    }
+   ]
+  },
+  {
+   "model": "iPhone 15",
+   "url": "danh-muc-san-pham/36-iphone-15.htm",
+   "variants": [
+    {
+     "name": "iPhone 15 128GB",
+     "url": "chi-tiet/320-iphone-15-128gb.htm",
+     "options": [
+      "Yellow / VN - 18600000",
+      "Pink / VN - 18600000",
+      "Green / VN - 18600000",
+      "Blue / VN - 18600000",
+      "Black / VN - 18600000"
+     ],
+     "pagePrice": "18.600.000 VNĐ",
+     "productImgs": 3
+    },
+    {
+     "name": "iPhone 15 256GB",
+     "url": "chi-tiet/321-iphone-15-256gb.htm",
+     "options": [
+      "Yellow / VN - 21700000",
+      "Pink / VN - 21700000",
+      "Green / VN - 21700000",
+      "Blue / VN - 21700000",
+      "Black / VN - 21700000"
+     ],
+     "pagePrice": "21.700.000 VNĐ",
+     "productImgs": 3
+    }
+   ]
+  },
+  {
+   "model": "iPhone SE 2022",
+   "url": "danh-muc-san-pham/104-iphone-se-2022.htm",
+   "variants": [
+    {
+     "name": "iPhone SE 2022 64GB ( VN/A ) - Bảo hành 12 tháng",
+     "url": "chi-tiet/907-iphone-se-2022-64gb-vna-bao-hanh-12-thang.htm",
+     "options": [
+      "Red / VN - 6600000",
+      "Midnight / VN - 6800000",
+      "Starlight / VN - 7200000"
+     ],
+     "pagePrice": "6.600.000 VNĐ",
+     "productImgs": 3
+    },
+    {
+     "name": "iPhone SE 2022 128GB ( VN/A ) - Bảo hành 12 tháng",
+     "url": "chi-tiet/906-iphone-se-2022-128gb-vna-bao-hanh-12-thang.htm",
+     "options": [
+      "Red / VN - 8600000",
+      "Midnight / VN - 8800000",
+      "Starlight / VN - 9200000"
+     ],
+     "pagePrice": "8.600.000 VNĐ",
+     "productImgs": 3
+    },
+    {
+     "name": "iPhone SE 2022 256GB ( VN/A ) - Bảo hành 12 tháng",
+     "url": "chi-tiet/905-iphone-se-2022-256gb-vna-bao-hanh-12-thang.htm",
+     "options": [
+      "Red / VN - 9900000",
+      "Midnight / VN - 10200000",
+      "Starlight / VN - 10300000"
+     ],
+     "pagePrice": "9.900.000 VNĐ",
+     "productImgs": 3
+    }
+   ]
+  },
+  {
+   "model": "Airpods",
+   "url": "danh-muc-san-pham/134-airpods.htm",
+   "variants": []
+  },
+  {
+   "model": "Accessories",
+   "url": "danh-muc-san-pham/19-accessories.htm",
+   "variants": []
+  }
+ ],
+ "ipad": [
+  {
+   "model": "iPad Pro M5 13\"",
+   "url": "danh-muc-san-pham/204-ipad-pro-m5-13.htm",
+   "variants": [
+    {
+     "name": "iPad Pro M5 13\" 256GB WIFI",
+     "url": "chi-tiet/3198-ipad-pro-m5-13-256gb-wifi.htm",
+     "options": [
+      "Black / Mỹ - 31900000",
+      "Silver / Mỹ - 32900000"
+     ],
+     "pagePrice": "31.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 512GB WIFI",
+     "url": "chi-tiet/3197-ipad-pro-m5-13-512gb-wifi.htm",
+     "options": [
+      "Silver / Mỹ - 39900000",
+      "Black / Mỹ - 39900000"
+     ],
+     "pagePrice": "39.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 1TB WIFI",
+     "url": "chi-tiet/3196-ipad-pro-m5-13-1tb-wifi.htm",
+     "options": [
+      "Black / Mỹ - 46900000",
+      "Silver / Mỹ - 47800000"
+     ],
+     "pagePrice": "46.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 2TB WIFI",
+     "url": "chi-tiet/3195-ipad-pro-m5-13-2tb-wifi.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 256GB 5G",
+     "url": "chi-tiet/3194-ipad-pro-m5-13-256gb-5g.htm",
+     "options": [
+      "Black / Mỹ - 33200000",
+      "Silver / Mỹ - 34200000"
+     ],
+     "pagePrice": "33.200.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 512GB 5G",
+     "url": "chi-tiet/3193-ipad-pro-m5-13-512gb-5g.htm",
+     "options": [
+      "Black / Mỹ - 39600000",
+      "Silver / Mỹ - 42900000"
+     ],
+     "pagePrice": "39.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 1TB 5G",
+     "url": "chi-tiet/3192-ipad-pro-m5-13-1tb-5g.htm",
+     "options": [
+      "Silver / Mỹ - 46800000",
+      "Black / Mỹ - 46800000"
+     ],
+     "pagePrice": "46.800.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 2TB 5G",
+     "url": "chi-tiet/3191-ipad-pro-m5-13-2tb-5g.htm",
+     "options": [
+      "Black / Mỹ - 50800000",
+      "Silver / Mỹ - 51800000"
+     ],
+     "pagePrice": "50.800.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 2TB 5G NaNo",
+     "url": "chi-tiet/1823-ipad-pro-m5-13-2tb-5g-nano.htm",
+     "options": [
+      "Silver / Mỹ - 52800000",
+      "Black / Mỹ - 52800000"
+     ],
+     "pagePrice": "52.800.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 1TB 5G NaNo",
+     "url": "chi-tiet/1822-ipad-pro-m5-13-1tb-5g-nano.htm",
+     "options": [
+      "Black / Mỹ - 51900000"
+     ],
+     "pagePrice": "51.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 13\" 2TB WIFI NaNo",
+     "url": "chi-tiet/1736-ipad-pro-m5-13-2tb-wifi-nano.htm",
+     "options": [
+      "Black / Mỹ - 51300000"
+     ],
+     "pagePrice": "51.300.000 VNĐ",
+     "productImgs": 7
+    }
+   ]
+  },
+  {
+   "model": "iPad Pro M5 11\"",
+   "url": "danh-muc-san-pham/203-ipad-pro-m5-11.htm",
+   "variants": [
+    {
+     "name": "iPad Pro M5 11\" 256GB WIFI",
+     "url": "chi-tiet/3206-ipad-pro-m5-11-256gb-wifi.htm",
+     "options": [
+      "Silver / Mỹ - 29300000",
+      "Black / Mỹ - 29300000",
+      "Black / VN - 31600000",
+      "Silver / VN - 31900000"
+     ],
+     "pagePrice": "29.300.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 11\" 512GB WIFI",
+     "url": "chi-tiet/3205-ipad-pro-m5-11-512gb-wifi.htm",
+     "options": [
+      "Black / Mỹ - 37800000",
+      "Silver / Mỹ - 38800000",
+      "Black / VN - 38800000",
+      "Silver / VN - 39800000"
+     ],
+     "pagePrice": "37.800.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 11\" 1TB WIFI",
+     "url": "chi-tiet/3204-ipad-pro-m5-11-1tb-wifi.htm",
+     "options": [
+      "Black / Mỹ - 39900000"
+     ],
+     "pagePrice": "39.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 11\" 2TB WIFI",
+     "url": "chi-tiet/3203-ipad-pro-m5-11-2tb-wifi.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 11\" 256GB 5G",
+     "url": "chi-tiet/3202-ipad-pro-m5-11-256gb-5g.htm",
+     "options": [
+      "Black / Mỹ - 31600000",
+      "Silver / Mỹ - 32200000",
+      "Silver / VN - 35200000",
+      "Black / VN - 35200000"
+     ],
+     "pagePrice": "31.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 11\" 512GB 5G",
+     "url": "chi-tiet/3201-ipad-pro-m5-11-512gb-5g.htm",
+     "options": [
+      "Black / Mỹ - 39900000",
+      "Silver / Mỹ - 41900000"
+     ],
+     "pagePrice": "39.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 11\" 1TB 5G",
+     "url": "chi-tiet/3200-ipad-pro-m5-11-1tb-5g.htm",
+     "options": [
+      "Silver / Mỹ - 50900000",
+      "Black / Mỹ - 50900000"
+     ],
+     "pagePrice": "50.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M5 11\" 2TB 5G",
+     "url": "chi-tiet/3199-ipad-pro-m5-11-2tb-5g.htm",
+     "options": [
+      "Silver / Mỹ - 55900000",
+      "Black / Mỹ - 55900000"
+     ],
+     "pagePrice": "55.900.000 VNĐ",
+     "productImgs": 7
+    }
+   ]
+  },
+  {
+   "model": "iPad Pro M4 13\"",
+   "url": "danh-muc-san-pham/50-ipad-pro-m4-13.htm",
+   "variants": [
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) WIFI - 256GB",
+     "url": "chi-tiet/818-ipad-pro-m4-13-gen-7-wifi-256gb.htm",
+     "options": [
+      "Black / Mỹ - 28900000",
+      "Silver / Mỹ - 29800000",
+      "Silver / VN - 33900000",
+      "Black / VN - 33900000"
+     ],
+     "pagePrice": "28.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) WIFI - 512GB",
+     "url": "chi-tiet/813-ipad-pro-m4-13-gen-7-wifi-512gb.htm",
+     "options": [
+      "Silver / Mỹ - 32900000",
+      "Black / Mỹ - 32900000",
+      "Silver / VN - 36900000",
+      "Black / VN - 36900000"
+     ],
+     "pagePrice": "32.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) WIFI - 1TB",
+     "url": "chi-tiet/626-ipad-pro-m4-13-gen-7-wifi-1tb.htm",
+     "options": [
+      "Black / Mỹ - 39300000",
+      "Silver / Mỹ - 39800000",
+      "Silver / VN - 41900000",
+      "Black / VN - 41900000"
+     ],
+     "pagePrice": "39.300.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) WIFI - 2TB",
+     "url": "chi-tiet/621-ipad-pro-m4-13-gen-7-wifi-2tb.htm",
+     "options": [
+      "Silver / VN - 41900000",
+      "Black / VN - 41900000"
+     ],
+     "pagePrice": "41.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) LTE - 256GB",
+     "url": "chi-tiet/616-ipad-pro-m4-13-gen-7-lte-256gb.htm",
+     "options": [
+      "Silver / Mỹ - 30800000",
+      "Black / Mỹ - 30800000",
+      "Silver / VN - 40300000",
+      "Black / VN - 40300000"
+     ],
+     "pagePrice": "30.800.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) LTE - 512GB",
+     "url": "chi-tiet/503-ipad-pro-m4-13-gen-7-lte-512gb.htm",
+     "options": [
+      "Black / Mỹ - 33600000",
+      "Silver / Mỹ - 34600000",
+      "Silver / VN - 45900000",
+      "Black / VN - 45900000"
+     ],
+     "pagePrice": "33.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) LTE - 1TB",
+     "url": "chi-tiet/499-ipad-pro-m4-13-gen-7-lte-1tb.htm",
+     "options": [
+      "Black / Mỹ - 39800000",
+      "Silver / Mỹ - 42300000"
+     ],
+     "pagePrice": "39.800.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) LTE - 2TB",
+     "url": "chi-tiet/494-ipad-pro-m4-13-gen-7-lte-2tb.htm",
+     "options": [
+      "Silver / Mỹ - 43900000",
+      "Black / Mỹ - 43900000"
+     ],
+     "pagePrice": "43.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) WIFI - 2TB ( Màn hình Nano )",
+     "url": "chi-tiet/1589-ipad-pro-m4-13-gen-7-wifi-2tb-man-hinh-nano-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) WIFI - 1TB ( Màn hình Nano )",
+     "url": "chi-tiet/1498-ipad-pro-m4-13-gen-7-wifi-1tb-man-hinh-nano-.htm",
+     "options": [
+      "Black / Mỹ - 39600000",
+      "Silver / Mỹ - 39600000",
+      "Silver / VN - 42300000",
+      "Black / VN - 42300000"
+     ],
+     "pagePrice": "39.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) LTE - 2TB ( Màn hình Nano )",
+     "url": "chi-tiet/1587-ipad-pro-m4-13-gen-7-lte-2tb-man-hinh-nano-.htm",
+     "options": [
+      "Black / Mỹ - 42900000",
+      "Silver / Mỹ - 48900000"
+     ],
+     "pagePrice": "42.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 13\" ( Gen 7 ) LTE - 1TB ( Màn hình Nano )",
+     "url": "chi-tiet/1497-ipad-pro-m4-13-gen-7-lte-1tb-man-hinh-nano-.htm",
+     "options": [
+      "Black / Mỹ - 40600000",
+      "Silver / Mỹ - 44900000"
+     ],
+     "pagePrice": "40.600.000 VNĐ",
+     "productImgs": 7
+    }
+   ]
+  },
+  {
+   "model": "iPad Pro M4 11\"",
+   "url": "danh-muc-san-pham/12-ipad-pro-m4-11.htm",
+   "variants": [
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) WIFI - 256GB",
+     "url": "chi-tiet/1041-ipad-pro-m4-11-gen-5-wifi-256gb.htm",
+     "options": [
+      "Black / Mỹ - 26600000",
+      "Silver / Mỹ - 26900000",
+      "Black / VN - 27300000",
+      "Silver / VN - 27300000"
+     ],
+     "pagePrice": "26.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) WIFI - 512GB",
+     "url": "chi-tiet/1631-ipad-pro-m4-11-gen-5-wifi-512gb.htm",
+     "options": [
+      "Black / Mỹ - 29600000",
+      "Silver / Mỹ - 29600000",
+      "Black / VN - 31200000",
+      "Silver / VN - 33600000"
+     ],
+     "pagePrice": "29.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) WIFI - 1TB",
+     "url": "chi-tiet/1622-ipad-pro-m4-11-gen-5-wifi-1tb.htm",
+     "options": [
+      "Silver / Mỹ - 33300000",
+      "Black / Mỹ - 33600000"
+     ],
+     "pagePrice": "33.300.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) WIFI - 2TB",
+     "url": "chi-tiet/1341-ipad-pro-m4-11-gen-5-wifi-2tb.htm",
+     "options": [
+      "Black / Mỹ - 34600000"
+     ],
+     "pagePrice": "34.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) LTE - 256GB",
+     "url": "chi-tiet/1322-ipad-pro-m4-11-gen-5-lte-256gb.htm",
+     "options": [
+      "Silver / Mỹ - 28900000",
+      "Black / Mỹ - 28900000",
+      "Silver / VN - 30900000",
+      "Black / VN - 30900000"
+     ],
+     "pagePrice": "28.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) LTE - 512GB",
+     "url": "chi-tiet/1317-ipad-pro-m4-11-gen-5-lte-512gb.htm",
+     "options": [
+      "Silver / Mỹ - 35900000",
+      "Black / Mỹ - 35900000",
+      "Silver / VN - 36600000",
+      "Black / VN - 36600000"
+     ],
+     "pagePrice": "35.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) LTE - 1TB",
+     "url": "chi-tiet/836-ipad-pro-m4-11-gen-5-lte-1tb.htm",
+     "options": [
+      "Black / Mỹ - 37900000",
+      "Silver / Mỹ - 38900000"
+     ],
+     "pagePrice": "37.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) LTE - 2TB",
+     "url": "chi-tiet/823-ipad-pro-m4-11-gen-5-lte-2tb.htm",
+     "options": [
+      "Silver / VN - 0",
+      "Black / VN - 0",
+      "Black / Mỹ - 41600000",
+      "Silver / Mỹ - 41600000"
+     ],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) WIFI - 1TB ( Màn hình Nano )",
+     "url": "chi-tiet/1043-ipad-pro-m4-11-gen-5-wifi-1tb-man-hinh-nano-.htm",
+     "options": [],
+     "pagePrice": "39.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) WIFI - 2TB ( Màn hình Nano )",
+     "url": "chi-tiet/1039-ipad-pro-m4-11-gen-5-wifi-2tb-man-hinh-nano-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) LTE - 1TB ( Màn hình Nano )",
+     "url": "chi-tiet/1499-ipad-pro-m4-11-gen-5-lte-1tb-man-hinh-nano-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "iPad Pro M4 11\" ( Gen 5 ) LTE - 2TB ( Màn hình Nano )",
+     "url": "chi-tiet/1590-ipad-pro-m4-11-gen-5-lte-2tb-man-hinh-nano-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    }
+   ]
+  },
+  {
+   "model": "iPad Air 8 13\"",
+   "url": "danh-muc-san-pham/75-ipad-air-8-13.htm",
+   "variants": [
+    {
+     "name": "iPad Air 8 13\" WIFI 128GB",
+     "url": "chi-tiet/3340-ipad-air-8-13-wifi-128gb.htm",
+     "options": [
+      "Blue / Mỹ - 21900000",
+      "Purple / Mỹ - 21900000",
+      "Space Gray / Mỹ - 21900000",
+      "Starlight / Mỹ - 21900000"
+     ],
+     "pagePrice": "21.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 13\" WIFI 256GB",
+     "url": "chi-tiet/3339-ipad-air-8-13-wifi-256gb.htm",
+     "options": [
+      "Blue / Mỹ - 25600000",
+      "Purple / Mỹ - 25600000",
+      "Space Gray / Mỹ - 25600000",
+      "Starlight / Mỹ - 25600000"
+     ],
+     "pagePrice": "25.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 13\" WIFI 512GB",
+     "url": "chi-tiet/3338-ipad-air-8-13-wifi-512gb.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 13\" WIFI 1TB",
+     "url": "chi-tiet/3337-ipad-air-8-13-wifi-1tb.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 13\" 5G 128GB",
+     "url": "chi-tiet/3336-ipad-air-8-13-5g-128gb.htm",
+     "options": [
+      "Blue / Mỹ - 24200000",
+      "Purple / Mỹ - 24200000",
+      "Space Gray / Mỹ - 24200000",
+      "Starlight / Mỹ - 24200000"
+     ],
+     "pagePrice": "24.200.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 13\" 5G 256GB",
+     "url": "chi-tiet/3335-ipad-air-8-13-5g-256gb.htm",
+     "options": [
+      "Purple / Mỹ - 28200000",
+      "Blue / Mỹ - 28200000",
+      "Starlight / Mỹ - 28200000",
+      "Space Gray / Mỹ - 28200000"
+     ],
+     "pagePrice": "28.200.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 13\" 5G 512GB",
+     "url": "chi-tiet/3334-ipad-air-8-13-5g-512gb.htm",
+     "options": [
+      "Blue / Mỹ - 30800000",
+      "Purple / Mỹ - 30800000",
+      "Space Gray / Mỹ - 30800000",
+      "Starlight / Mỹ - 30800000"
+     ],
+     "pagePrice": "30.800.000 VNĐ",
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPad Air 8 11\"",
+   "url": "danh-muc-san-pham/91-ipad-air-8-11.htm",
+   "variants": [
+    {
+     "name": "iPad Air 8 11\" WIFI 128GB",
+     "url": "chi-tiet/3348-ipad-air-8-11-wifi-128gb.htm",
+     "options": [
+      "Starlight / Mỹ - 17600000",
+      "Space Gray / Mỹ - 17600000",
+      "Purple / Mỹ - 17600000",
+      "Blue / Mỹ - 17600000",
+      "Starlight / VN - 18300000",
+      "Space Gray / VN - 18300000",
+      "Purple / VN - 18300000",
+      "Blue / VN - 18300000"
+     ],
+     "pagePrice": "17.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 11\" WIFI 256GB",
+     "url": "chi-tiet/3347-ipad-air-8-11-wifi-256gb.htm",
+     "options": [
+      "Blue / Mỹ - 21300000",
+      "Purple / Mỹ - 21300000",
+      "Space Gray / Mỹ - 21300000",
+      "Starlight / Mỹ - 21300000",
+      "Space Gray / VN - 21600000",
+      "Purple / VN - 21600000",
+      "Blue / VN - 21600000",
+      "Starlight / VN - 21800000"
+     ],
+     "pagePrice": "21.300.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 11\" WIFI 512GB",
+     "url": "chi-tiet/3346-ipad-air-8-11-wifi-512gb.htm",
+     "options": [],
+     "pagePrice": "25.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 11\" WIFI 1TB",
+     "url": "chi-tiet/3345-ipad-air-8-11-wifi-1tb.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 11\" 5G 128GB",
+     "url": "chi-tiet/3344-ipad-air-8-11-5g-128gb.htm",
+     "options": [
+      "Starlight / Mỹ - 22600000",
+      "Space Gray / Mỹ - 22600000",
+      "Purple / Mỹ - 22600000",
+      "Blue / Mỹ - 22600000",
+      "Blue / VN - 22600000",
+      "Starlight / VN - 22900000",
+      "Space Gray / VN - 22900000",
+      "Purple / VN - 22900000"
+     ],
+     "pagePrice": "22.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 11\" 5G 256GB",
+     "url": "chi-tiet/3343-ipad-air-8-11-5g-256gb.htm",
+     "options": [
+      "Blue / Mỹ - 25200000",
+      "Purple / Mỹ - 25200000",
+      "Starlight / Mỹ - 25200000",
+      "Space Gray / Mỹ - 25200000",
+      "Blue / VN - 25600000",
+      "Purple / VN - 25600000",
+      "Space Gray / VN - 25600000",
+      "Starlight / VN - 25600000"
+     ],
+     "pagePrice": "25.200.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 11\" 5G 512GB",
+     "url": "chi-tiet/3342-ipad-air-8-11-5g-512gb.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 8 11\" 5G 1TB",
+     "url": "chi-tiet/3341-ipad-air-8-11-5g-1tb.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPad Air 7 13\"",
+   "url": "danh-muc-san-pham/54-ipad-air-7-13.htm",
+   "variants": [
+    {
+     "name": "iPad Air 7 13\" M3 128GB WIFI",
+     "url": "chi-tiet/2101-ipad-air-7-13-m3-128gb-wifi.htm",
+     "options": [
+      "Blue / Mỹ - 17800000",
+      "Purple / Mỹ - 17800000",
+      "Space Gray / Mỹ - 17800000",
+      "Starlight / Mỹ - 17800000",
+      "Blue / VN - 18300000",
+      "Purple / VN - 18300000",
+      "Space Gray / VN - 18300000",
+      "Starlight / VN - 18300000"
+     ],
+     "pagePrice": "17.800.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 13\" M3 256GB WIFI",
+     "url": "chi-tiet/2095-ipad-air-7-13-m3-256gb-wifi.htm",
+     "options": [
+      "Blue / Mỹ - 21800000",
+      "Purple / Mỹ - 21800000",
+      "Space Gray / Mỹ - 21800000",
+      "Starlight / Mỹ - 21800000",
+      "Blue / VN - 21900000",
+      "Purple / VN - 21900000",
+      "Space Gray / VN - 21900000",
+      "Starlight / VN - 21900000"
+     ],
+     "pagePrice": "21.800.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 13\" M3 512GB WIFI",
+     "url": "chi-tiet/2102-ipad-air-7-13-m3-512gb-wifi.htm",
+     "options": [
+      "Blue / VN - 24900000",
+      "Purple / VN - 24900000",
+      "Space Gray / VN - 24900000",
+      "Starlight / VN - 24900000"
+     ],
+     "pagePrice": "24.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 13\" M3 1TB WIFI",
+     "url": "chi-tiet/2103-ipad-air-7-13-m3-1tb-wifi.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 13\" M3 128GB 5G",
+     "url": "chi-tiet/2104-ipad-air-7-13-m3-128gb-5g.htm",
+     "options": [
+      "Blue / VN - 22800000",
+      "Purple / VN - 22800000",
+      "Space Gray / VN - 22800000",
+      "Starlight / VN - 22800000"
+     ],
+     "pagePrice": "22.800.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 13\" M3 256GB 5G",
+     "url": "chi-tiet/2105-ipad-air-7-13-m3-256gb-5g.htm",
+     "options": [
+      "Blue / VN - 25800000",
+      "Purple / VN - 25800000",
+      "Space Gray / VN - 25800000",
+      "Starlight / VN - 25800000"
+     ],
+     "pagePrice": "25.800.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 13\" M3 512GB 5G",
+     "url": "chi-tiet/2106-ipad-air-7-13-m3-512gb-5g.htm",
+     "options": [
+      "Blue / VN - 28900000",
+      "Purple / VN - 28900000",
+      "Space Gray / VN - 28900000",
+      "Starlight / VN - 28900000"
+     ],
+     "pagePrice": "28.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 13\" M3 1TB 5G",
+     "url": "chi-tiet/2094-ipad-air-7-13-m3-1tb-5g.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPad Air 7 11\"",
+   "url": "danh-muc-san-pham/69-ipad-air-7-11.htm",
+   "variants": [
+    {
+     "name": "iPad Air 7 11\" M3 128GB WIFI",
+     "url": "chi-tiet/2110-ipad-air-7-11-m3-128gb-wifi.htm",
+     "options": [
+      "Space Gray / VN - 16600000",
+      "Blue / Mỹ - 16600000",
+      "Purple / Mỹ - 16600000",
+      "Space Gray / Mỹ - 16600000",
+      "Starlight / Mỹ - 16600000",
+      "Blue / VN - 16900000",
+      "Purple / VN - 16900000",
+      "Starlight / VN - 16900000"
+     ],
+     "pagePrice": "16.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 11\" M3 256GB WIFI",
+     "url": "chi-tiet/2109-ipad-air-7-11-m3-256gb-wifi.htm",
+     "options": [
+      "Blue / Mỹ - 18900000",
+      "Purple / Mỹ - 18900000",
+      "Space Gray / Mỹ - 18900000",
+      "Starlight / Mỹ - 18900000",
+      "Blue / VN - 19300000",
+      "Purple / VN - 19300000",
+      "Space Gray / VN - 19300000",
+      "Starlight / VN - 19300000"
+     ],
+     "pagePrice": "18.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 11\" M3 512GB WIFI",
+     "url": "chi-tiet/2108-ipad-air-7-11-m3-512gb-wifi.htm",
+     "options": [
+      "Purple / VN - 21900000",
+      "Space Gray / VN - 21900000",
+      "Starlight / VN - 21900000",
+      "Blue / VN - 21900000"
+     ],
+     "pagePrice": "21.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 11\" M3 1TB WIFI",
+     "url": "chi-tiet/2107-ipad-air-7-11-m3-1tb-wifi.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 11\" M3 128GB 5G",
+     "url": "chi-tiet/2097-ipad-air-7-11-m3-128gb-5g.htm",
+     "options": [
+      "Blue / Mỹ - 18600000",
+      "Purple / Mỹ - 18600000",
+      "Space Gray / Mỹ - 18600000",
+      "Starlight / Mỹ - 18600000",
+      "Blue / VN - 19600000",
+      "Purple / VN - 19600000",
+      "Space Gray / VN - 19600000",
+      "Starlight / VN - 19600000"
+     ],
+     "pagePrice": "18.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 11\" M3 256GB 5G",
+     "url": "chi-tiet/2098-ipad-air-7-11-m3-256gb-5g.htm",
+     "options": [
+      "Blue / Mỹ - 21800000",
+      "Purple / Mỹ - 21800000",
+      "Space Gray / Mỹ - 21800000",
+      "Starlight / Mỹ - 21800000",
+      "Blue / VN - 22600000",
+      "Purple / VN - 22600000",
+      "Space Gray / VN - 22600000",
+      "Starlight / VN - 22600000"
+     ],
+     "pagePrice": "21.800.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 11\" M3 512GB 5G",
+     "url": "chi-tiet/2099-ipad-air-7-11-m3-512gb-5g.htm",
+     "options": [
+      "Blue / Mỹ - 27200000",
+      "Purple / Mỹ - 27200000",
+      "Space Gray / Mỹ - 27200000",
+      "Starlight / Mỹ - 27200000"
+     ],
+     "pagePrice": "27.200.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Air 7 11\" M3 1TB 5G",
+     "url": "chi-tiet/2100-ipad-air-7-11-m3-1tb-5g.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPad Gen 11\"",
+   "url": "danh-muc-san-pham/122-ipad-gen-11.htm",
+   "variants": [
+    {
+     "name": "iPad Gen 11 WIFI 128GB",
+     "url": "chi-tiet/3019-ipad-gen-11-wifi-128gb.htm",
+     "options": [
+      "Yellow / VN - 11300000",
+      "Silver / VN - 11300000",
+      "Pink / VN - 11300000",
+      "Blue / VN - 11300000",
+      "Yellow / Mỹ - 11300000",
+      "Silver / Mỹ - 11300000",
+      "Pink / Mỹ - 11300000",
+      "Blue / Mỹ - 11300000"
+     ],
+     "pagePrice": "11.300.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Gen 11 WIFI 256GB",
+     "url": "chi-tiet/3018-ipad-gen-11-wifi-256gb.htm",
+     "options": [
+      "Silver / Mỹ - 13900000",
+      "Yellow / VN - 14300000",
+      "Silver / VN - 14300000",
+      "Pink / VN - 14300000",
+      "Blue / VN - 14300000",
+      "Yellow / Mỹ - 14300000",
+      "Pink / Mỹ - 14300000",
+      "Blue / Mỹ - 14300000"
+     ],
+     "pagePrice": "13.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Gen 11 WIFI 512GB",
+     "url": "chi-tiet/3017-ipad-gen-11-wifi-512gb.htm",
+     "options": [
+      "Yellow / Mỹ - 17200000",
+      "Silver / Mỹ - 17600000",
+      "Pink / Mỹ - 17600000",
+      "Blue / Mỹ - 17600000",
+      "Silver / VN - 19600000",
+      "Yellow / VN - 19600000",
+      "Pink / VN - 19600000",
+      "Blue / VN - 19600000"
+     ],
+     "pagePrice": "17.200.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Gen 11 LTE 128GB",
+     "url": "chi-tiet/3016-ipad-gen-11-lte-128gb.htm",
+     "options": [
+      "Silver / Mỹ - 13900000",
+      "Yellow / VN - 14300000",
+      "Silver / VN - 14300000",
+      "Pink / VN - 14300000",
+      "Blue / VN - 14300000",
+      "Yellow / Mỹ - 14300000",
+      "Pink / Mỹ - 14300000",
+      "Blue / Mỹ - 14300000"
+     ],
+     "pagePrice": "13.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Gen 11 LTE 256GB",
+     "url": "chi-tiet/3015-ipad-gen-11-lte-256gb.htm",
+     "options": [
+      "Yellow / VN - 17900000",
+      "Silver / VN - 17900000",
+      "Pink / VN - 17900000",
+      "Blue / VN - 17900000",
+      "Yellow / Mỹ - 17900000",
+      "Silver / Mỹ - 17900000",
+      "Pink / Mỹ - 17900000",
+      "Blue / Mỹ - 17900000"
+     ],
+     "pagePrice": "17.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Gen 11 LTE 512GB",
+     "url": "chi-tiet/3014-ipad-gen-11-lte-512gb.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iPad Mini 7",
+   "url": "danh-muc-san-pham/74-ipad-mini-7.htm",
+   "variants": [
+    {
+     "name": "iPad Mini Gen 7 WIFI - 128GB",
+     "url": "chi-tiet/2930-ipad-mini-gen-7-wifi-128gb.htm",
+     "options": [
+      "Blue / VN - 13600000",
+      "Purple / VN - 13600000",
+      "Space Gray / VN - 13600000",
+      "Starlight / VN - 13600000",
+      "Blue / Mỹ - 13600000",
+      "Purple / Mỹ - 13600000",
+      "Starlight / Mỹ - 13600000",
+      "Space Gray / Mỹ - 13600000"
+     ],
+     "pagePrice": "13.600.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Mini Gen 7 WIFI - 256GB",
+     "url": "chi-tiet/2929-ipad-mini-gen-7-wifi-256gb.htm",
+     "options": [
+      "Space Gray / Mỹ - 16900000",
+      "Starlight / Mỹ - 17200000",
+      "Purple / Mỹ - 17800000",
+      "Blue / VN - 17900000",
+      "Purple / VN - 17900000",
+      "Space Gray / VN - 17900000",
+      "Starlight / VN - 17900000",
+      "Blue / Mỹ - 18200000"
+     ],
+     "pagePrice": "16.900.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "iPad Mini Gen 7 WIFI - 512GB",
+     "url": "chi-tiet/2928-ipad-mini-gen-7-wifi-512gb.htm",
+     "options": [
+      "Blue / VN - 21900000",
+      "Purple / VN - 21900000",
+      "Space Gray / VN - 21900000",
+      "Starlight / VN - 21900000",
+      "Purple / Mỹ - 21900000",
+      "Space Gray / Mỹ - 21900000",
+      "Starlight / Mỹ - 21900000",
+      "Blue / Mỹ - 21900000"
+     ],
+     "pagePrice": "21.900.000 VNĐ",
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "Airpods",
+   "url": "danh-muc-san-pham/135-airpods.htm",
+   "variants": []
+  },
+  {
+   "model": "Accessories",
+   "url": "danh-muc-san-pham/13-accessories.htm",
+   "variants": []
+  }
+ ],
+ "mac": [
+  {
+   "model": "MacBook Pro 16\" M5",
+   "url": "danh-muc-san-pham/108-macbook-pro-16-m5.htm",
+   "variants": [
+    {
+     "name": "Macbook Pro 16\" M5 Pro 24GB/1TB - 18 CPU || 20 GPU",
+     "url": "chi-tiet/3328-macbook-pro-16-m5-pro-24gb1tb-18-cpu-20-gpu.htm",
+     "options": [
+      "Silver / Mỹ - 69600000",
+      "Black / Mỹ - 69600000",
+      "Silver / VN - 78900000",
+      "Black / VN - 78900000"
+     ],
+     "pagePrice": "69.600.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 16\" M5 Pro 48GB/1TB - 18 CPU || 20 GPU",
+     "url": "chi-tiet/3327-macbook-pro-16-m5-pro-48gb1tb-18-cpu-20-gpu.htm",
+     "options": [
+      "Silver / VN - 94900000",
+      "Black / VN - 94900000"
+     ],
+     "pagePrice": "94.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 16\" M5 Max 36GB/2TB - 18 CPU || 32 GPU",
+     "url": "chi-tiet/3326-macbook-pro-16-m5-max-36gb2tb-18-cpu-32-gpu.htm",
+     "options": [
+      "Black / Mỹ - 95900000",
+      "Silver / VN - 114900000",
+      "Black / VN - 114900000"
+     ],
+     "pagePrice": "95.900.000 VNĐ",
+     "productImgs": 3
+    },
+    {
+     "name": "Macbook Pro 16\" M5 Max 48GB/2TB - 18 CPU || 40 GPU",
+     "url": "chi-tiet/3325-macbook-pro-16-m5-max-48gb2tb-18-cpu-40-gpu.htm",
+     "options": [
+      "Black / VN - 133900000",
+      "Silver / VN - 133900000"
+     ],
+     "pagePrice": "133.900.000 VNĐ",
+     "productImgs": 3
+    }
+   ]
+  },
+  {
+   "model": "Macbook Pro 14\" M5",
+   "url": "danh-muc-san-pham/160-macbook-pro-14-m5.htm",
+   "variants": [
+    {
+     "name": "Macbook Pro 14\" M5 16GB / 512GB - 10 CPU / 10 GPU",
+     "url": "chi-tiet/3217-macbook-pro-14-m5-16gb-512gb-10-cpu-10-gpu.htm",
+     "options": [
+      "Black / VN - 46900000",
+      "Silver / VN - 47800000"
+     ],
+     "pagePrice": "46.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 14\" M5 16GB / 1TB - 10 CPU / 10 GPU",
+     "url": "chi-tiet/3216-macbook-pro-14-m5-16gb-1tb-10-cpu-10-gpu.htm",
+     "options": [
+      "Black / Mỹ - 47900000",
+      "Black / VN - 48600000",
+      "Silver / VN - 49600000"
+     ],
+     "pagePrice": "47.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 14\" M5 24GB / 512GB - 10 CPU / 10 GPU",
+     "url": "chi-tiet/3255-macbook-pro-14-m5-24gb-512gb-10-cpu-10-gpu.htm",
+     "options": [
+      "Black / Mỹ - 48900000"
+     ],
+     "pagePrice": "48.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 14\" M5 24GB / 1TB - 10 CPU / 10 GPU",
+     "url": "chi-tiet/3215-macbook-pro-14-m5-24gb-1tb-10-cpu-10-gpu.htm",
+     "options": [
+      "Silver / VN - 54900000",
+      "Silver / Mỹ - 56900000",
+      "Black / VN - 57300000"
+     ],
+     "pagePrice": "54.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 14\" M5 Pro 24GB/1TB - 15 CPU || 16 GPU",
+     "url": "chi-tiet/3332-macbook-pro-14-m5-pro-24gb1tb-15-cpu-16-gpu.htm",
+     "options": [
+      "Silver / VN - 66900000",
+      "Black / VN - 67900000"
+     ],
+     "pagePrice": "66.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 14\" M5 Pro 24GB/2TB - 15 CPU || 16 GPU",
+     "url": "chi-tiet/3331-macbook-pro-14-m5-pro-24gb2tb-15-cpu-16-gpu.htm",
+     "options": [
+      "Black / Mỹ - 68600000",
+      "Silver / VN - 73600000",
+      "Black / VN - 73600000"
+     ],
+     "pagePrice": "68.600.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 14\" M5 Pro 24GB/2TB - 18 CPU || 20 GPU",
+     "url": "chi-tiet/3330-macbook-pro-14-m5-pro-24gb2tb-18-cpu-20-gpu.htm",
+     "options": [
+      "Black / Mỹ - 71600000",
+      "Silver / VN - 78900000",
+      "Black / VN - 78900000"
+     ],
+     "pagePrice": "71.600.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Macbook Pro 14\" M5 Max 36GB/2TB - 18 CPU || 32 GPU",
+     "url": "chi-tiet/3329-macbook-pro-14-m5-max-36gb2tb-18-cpu-32-gpu.htm",
+     "options": [
+      "Silver / VN - 99200000",
+      "Black / VN - 99200000"
+     ],
+     "pagePrice": "99.200.000 VNĐ",
+     "productImgs": 5
+    }
+   ]
+  },
+  {
+   "model": "Macbook Air 15\" M5",
+   "url": "danh-muc-san-pham/2-macbook-air-15-m5.htm",
+   "variants": [
+    {
+     "name": "Macbook Air 15\" M5 16GB / 512GB",
+     "url": "chi-tiet/1509-macbook-air-15-m5-16gb-512gb.htm",
+     "options": [
+      "Midnight / Mỹ - 37600000",
+      "Starlight / Mỹ - 37600000",
+      "Blue / Mỹ - 37900000",
+      "Silver / Mỹ - 37900000",
+      "Blue / VN - 38600000",
+      "Starlight / VN - 38900000",
+      "Silver / VN - 38900000",
+      "Midnight / VN - 38900000"
+     ],
+     "pagePrice": "37.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Macbook Air 15\" M5 16GB / 1TB",
+     "url": "chi-tiet/1527-macbook-air-15-m5-16gb-1tb.htm",
+     "options": [
+      "Starlight / VN - 44600000",
+      "Silver / VN - 44600000",
+      "Midnight / VN - 44600000",
+      "Blue / VN - 44600000"
+     ],
+     "pagePrice": "44.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Macbook Air 15\" M5 24GB / 1TB",
+     "url": "chi-tiet/1526-macbook-air-15-m5-24gb-1tb.htm",
+     "options": [
+      "Starlight / VN - 49900000",
+      "Silver / VN - 49900000",
+      "Midnight / VN - 49900000",
+      "Blue / VN - 49900000"
+     ],
+     "pagePrice": "49.900.000 VNĐ",
+     "productImgs": 9
+    }
+   ]
+  },
+  {
+   "model": "MacBook Air 13\" M5",
+   "url": "danh-muc-san-pham/109-macbook-air-13-m5.htm",
+   "variants": [
+    {
+     "name": "Macbook Air 13\" M5 16GB / 512GB",
+     "url": "chi-tiet/1528-macbook-air-13-m5-16gb-512gb.htm",
+     "options": [
+      "Starlight / Mỹ - 32900000",
+      "Blue / Mỹ - 32900000",
+      "Blue / VN - 33200000",
+      "Midnight / VN - 33200000",
+      "Silver / VN - 33200000",
+      "Midnight / Mỹ - 33200000",
+      "Silver / Mỹ - 33200000",
+      "Starlight / VN - 33200000"
+     ],
+     "pagePrice": "32.900.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Macbook Air 13\" M5 16GB / 1TB",
+     "url": "chi-tiet/1308-macbook-air-13-m5-16gb-1tb.htm",
+     "options": [
+      "Blue / Mỹ - 37900000",
+      "Silver / Mỹ - 38900000",
+      "Midnight / Mỹ - 38900000",
+      "Starlight / Mỹ - 38900000",
+      "Starlight / VN - 40600000",
+      "Blue / VN - 40600000",
+      "Midnight / VN - 40600000",
+      "Silver / VN - 40600000"
+     ],
+     "pagePrice": "37.900.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Macbook Air 13\" M5 24GB / 512GB",
+     "url": "chi-tiet/3448-macbook-air-13-m5-24gb-512gb.htm",
+     "options": [
+      "Midnight / VN - 39600000",
+      "Blue / VN - 39600000",
+      "Starlight / VN - 39900000",
+      "Silver / VN - 39900000"
+     ],
+     "pagePrice": "39.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Macbook Air 13\" M5 24GB / 1TB",
+     "url": "chi-tiet/1309-macbook-air-13-m5-24gb-1tb.htm",
+     "options": [
+      "Blue / Mỹ - 42600000",
+      "Starlight / Mỹ - 43200000",
+      "Silver / Mỹ - 43200000",
+      "Midnight / Mỹ - 43200000",
+      "Silver / VN - 45900000",
+      "Blue / VN - 46300000",
+      "Starlight / VN - 46800000",
+      "Midnight / VN - 46800000"
+     ],
+     "pagePrice": "42.600.000 VNĐ",
+     "productImgs": 9
+    }
+   ]
+  },
+  {
+   "model": "MacBook Neo",
+   "url": "danh-muc-san-pham/86-macbook-neo.htm",
+   "variants": [
+    {
+     "name": "Macbook Neo 8GB/256GB",
+     "url": "chi-tiet/3352-macbook-neo-8gb256gb.htm",
+     "options": [
+      "Yellow / VN - 16300000",
+      "Silver / VN - 17600000",
+      "Blue / VN - 17600000",
+      "Pink / VN - 17600000"
+     ],
+     "pagePrice": "16.300.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "Macbook Neo 8GB/512GB",
+     "url": "chi-tiet/3351-macbook-neo-8gb512gb.htm",
+     "options": [
+      "Yellow / VN - 20300000",
+      "Silver / VN - 20300000",
+      "Blue / VN - 20300000",
+      "Pink / VN - 20600000"
+     ],
+     "pagePrice": "20.300.000 VNĐ",
+     "productImgs": 11
+    },
+    {
+     "name": "Macbook Neo 8GB/256GB - Touch ID",
+     "url": "chi-tiet/3350-macbook-neo-8gb256gb-touch-id.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    },
+    {
+     "name": "Macbook Neo 8GB/512GB - Touch ID",
+     "url": "chi-tiet/3349-macbook-neo-8gb512gb-touch-id.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 11
+    }
+   ]
+  },
+  {
+   "model": "iMac",
+   "url": "danh-muc-san-pham/148-imac.htm",
+   "variants": [
+    {
+     "name": "iMac M4 2024 16GB RAM - 256GB - 8-Core CPU || 8-Core GPU",
+     "url": "chi-tiet/1896-imac-m4-2024-16gb-ram-256gb-8-core-cpu-8-core-gpu.htm",
+     "options": [
+      "Pink / VN - 41600000",
+      "Silver / VN - 41600000",
+      "Green / VN - 41600000"
+     ],
+     "pagePrice": "41.600.000 VNĐ",
+     "productImgs": 15
+    },
+    {
+     "name": "iMac M4 2024 24GB RAM - 512GB - 10-Core CPU || 10-Core GPU",
+     "url": "chi-tiet/1024-imac-m4-2024-24gb-ram-512gb-10-core-cpu-10-core-gpu.htm",
+     "options": [],
+     "pagePrice": "52.600.000 VNĐ",
+     "productImgs": 15
+    },
+    {
+     "name": "iMac M4 2024 16GB RAM - 1TB - 10-Core CPU || 10-Core GPU - Silver",
+     "url": "chi-tiet/1880-imac-m4-2024-16gb-ram-1tb-10-core-cpu-10-core-gpu-silver.htm",
+     "options": [],
+     "pagePrice": "50.500.000 VNĐ",
+     "productImgs": 3
+    }
+   ]
+  },
+  {
+   "model": "Mac Mini",
+   "url": "danh-muc-san-pham/191-mac-mini.htm",
+   "variants": [
+    {
+     "name": "Mac Mini M6 16GB / 256GB - 12-Core CPU || 12-Core GPU",
+     "url": "chi-tiet/2983-mac-mini-m6-16gb-256gb-12-core-cpu-12-core-gpu.htm",
+     "options": [],
+     "pagePrice": "24.600.000 VNĐ",
+     "productImgs": 3
+    },
+    {
+     "name": "Mac Mini M6 16GB / 512GB - 12-Core CPU || 12-Core GPU",
+     "url": "chi-tiet/2984-mac-mini-m6-16gb-512gb-12-core-cpu-12-core-gpu.htm",
+     "options": [],
+     "pagePrice": "28.600.000 VNĐ",
+     "productImgs": 3
+    },
+    {
+     "name": "Mac Mini M6 24GB / 512GB - 12-Core CPU || 12-Core GPU",
+     "url": "chi-tiet/2982-mac-mini-m6-24gb-512gb-12-core-cpu-12-core-gpu.htm",
+     "options": [],
+     "pagePrice": "34.600.000 VNĐ",
+     "productImgs": 3
+    },
+    {
+     "name": "Mac Mini M5 Pro 24GB / 512GB - 15-Core CPU || 16-Core GPU",
+     "url": "chi-tiet/2915-mac-mini-m5-pro-24gb-512gb-15-core-cpu-16-core-gpu.htm",
+     "options": [],
+     "pagePrice": "45.900.000 VNĐ",
+     "productImgs": 3
+    }
+   ]
+  },
+  {
+   "model": "Accessories",
+   "url": "danh-muc-san-pham/6-accessories.htm",
+   "variants": []
+  }
+ ],
+ "watch": [
+  {
+   "model": "Apple Watch Ultra 4",
+   "url": "danh-muc-san-pham/21-apple-watch-ultra-4.htm",
+   "variants": []
+  },
+  {
+   "model": "Apple Watch Ultra 3",
+   "url": "danh-muc-san-pham/111-apple-watch-ultra-3.htm",
+   "variants": [
+    {
+     "name": "Apple Watch Ultra 3 Milanese Loop",
+     "url": "chi-tiet/3184-apple-watch-ultra-3-milanese-loop.htm",
+     "options": [
+      "Natural / VN - 20900000",
+      "Black / VN - 21600000",
+      "Natural / Mỹ - 21600000",
+      "Black / Mỹ - 21600000"
+     ],
+     "pagePrice": "20.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Apple Watch Ultra 3 Trail Loop",
+     "url": "chi-tiet/3183-apple-watch-ultra-3-trail-loop.htm",
+     "options": [
+      "Natural / VN - 18900000",
+      "Black / Mỹ - 18900000",
+      "Black / VN - 18900000",
+      "Natural / Mỹ - 18900000"
+     ],
+     "pagePrice": "18.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Apple Watch Ultra 3 Alpine Loop",
+     "url": "chi-tiet/3182-apple-watch-ultra-3-alpine-loop.htm",
+     "options": [
+      "Black / Mỹ - 18900000",
+      "Natural / Mỹ - 18900000",
+      "Black / VN - 18900000",
+      "Natural / VN - 18900000"
+     ],
+     "pagePrice": "18.900.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Apple Watch Ultra 3 Ocean Band",
+     "url": "chi-tiet/3181-apple-watch-ultra-3-ocean-band.htm",
+     "options": [
+      "Black / Mỹ - 18300000",
+      "Natural / Mỹ - 18300000",
+      "Black / VN - 18900000",
+      "Natural / VN - 18900000"
+     ],
+     "pagePrice": "18.300.000 VNĐ",
+     "productImgs": 5
+    }
+   ]
+  },
+  {
+   "model": "Apple Watch 12",
+   "url": "danh-muc-san-pham/95-apple-watch-12.htm",
+   "variants": []
+  },
+  {
+   "model": "Apple Watch 11",
+   "url": "danh-muc-san-pham/159-apple-watch-11.htm",
+   "variants": [
+    {
+     "name": "Apple Watch 11 Titanium LTE 42mm Sport Band",
+     "url": "chi-tiet/3176-apple-watch-11-titanium-lte-42mm-sport-band.htm",
+     "options": [
+      "Gold / Mỹ - 17600000",
+      "Natural / Mỹ - 17900000",
+      "Gold / VN - 17900000",
+      "Black / Mỹ - 21300000",
+      "Black / VN - 21300000",
+      "Natural / VN - 21300000"
+     ],
+     "pagePrice": "17.600.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "Apple Watch 11 Titanium LTE 46mm Sport Band",
+     "url": "chi-tiet/3175-apple-watch-11-titanium-lte-46mm-sport-band.htm",
+     "options": [
+      "Black / Mỹ - 22900000",
+      "Gold / Mỹ - 22900000",
+      "Natural / Mỹ - 22900000",
+      "Black / VN - 22900000",
+      "Gold / VN - 22900000",
+      "Natural / VN - 22900000"
+     ],
+     "pagePrice": "22.900.000 VNĐ",
+     "productImgs": 7
+    },
+    {
+     "name": "Apple Watch 11 GPS 42mm Sport Band",
+     "url": "chi-tiet/3174-apple-watch-11-gps-42mm-sport-band.htm",
+     "options": [
+      "Black / Mỹ - 7900000",
+      "Silver / Mỹ - 8200000",
+      "Gold / Mỹ - 8200000",
+      "Space Gray / Mỹ - 8200000",
+      "Black / VN - 8300000",
+      "Gold / VN - 8600000",
+      "Space Gray / VN - 8600000",
+      "Silver / VN - 8800000"
+     ],
+     "pagePrice": "7.900.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Apple Watch 11 GPS 46mm Sport Band",
+     "url": "chi-tiet/3173-apple-watch-11-gps-46mm-sport-band.htm",
+     "options": [
+      "Silver / Mỹ - 8600000",
+      "Black / Mỹ - 8600000",
+      "Gold / Mỹ - 8600000",
+      "Space Gray / Mỹ - 8600000",
+      "Space Gray / VN - 9600000",
+      "Silver / VN - 9600000",
+      "Gold / VN - 9600000",
+      "Black / VN - 9600000"
+     ],
+     "pagePrice": "8.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Apple Watch 11 LTE 42mm Sport Band",
+     "url": "chi-tiet/3172-apple-watch-11-lte-42mm-sport-band.htm",
+     "options": [
+      "Silver / Mỹ - 11300000",
+      "Black / Mỹ - 11300000",
+      "Black / VN - 11300000",
+      "Space Gray / Mỹ - 11600000",
+      "Gold / Mỹ - 11600000",
+      "Silver / VN - 12600000",
+      "Gold / VN - 12600000",
+      "Space Gray / VN - 12600000"
+     ],
+     "pagePrice": "11.300.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Apple Watch 11 LTE 46mm Sport Band",
+     "url": "chi-tiet/3171-apple-watch-11-lte-46mm-sport-band.htm",
+     "options": [
+      "Gold / Mỹ - 10300000",
+      "Black / Mỹ - 10600000",
+      "Silver / Mỹ - 11900000",
+      "Space Gray / Mỹ - 11900000",
+      "Silver / VN - 12900000",
+      "Gold / VN - 12900000",
+      "Black / VN - 12900000",
+      "Space Gray / VN - 12900000"
+     ],
+     "pagePrice": "10.300.000 VNĐ",
+     "productImgs": 9
+    }
+   ]
+  },
+  {
+   "model": "Apple Watch SE 3",
+   "url": "danh-muc-san-pham/110-apple-watch-se-3.htm",
+   "variants": [
+    {
+     "name": "Apple Watch SE 3 GPS 40mm Sport Band",
+     "url": "chi-tiet/3180-apple-watch-se-3-gps-40mm-sport-band.htm",
+     "options": [
+      "Midnight / Mỹ - 5600000",
+      "Midnight / VN - 5800000",
+      "Starlight / VN - 5900000",
+      "Starlight / Mỹ - 6200000"
+     ],
+     "pagePrice": "5.600.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Apple Watch SE 3 GPS 44mm Sport Band",
+     "url": "chi-tiet/3179-apple-watch-se-3-gps-44mm-sport-band.htm",
+     "options": [
+      "Midnight / VN - 6600000",
+      "Starlight / VN - 6600000",
+      "Midnight / Mỹ - 6800000",
+      "Starlight / Mỹ - 7300000"
+     ],
+     "pagePrice": "6.600.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Apple Watch SE 3 LTE 40mm Sport Band",
+     "url": "chi-tiet/3178-apple-watch-se-3-lte-40mm-sport-band.htm",
+     "options": [
+      "Starlight / Mỹ - 8600000",
+      "Midnight / Mỹ - 8600000",
+      "Starlight / VN - 8600000",
+      "Midnight / VN - 8600000"
+     ],
+     "pagePrice": "8.600.000 VNĐ",
+     "productImgs": 5
+    },
+    {
+     "name": "Apple Watch SE 3 LTE 44mm Sport Band",
+     "url": "chi-tiet/3177-apple-watch-se-3-lte-44mm-sport-band.htm",
+     "options": [
+      "Midnight / Mỹ - 7600000",
+      "Starlight / Mỹ - 8900000",
+      "Starlight / VN - 8900000",
+      "Midnight / VN - 8900000"
+     ],
+     "pagePrice": "7.600.000 VNĐ",
+     "productImgs": 5
+    }
+   ]
+  },
+  {
+   "model": "Dây Apple Watch",
+   "url": "danh-muc-san-pham/96-day-apple-watch.htm",
+   "variants": [
+    {
+     "name": "Dây Cao Su - Sport Band ( Chính hãng )",
+     "url": "chi-tiet/773-day-cao-su-sport-band-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": "1.200.000 VNĐ",
+     "productImgs": 21
+    },
+    {
+     "name": "Dây Apple Watch Thép - Stainless Steel ( Chính hãng )",
+     "url": "chi-tiet/775-day-apple-watch-thep-stainless-steel-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": "3.600.000 VNĐ",
+     "productImgs": 9
+    },
+    {
+     "name": "Dây Vải - Sport Loop ( Chính hãng )",
+     "url": "chi-tiet/774-day-vai-sport-loop-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": "1.600.000 VNĐ",
+     "productImgs": 17
+    },
+    {
+     "name": "Dây Apple Watch NIKE ( Chính hãng )",
+     "url": "chi-tiet/776-day-apple-watch-nike-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": "1.600.000 VNĐ",
+     "productImgs": 13
+    },
+    {
+     "name": "Dây 40mm Raspberry Modern Buckle ( Chính hãng )",
+     "url": "chi-tiet/984-day-40mm-raspberry-modern-buckle-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây 40mm Deep Sea Blue Modern Buckle ( Chính hãng )",
+     "url": "chi-tiet/985-day-40mm-deep-sea-blue-modern-buckle-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây 40mm Saddle Brown Modern Buckle ( Chính hãng )",
+     "url": "chi-tiet/986-day-40mm-saddle-brown-modern-buckle-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây 40mm Black Modern Buckle ( Chính hãng )",
+     "url": "chi-tiet/987-day-40mm-black-modern-buckle-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây 44mm Peacock Leather Loop ( Chính hãng )",
+     "url": "chi-tiet/988-day-44mm-peacock-leather-loop-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây 44mm Meyer Lemon Leather Loop ( Chính hãng )",
+     "url": "chi-tiet/989-day-44mm-meyer-lemon-leather-loop-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây 44mm Saddle Brown Leather Loop ( Chính hãng )",
+     "url": "chi-tiet/990-day-44mm-saddle-brown-leather-loop-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây 44mm Black Leather Loop ( Chính hãng )",
+     "url": "chi-tiet/991-day-44mm-black-leather-loop-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Noir/Blanc/Gold Swift Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1003-day-hermes-44mm-noirblancgold-swift-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Orange Swift Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1004-day-hermes-44mm-orange-swift-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Noir Swift Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1000-day-hermes-40mm-noir-swift-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Noir Swift Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1008-day-hermes-44mm-noir-swift-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Fauve Barénia Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1002-day-hermes-40mm-fauve-barenia-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Fauve Barénia Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1009-day-hermes-44mm-fauve-barenia-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Fauve Barénia Leather Double Tour ( Chính hãng )",
+     "url": "chi-tiet/1001-day-hermes-40mm-fauve-barenia-leather-double-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Noir Swift Leather Double Tour ( Chính hãng )",
+     "url": "chi-tiet/999-day-hermes-40mm-noir-swift-leather-double-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Étain/Béton Swift Leather Double Tour ( Chính hãng )",
+     "url": "chi-tiet/998-day-hermes-40mm-etainbeton-swift-leather-double-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Encre/Béton Swift Leather Double Tour ( Chính hãng )",
+     "url": "chi-tiet/997-day-hermes-40mm-encrebeton-swift-leather-double-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Brique/Béton Swift Leather Double Tour ( Chính hãng )",
+     "url": "chi-tiet/996-day-hermes-40mm-briquebeton-swift-leather-double-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Blanc Swift Leather Allover Print Double Tour ( Chính hãng )",
+     "url": "chi-tiet/995-day-hermes-40mm-blanc-swift-leather-allover-print-double-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 40mm Noir Swift Leather Allover Print Double Tour ( Chính hãng )",
+     "url": "chi-tiet/994-day-hermes-40mm-noir-swift-leather-allover-print-double-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Fauve Barénia Leather Single Tour Deployment Buckle ( Chính hãng )",
+     "url": "chi-tiet/1011-day-hermes-44mm-fauve-barenia-leather-single-tour-deployment-buckle-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Ébène Barénia Leather Single Tour Deployment Buckle ( Chính hãng )",
+     "url": "chi-tiet/1010-day-hermes-44mm-ebene-barenia-leather-single-tour-deployment-buckle-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Étain/Béton Swift Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1007-day-hermes-44mm-etainbeton-swift-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Encre/Béton Swift Leather Single Tour ( Chính hãng )",
+     "url": "chi-tiet/1006-day-hermes-44mm-encrebeton-swift-leather-single-tour-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    },
+    {
+     "name": "Dây Hermès - 44mm Noir Gala Leather Single Tour Rallye ( Chính hãng )",
+     "url": "chi-tiet/1005-day-hermes-44mm-noir-gala-leather-single-tour-rallye-chinh-hang-.htm",
+     "options": [],
+     "pagePrice": null,
+     "productImgs": 7
+    }
+   ]
+  },
+  {
+   "model": "Airpods",
+   "url": "danh-muc-san-pham/140-airpods.htm",
+   "variants": []
+  },
+  {
+   "model": "Accessories",
+   "url": "danh-muc-san-pham/22-accessories.htm",
+   "variants": []
+  }
+ ]
+}

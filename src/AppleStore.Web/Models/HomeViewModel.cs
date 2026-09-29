@@ -9,5 +9,5 @@ public record HomeViewModel(IReadOnlyList<ProductDetail> Carousel, IReadOnlyList
 {
     public static readonly IReadOnlyList<string> CarouselSlugs = new[] { "iphone-18-pro", "iphone-18-pro-max", "iphone-air" };
 
-    public static readonly IReadOnlyList<string> BannerSlugs = new[] { "apple-watch-series-12", "macbook-neo", "ipad-mini", "apple-watch-ultra-4", "airpods-5" };
+    public static readonly IReadOnlyList<string> BannerSlugs = new[] { "apple-watch-11", "macbook-neo", "ipad-mini-7", "apple-watch-ultra-3", "airpods-5" };
 }
