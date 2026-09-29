@@ -1,7 +1,7 @@
 # Apple Store
 
-Website ban san pham cong nghe cua Apple. Do an mon hoc Cong nghe phan mem, TVU,
-2025, individual project.
+Website ban san pham cong nghe cua Apple. Do an mon hoc Chuyên đề ASP.net, TVU,
+2026, individual project.
 
 An e-commerce web application for selling Apple technology products, built as a
 software engineering course project.
@@ -40,7 +40,7 @@ thesis/           project documents: doc/, pdf/, html/, abs/, refs/ (soft/, dock
 
 Individual project, one author:
 
-- Le Binh, kbsaigonese@gmail.com
+- Le Binh, binhl030199@tvu-onschool.edu.vn
 
 ## Running locally
 
