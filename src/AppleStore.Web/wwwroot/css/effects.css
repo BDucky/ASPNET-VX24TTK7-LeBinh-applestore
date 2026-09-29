@@ -851,6 +851,38 @@ p {
   transform: scale(1.04);
 }
 
+/* No licensed photo of this exact model yet: a labelled line drawing in
+   the same light well, so it never reads as a broken image. */
+.no-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  color: #8a877f;
+}
+
+.no-photo svg {
+  width: 30%;
+  max-width: 96px;
+}
+
+.no-photo-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.no-photo.is-compact svg {
+  width: 60%;
+}
+
+.no-photo.is-compact .no-photo-label {
+  display: none;
+}
+
 .product-card-badge {
   margin-top: -14px;
   position: relative;
@@ -1008,6 +1040,59 @@ p {
 
 .pdp-block {
   margin-top: 26px;
+}
+
+/* Colour and region choices, rauvang.com's bordered tiles with a red
+   border on the chosen one. Text only: we have one photo per model. */
+.pdp-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.pdp-options-label {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.pdp-options + .pdp-options-label + .pdp-options {
+  margin-top: 8px;
+}
+
+.pdp-chip {
+  min-width: 80px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.pdp-chip.is-small {
+  min-width: 52px;
+  padding: 6px 10px;
+}
+
+.pdp-chip:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.pdp-chip.is-selected {
+  border-color: var(--price-accent, #ef4444);
+  box-shadow: inset 0 0 0 1px var(--price-accent, #ef4444);
+}
+
+.pdp-chip.is-unavailable {
+  opacity: 0.4;
+  border-style: dashed;
 }
 
 .pdp-block-label {
