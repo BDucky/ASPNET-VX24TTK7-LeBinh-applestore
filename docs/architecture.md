@@ -99,8 +99,15 @@ project uses, but over this project's own `Users` table:
 | `UserStore` | `Infrastructure/Identity/UserStore.cs` | Lets Identity read and write `Users`; the email is the user name |
 | `AppUserClaimsPrincipalFactory` | `Infrastructure/Identity/` | Puts the role (`Customer`, `Employee`, `Admin`) and full name into the cookie |
 | `AddAppleStoreIdentityCore` | `Infrastructure/Identity/IdentityServiceCollectionExtensions.cs` | The one place the password and lockout rules are set; the tests use it too |
-| `AccountController` | `Web/Controllers/AccountController.cs` | Register, verify OTP, sign in, sign out, account page |
+| `AccountController` | `Web/Controllers/AccountController.cs` | Register, verify OTP, sign in, sign out, forgot and reset password, change password, profile, account page |
+| `AddressesController` | `Web/Controllers/AddressesController.cs` | The signed-in user's delivery addresses at `/Account/Addresses` |
+| `PasswordResetService` | `Infrastructure/Services/` | Reset code in `UserTokens`, then Identity's `ResetPasswordAsync` |
+| `ProfileService` | `Infrastructure/Services/` | Name, phone and addresses, always scoped to the signed-in user |
 
 Rules: password at least 8 characters, no other complexity rule; 5 wrong
-passwords lock the account for 5 minutes (Identity's defaults). `Domain`
+passwords or wrong reset codes lock the account for 5 minutes (Identity's
+defaults). Changing or resetting the password changes the security stamp;
+other signed-in sessions end at their next stamp check, which Identity runs
+every 30 minutes by default. `Infrastructure` references the ASP.NET Core
+shared framework for Identity's token providers and data protection. `Domain`
 still has no ASP.NET reference: `User` only gained plain columns.

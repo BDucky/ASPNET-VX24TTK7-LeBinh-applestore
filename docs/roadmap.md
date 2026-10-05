@@ -25,9 +25,9 @@ an authenticated user.
 | `IEmailSender` / `DevEmailSender` | done, PR #2 |
 | Register + verify-OTP controller and views | done, ASP.NET Core Identity, `feat/identity-login` |
 | Log in, log out, lockout after 5 wrong passwords | done, `feat/identity-login` |
-| Forgot password | not started |
-| Change password | not started |
-| Update profile | not started |
+| Forgot password (code by email, `UserTokens`) | done, `feat/account-password-profile` |
+| Change password | done, `feat/account-password-profile` |
+| Update profile and delivery addresses | done, `feat/account-password-profile` |
 
 The registration flow does not use `UserToken` the way the schema's
 `UserTokenType.RegisterOtp` value implies. See `docs/data-model.md`,
