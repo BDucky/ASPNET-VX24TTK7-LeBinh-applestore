@@ -60,9 +60,9 @@ method codes, and needs sandbox credentials for VNPay/MoMo before it can start.
 ## M5: Order management, tracking, shipments
 
 Use cases 18, 19, 22-24 (employee order processing, tracking assignment, status
-updates, customer order lookup and tracking). Entity: `Shipment`. This is where the
-`OrderStatus` gap documented in `docs/data-model.md` must be resolved first, since
-every use case here reads or writes that field.
+updates, customer order lookup and tracking). Entity: `Shipment`. The `OrderStatus`
+gap that blocked this milestone was resolved on 2026-10-05 (fifth value
+`Confirmed`), see `docs/data-model.md`.
 
 ## M6: Employee stock, pricing, promotions
 
