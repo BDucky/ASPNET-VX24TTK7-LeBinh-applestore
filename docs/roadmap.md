@@ -21,8 +21,8 @@ an authenticated user.
 | `OtpService` (generate, validate) | done, tested, merged path via PR #2 |
 | `RegistrationService` (duplicate checks, pending state, OTP confirm, hashed password) | done, tested, PR #2 |
 | `IEmailSender` / `DevEmailSender` | done, PR #2 |
-| Register + verify-OTP controller and views | not started |
-| Log in | not started |
+| Register + verify-OTP controller and views | done, ASP.NET Core Identity, `feat/identity-login` |
+| Log in, log out, lockout after 5 wrong passwords | done, `feat/identity-login` |
 | Forgot password | not started |
 | Change password | not started |
 | Update profile | not started |
