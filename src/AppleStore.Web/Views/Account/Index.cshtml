@@ -1,0 +1,26 @@
+@model AppleStore.Web.Models.Account.AccountSummaryViewModel
+@{
+    ViewData["Title"] = "My account";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card">
+        <div class="hero-eyebrow">Account</div>
+        <h1 class="account-title">@Model.FullName</h1>
+
+        <dl class="account-details">
+            <dt>Email</dt>
+            <dd>@Model.Email</dd>
+            <dt>Phone</dt>
+            <dd>@(Model.Phone ?? "Not set")</dd>
+            <dt>Account type</dt>
+            <dd>@Model.Role</dd>
+            <dt>Member since</dt>
+            <dd>@Model.MemberSince.ToString("dd/MM/yyyy")</dd>
+        </dl>
+
+        <form asp-action="Logout" method="post">
+            <button type="submit" class="btn-store-ghost">Sign out</button>
+        </form>
+    </div>
+</section>

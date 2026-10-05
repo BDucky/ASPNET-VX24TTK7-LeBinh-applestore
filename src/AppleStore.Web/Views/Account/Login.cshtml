@@ -1,0 +1,36 @@
+@model AppleStore.Web.Models.Account.LoginViewModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card">
+        <div class="hero-eyebrow">Account</div>
+        <h1 class="account-title">Sign in</h1>
+
+        <partial name="_AccountErrors" />
+
+        <form asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="account-form" novalidate>
+            <label asp-for="Email"></label>
+            <input asp-for="Email" autocomplete="email" />
+            <span asp-validation-for="Email" class="account-field-error"></span>
+
+            <label asp-for="Password"></label>
+            <input asp-for="Password" autocomplete="current-password" />
+            <span asp-validation-for="Password" class="account-field-error"></span>
+
+            <label class="account-check">
+                <input asp-for="RememberMe" />
+                <span>@Html.DisplayNameFor(m => m.RememberMe)</span>
+            </label>
+
+            <button type="submit" class="btn-store-primary">Sign in</button>
+        </form>
+
+        <p class="account-switch">New here? <a asp-action="Register">Create an account</a></p>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

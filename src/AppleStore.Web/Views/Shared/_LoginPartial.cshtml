@@ -1,0 +1,21 @@
+@using AppleStore.Infrastructure.Identity
+@using System.Security.Claims
+@* Right side of the nav: sign-in link, or the signed-in user's name with
+   their account page and a sign-out form (POST, so a link cannot sign
+   anyone out). *@
+@if (User.Identity?.IsAuthenticated == true)
+{
+    var name = User.FindFirstValue(AppUserClaimsPrincipalFactory.FullNameClaim) ?? User.Identity.Name;
+    <div class="site-nav-account">
+        <a class="site-nav-account-link" asp-area="" asp-controller="Account" asp-action="Index">@name</a>
+        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit" class="site-nav-account-out">Sign out</button>
+        </form>
+    </div>
+}
+else
+{
+    <div class="site-nav-account">
+        <a class="site-nav-account-link" asp-area="" asp-controller="Account" asp-action="Login">Sign in</a>
+    </div>
+}

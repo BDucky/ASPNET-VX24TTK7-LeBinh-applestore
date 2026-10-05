@@ -1330,3 +1330,147 @@ body.has-custom-cursor button {
     display: none;
   }
 }
+
+/* ---------- Account pages (register, verify code, sign in) ---------- */
+
+.site-nav-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: clamp(8px, 2vw, 24px);
+  font-size: 0.9rem;
+}
+
+.site-nav-account form {
+  margin: 0;
+}
+
+.site-nav-account-link,
+.site-nav-account-out {
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+  font: inherit;
+  font-weight: 600;
+}
+
+.site-nav-account-out {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.site-nav-account-link:hover,
+.site-nav-account-out:hover {
+  color: var(--accent);
+}
+
+.account-page {
+  display: flex;
+  justify-content: center;
+  padding-inline: 16px;
+}
+
+.account-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: clamp(24px, 5vw, 40px);
+}
+
+.account-title {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  margin-bottom: 8px;
+}
+
+.account-lead,
+.account-hint {
+  color: var(--text-muted);
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.account-form label {
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.account-form input:not([type="checkbox"]) {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+}
+
+.account-form input:not([type="checkbox"]):focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.account-form .btn-store-primary {
+  margin-top: 18px;
+}
+
+.account-otp {
+  font-size: 1.4rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+.account-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500 !important;
+}
+
+.account-field-error,
+.account-error {
+  color: #ff7a7a;
+  font-size: 0.88rem;
+}
+
+.account-error {
+  background: rgba(255, 122, 122, 0.08);
+  border: 1px solid rgba(255, 122, 122, 0.3);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 16px 0 0;
+}
+
+.account-switch {
+  margin-top: 20px;
+  color: var(--text-muted);
+}
+
+.account-switch a {
+  color: var(--text);
+}
+
+.account-details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 20px;
+  margin: 20px 0 28px;
+}
+
+.account-details dt {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.account-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
