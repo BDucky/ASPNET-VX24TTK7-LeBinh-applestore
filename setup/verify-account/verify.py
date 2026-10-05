@@ -49,7 +49,9 @@ def check(name, ok, detail=""):
 
 
 def start_app(env_name, db_path, log_path):
-    env = dict(os.environ, ASPNETCORE_ENVIRONMENT=env_name, ConnectionStrings__Default=f"Data Source={db_path}")
+    # Smtp__Host empty keeps mail in the log even when user-secrets hold real
+    # SMTP settings, so the script can read each code and never mails anyone.
+    env = dict(os.environ, ASPNETCORE_ENVIRONMENT=env_name, ConnectionStrings__Default=f"Data Source={db_path}", Smtp__Host="")
     log = open(log_path, "w")
     proc = subprocess.Popen(
         ["dotnet", "run", "--no-build", "--no-launch-profile", "--urls", APP],
