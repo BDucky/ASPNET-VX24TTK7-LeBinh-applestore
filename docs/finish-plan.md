@@ -39,8 +39,9 @@ puts a demoable buying flow and the admin area first.
 3. Structural commit first if there are entities or migrations, then one RED
    commit and one GREEN commit per behavior. Each RED commit builds and fails
    only its new tests.
-4. `dotnet build`, `dotnet test`, `dotnet format --verify-no-changes` all
-   clean.
+4. `dotnet build --no-incremental`, `dotnet test`,
+   `dotnet format --verify-no-changes` all clean. Use the full rebuild:
+   incremental builds hide warnings in projects they skip.
 5. Live browser check with a rerunnable script under `setup/verify-*/`
    (pattern: `setup/verify-account/verify.py`): every page at 1440px and
    390px, console errors, every path including the failure ones, a server
@@ -57,7 +58,7 @@ puts a demoable buying flow and the admin area first.
 | # | Task | Use cases | Branch | ASP.NET focus | Status |
 |---|---|---|---|---|---|
 | 1 | Resolve OrderStatus, week 3 report | | `chore/order-status-confirmed` | | done, PR #11 |
-| 2 | Register, OTP, sign in, sign out, lockout | 1-3 | `feat/identity-login` | Identity with a custom `UserStore`, cookie, `[Authorize]`, anti-forgery | done, verified 31/31, PR pending |
+| 2 | Register, OTP, sign in, sign out, lockout | 1-3 | `feat/identity-login` | Identity with a custom `UserStore`, cookie, `[Authorize]`, anti-forgery | done, verified 31/31, PR #12 |
 | 3 | Forgot password, change password, profile and addresses | 4-6 | `feat/account-password-profile` | `UserManager.ChangePasswordAsync`, `ResetPasswordAsync`, security stamp sign-out | next, plan pending |
 | 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager` | not started |
 | 5 | Cart | 11-14 | `feat/cart` | session or DB cart, view components for the nav count | not started |

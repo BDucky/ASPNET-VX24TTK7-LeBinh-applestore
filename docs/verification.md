@@ -13,9 +13,9 @@ database, and a live browser pass over every account page and path.
 
 | Command | Result |
 |---|---|
-| `dotnet build` | 0 warnings, 0 errors |
+| `dotnet build --no-incremental` | 0 warnings, 0 errors (a full rebuild found one CS8625 warning that incremental builds had hidden; fixed in its own commit) |
 | `dotnet format --verify-no-changes` | clean |
-| `dotnet test` | 74 of 74 pass (53 existing, 21 new: 6 `UserStoreTests`, 4 new `RegistrationServiceTests`, 11 `AccountFlowTests` running the real app through `WebApplicationFactory`) |
+| `dotnet test` | 75 of 75 pass (53 existing, 22 new: 7 `UserStoreTests`, 4 new `RegistrationServiceTests`, 11 `AccountFlowTests` running the real app through `WebApplicationFactory`) |
 | `dotnet ef database update` on `src/AppleStore.Web/AppleStore.db` | applied `AddIdentityColumnsToUsers`, 4 new columns present |
 
 ### Live browser check
