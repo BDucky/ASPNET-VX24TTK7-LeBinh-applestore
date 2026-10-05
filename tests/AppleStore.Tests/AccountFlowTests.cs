@@ -175,6 +175,15 @@ public class AccountFlowTests : IDisposable
         Assert.DoesNotContain(">Sign in<", home);
     }
 
+    [Fact]
+    public async Task Verify_page_without_a_registration_sends_the_visitor_to_register()
+    {
+        var response = await _client.GetAsync("/Account/VerifyOtp");
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("/Account/Register", response.Headers.Location!.OriginalString);
+    }
+
     private async Task<HttpResponseMessage> LoginAsync(string email, string password, string? returnUrl = null)
     {
         var url = returnUrl is null ? "/Account/Login" : $"/Account/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
