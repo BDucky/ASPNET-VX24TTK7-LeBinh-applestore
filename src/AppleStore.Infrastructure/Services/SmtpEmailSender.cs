@@ -39,7 +39,7 @@ public class SmtpEmailSender : IEmailSender
         // STARTTLS, and the connection fails rather than send the password in clear.
         var security = _options.Port == 465 ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls;
 
-        using var client = new SmtpClient();
+        using var client = new SmtpClient { CheckCertificateRevocation = _options.CheckCertificateRevocation };
         try
         {
             await client.ConnectAsync(_options.Host, _options.Port, security, ct);

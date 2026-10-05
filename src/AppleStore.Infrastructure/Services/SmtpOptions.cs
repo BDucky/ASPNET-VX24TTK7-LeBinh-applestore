@@ -26,6 +26,9 @@ public class SmtpOptions
 
     public string FromName { get; set; } = "Apple Store";
 
-    // RED stub: wrong default.
-    public bool CheckCertificateRevocation { get; set; }
+    // Whether TLS also asks if Gmail's certificate was revoked. On by default.
+    // .NET on macOS can report that check as "incomplete" and MailKit then
+    // refuses the connection; a developer may turn it off for their machine
+    // (user-secrets). The certificate chain and host name are still checked.
+    public bool CheckCertificateRevocation { get; set; } = true;
 }
