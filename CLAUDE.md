@@ -20,6 +20,14 @@ messages, code comments, and replies in the terminal.
 
 This file follows its own rule. Do not reintroduce em dashes when editing it.
 
+## Current Plan
+
+Read `docs/finish-plan.md` at the start of every session. It is the source of
+truth for task order, status, the definition of done, and open decisions.
+Update it in the same PR as the work. This is an ASP.NET course project: when
+ASP.NET Core has a built-in mechanism for something (Identity, Areas, model
+validation, tag helpers, EF Core migrations), use it.
+
 ## Tech Stack
 
 | Layer | Choice |

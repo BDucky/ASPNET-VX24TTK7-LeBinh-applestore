@@ -7,6 +7,8 @@ share technically. Treat this as a starting point to adjust, not a fixed plan.
 Each milestone is sized to be its own set of feature branches and TDD sessions, not
 one big session.
 
+Order and status of the remaining work: `docs/finish-plan.md`.
+
 ## M1: Auth and OTP
 
 Use cases 1-6 (register, send OTP, log in, forgot password, change password,
