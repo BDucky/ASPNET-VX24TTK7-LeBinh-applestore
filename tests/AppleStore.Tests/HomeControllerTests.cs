@@ -10,7 +10,7 @@ public class HomeControllerTests
     [Fact]
     public async Task Index_builds_carousel_and_banners_from_the_curated_slugs()
     {
-        var detail = new ProductDetail(1, "iPhone 18 Pro", "iphone-18-pro", "desc", "iPhone", "iphone", Array.Empty<ProductVariantSummary>(), Array.Empty<string>());
+        var detail = new ProductDetail(1, "iPhone 18 Pro", "iphone-18-pro", "desc", "iPhone", "iphone", Array.Empty<ConfigurationSummary>(), Array.Empty<string>());
         var sut = new HomeController(new FakeProductCatalogService { DetailToReturn = detail });
 
         var result = await sut.Index(default);

@@ -16,6 +16,10 @@
                     {
                         <img src="@Url.Content(m.ImageUrl)" alt="" loading="lazy" />
                     }
+                    else
+                    {
+                        <partial name="_NoPhoto" model="@("is-compact")" />
+                    }
                 </span>
                 <span class="model-tile-name">@m.Name</span>
             </a>

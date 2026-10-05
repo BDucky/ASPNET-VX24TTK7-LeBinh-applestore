@@ -1,40 +1,85 @@
-@model AppleStore.Infrastructure.Services.ProductVariantDetail
+@model AppleStore.Infrastructure.Services.ConfigurationDetail
+@using System.Text.Json
+@using AppleStore.Web.Formatting
 @using AppleStore.Web.Models.Products
 @{
-    ViewData["Title"] = $"{Model.ProductName} ({Model.SKU})";
+    ViewData["Title"] = Model.Name;
     ViewData["NavCategory"] = Model.CategorySlug;
     var strip = ViewData[ModelStripViewModel.ViewDataKey] as ModelStripViewModel;
+    var selected = Model.Select(Context.Request.Query["color"], Context.Request.Query["region"]);
+    var colors = Model.Choices.Select(c => c.Color).OfType<string>().Distinct().ToList();
+    var regions = Model.Choices.Select(c => c.Region).OfType<string>().Distinct().ToList();
+    var choicesJson = JsonSerializer.Serialize(Model.Choices.Select(c => new
+    {
+        sku = c.SKU,
+        color = c.Color,
+        region = c.Region,
+        price = PriceText.Vnd(c.Price),
+        stock = c.StockQty,
+    }));
+    string ChoiceUrl(string? color, string? region) =>
+        Url.Action("Variant", "Products", new { slug = Model.ProductSlug, config = Model.Slug, color, region })!;
 }
 
-@* Laid out like rauvang.com's variant page (live-browsed 2026-09-25):
-   model strip; photo on the left; on the right the title, a red price with
-   the warranty line beside it, a labelled benefits block, a labelled
-   product-information block, and one dark button at the end.
-   Not copied: rauvang's colour and region swatches. Each of our variants
-   has one SKU and one photo, and there is no colour or region data yet
-   (VariantOptions is empty), so a picker would switch nothing. Also not
-   copied: rauvang's promo amounts, since no promotion system exists yet. *@
+@* Laid out like rauvang.com's variant page (live-browsed 2026-09-25): model
+   strip; photo left; on the right the configuration name, a red price with
+   the warranty beside it, colour and region choices that change the price,
+   labelled benefit and information blocks, one dark button.
+   Colour chips are text, not photos: every model has one licensed photo,
+   and rauvang's per-colour photos are its own property. Each chip is a real
+   link, so choosing works without JavaScript; effects.js swaps the price in
+   place when it runs. *@
 <section class="shop-page is-shop">
     @if (strip is not null)
     {
         <partial name="_ModelStrip" model="strip" />
     }
 
-    <div class="product-detail">
+    <div class="product-detail" data-config-choices="@choicesJson">
         <div class="product-detail-media">
             @if (Model.ImageUrl is not null)
             {
                 <img src="@Url.Content(Model.ImageUrl)" alt="@Model.ProductName" />
             }
+            else
+            {
+                <partial name="_NoPhoto" model="(string?)null" />
+            }
         </div>
         <div class="product-detail-info">
-            <h1>@Model.ProductName (@Model.SKU)</h1>
+            <h1>@Model.Name</h1>
 
             <div class="pdp-price-row">
                 <span class="pdp-price-label">Price</span>
-                <span class="pdp-price">$@Model.Price.ToString("N2")</span>
+                <span class="pdp-price" data-choice-price>@PriceText.Vnd(selected.Price)</span>
                 <span class="pdp-warranty">Warranty: <span>12 months, 1-for-1 on defects</span></span>
             </div>
+
+            @if (colors.Any())
+            {
+                <div class="pdp-options" role="group" aria-label="Colour">
+                    @foreach (var color in colors)
+                    {
+                        var isSelected = color == selected.Color;
+                        <a class="pdp-chip @(isSelected ? "is-selected" : "")" href="@ChoiceUrl(color, selected.Region)"
+                           data-choice-color="@color" aria-current="@(isSelected ? "true" : null)">@color</a>
+                    }
+                </div>
+            }
+
+            @if (regions.Any())
+            {
+                <div class="pdp-options-label">Region</div>
+                <div class="pdp-options" role="group" aria-label="Region">
+                    @foreach (var region in regions)
+                    {
+                        var isSelected = region == selected.Region;
+                        var available = Model.Choices.Any(c => c.Color == selected.Color && c.Region == region);
+                        <a class="pdp-chip is-small @(isSelected ? "is-selected" : "") @(available ? "" : "is-unavailable")" href="@ChoiceUrl(selected.Color, region)"
+                           data-choice-region="@region" aria-current="@(isSelected ? "true" : null)">@region</a>
+                    }
+                </div>
+            }
 
             <div class="pdp-block">
                 <div class="pdp-block-label">Store benefits</div>
@@ -49,12 +94,12 @@
             <div class="pdp-block">
                 <div class="pdp-block-label">Product information</div>
                 <ul>
-                    <li>Category: @Model.CategoryName</li>
-                    <li>SKU: <span class="pdp-sku">@Model.SKU</span></li>
+                    <li>Model: @Model.ProductName</li>
+                    <li>SKU: <span class="pdp-sku" data-choice-sku>@selected.SKU</span></li>
                     <li>
                         Availability:
-                        <span class="pdp-stock @(Model.StockQty > 0 ? "is-in-stock" : "is-out-of-stock")">
-                            @(Model.StockQty > 0 ? $"{Model.StockQty} in stock" : "Out of stock")
+                        <span class="pdp-stock @(selected.StockQty > 0 ? "is-in-stock" : "is-out-of-stock")" data-choice-stock>
+                            @(selected.StockQty > 0 ? $"{selected.StockQty} in stock" : "Out of stock")
                         </span>
                     </li>
                 </ul>

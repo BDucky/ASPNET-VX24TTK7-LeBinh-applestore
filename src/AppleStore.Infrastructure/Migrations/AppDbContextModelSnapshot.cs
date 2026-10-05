@@ -416,7 +416,7 @@ namespace AppleStore.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("BasePrice")
+                    b.Property<decimal?>("BasePrice")
                         .HasPrecision(12, 2)
                         .HasColumnType("TEXT");
 
@@ -438,6 +438,9 @@ namespace AppleStore.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(220)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("Status")
                         .HasColumnType("INTEGER");
@@ -513,7 +516,7 @@ namespace AppleStore.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasPrecision(12, 2)
                         .HasColumnType("TEXT");
 

@@ -205,6 +205,76 @@
     });
   }
 
+  // ---- Variant page: colour and region choices (rauvang.com's swatches) ----
+  // Each chip is a real link, so choosing works without this script. With
+  // it, the price, SKU, and stock swap in place and the URL keeps the choice.
+  document.querySelectorAll("[data-config-choices]").forEach(function (root) {
+    var choices;
+    try {
+      choices = JSON.parse(root.getAttribute("data-config-choices"));
+    } catch (e) {
+      return;
+    }
+    if (!choices.length) return;
+    var colorChips = root.querySelectorAll("[data-choice-color]");
+    var regionChips = root.querySelectorAll("[data-choice-region]");
+    var priceEl = root.querySelector("[data-choice-price]");
+    var skuEl = root.querySelector("[data-choice-sku]");
+    var stockEl = root.querySelector("[data-choice-stock]");
+    var selected = choices.filter(function (c) { return c.sku === (skuEl && skuEl.textContent.trim()); })[0] || choices[0];
+
+    function pick(color, region) {
+      return choices.filter(function (c) { return c.color === color && c.region === region; })[0]
+        || choices.filter(function (c) { return c.color === color; })[0]
+        || choices[0];
+    }
+    function render() {
+      colorChips.forEach(function (chip) {
+        var on = chip.dataset.choiceColor === selected.color;
+        chip.classList.toggle("is-selected", on);
+        if (on) chip.setAttribute("aria-current", "true"); else chip.removeAttribute("aria-current");
+      });
+      regionChips.forEach(function (chip) {
+        var region = chip.dataset.choiceRegion;
+        var on = region === selected.region;
+        var available = choices.some(function (c) { return c.color === selected.color && c.region === region; });
+        chip.classList.toggle("is-selected", on);
+        chip.classList.toggle("is-unavailable", !available);
+        if (on) chip.setAttribute("aria-current", "true"); else chip.removeAttribute("aria-current");
+      });
+      if (priceEl) priceEl.textContent = selected.price;
+      if (skuEl) skuEl.textContent = selected.sku;
+      if (stockEl) {
+        stockEl.textContent = selected.stock > 0 ? selected.stock + " in stock" : "Out of stock";
+        stockEl.classList.toggle("is-in-stock", selected.stock > 0);
+        stockEl.classList.toggle("is-out-of-stock", selected.stock <= 0);
+      }
+      var url = new URL(window.location.href);
+      if (selected.color) url.searchParams.set("color", selected.color); else url.searchParams.delete("color");
+      if (selected.region) url.searchParams.set("region", selected.region); else url.searchParams.delete("region");
+      history.replaceState(null, "", url);
+    }
+    colorChips.forEach(function (chip) {
+      chip.addEventListener("click", function (e) {
+        e.preventDefault();
+        selected = pick(chip.dataset.choiceColor, selected.region);
+        render();
+      });
+    });
+    regionChips.forEach(function (chip) {
+      chip.addEventListener("click", function (e) {
+        e.preventDefault();
+        var region = chip.dataset.choiceRegion;
+        // A region this colour isn't sold in switches to the first colour
+        // that is, rather than ignoring the click.
+        selected = choices.filter(function (c) { return c.color === selected.color && c.region === region; })[0]
+          || choices.filter(function (c) { return c.region === region; })[0]
+          || selected;
+        render();
+      });
+    });
+  });
+
   // ---- Custom cursor: desktop, fine pointer, motion allowed only ----
   if (!prefersReducedMotion && hasFinePointer) {
     var ring = document.createElement("div");

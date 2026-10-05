@@ -1,9 +1,14 @@
 @model AppleStore.Web.Models.Products.ShopCardViewModel
+@using AppleStore.Web.Formatting
 <a class="product-card" href="@Model.Href">
     <div class="product-card-media">
         @if (Model.ImageUrl is not null)
         {
             <img src="@Url.Content(Model.ImageUrl)" alt="@Model.Title" loading="lazy" />
+        }
+        else
+        {
+            <partial name="_NoPhoto" model="(string?)null" />
         }
     </div>
     @if (Model.Badge is not null)
@@ -12,6 +17,13 @@
     }
     <div class="product-card-body">
         <h3>@Model.Title</h3>
-        <div class="price"><span class="price-label">From:</span> $@Model.Price.ToString("N2")</div>
+        @if (Model.Price is not null)
+        {
+            <div class="price"><span class="price-label">From:</span> @PriceText.Vnd(Model.Price)</div>
+        }
+        else
+        {
+            <div class="price">@PriceText.Vnd(null)</div>
+        }
     </div>
 </a>

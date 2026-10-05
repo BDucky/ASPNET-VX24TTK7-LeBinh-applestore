@@ -8,8 +8,8 @@
 }
 
 @* rauvang.com's model page (live-browsed 2026-09-25): the category's model
-   strip, then one card per storage/region variant, each linking to its own
-   page. No heading block, no description, no back button. *@
+   strip, then one card per configuration (storage/size/region), each
+   linking to its own page. No heading block, no description, no back button. *@
 <section class="shop-page is-shop">
     @if (strip is not null)
     {
@@ -17,17 +17,17 @@
     }
     <h1 class="visually-hidden">@Model.Name</h1>
 
-    @if (Model.Variants.Any())
+    @if (Model.Configurations.Any())
     {
         <div class="product-grid">
-            @foreach (var variant in Model.Variants)
+            @foreach (var config in Model.Configurations)
             {
                 var card = new ShopCardViewModel(
-                    Url.Action("Variant", "Products", new { slug = Model.Slug, sku = variant.SKU })!,
+                    Url.Action("Variant", "Products", new { slug = Model.Slug, config = config.Slug })!,
                     imageUrl,
-                    $"{Model.Name} ({variant.SKU})",
-                    variant.StockQty > 0 ? "In stock" : "Out of stock",
-                    variant.Price);
+                    config.Name,
+                    config.InStock ? "In stock" : "Out of stock",
+                    config.FromPrice);
                 <partial name="_ShopCard" model="card" />
             }
         </div>

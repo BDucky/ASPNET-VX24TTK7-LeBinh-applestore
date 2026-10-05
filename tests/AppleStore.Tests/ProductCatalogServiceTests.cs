@@ -16,9 +16,10 @@ public class ProductCatalogServiceTests
     private static Category NewCategory(string name, string slug) =>
         new() { Name = name, Slug = slug };
 
-    private static Product NewProduct(Category category, string name, string slug, decimal basePrice, bool status = true) =>
+    private static Product NewProduct(Category category, string name, string slug, decimal basePrice, bool status = true, int sortOrder = 0) =>
         new()
         {
+            SortOrder = sortOrder,
             Category = category,
             Name = name,
             Slug = slug,
@@ -28,7 +29,7 @@ public class ProductCatalogServiceTests
             UpdatedAt = DateTime.UtcNow,
         };
 
-    private static ProductVariant NewVariant(Product product, string sku, decimal price, int stock, bool status = true) =>
+    private static ProductVariant NewVariant(Product product, string sku, decimal? price, int stock, bool status = true) =>
         new()
         {
             Product = product,
@@ -39,6 +40,27 @@ public class ProductCatalogServiceTests
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
+
+    // Tags a variant with an option ("config", "color", "region"), reusing
+    // the option type and value rows when they already exist.
+    private static void Tag(AppleStore.Infrastructure.Data.AppDbContext db, ProductVariant variant, string code, string value)
+    {
+        var type = db.ChangeTracker.Entries<OptionType>().Select(e => e.Entity).FirstOrDefault(t => t.Code == code)
+            ?? new OptionType { Code = code };
+        var optionValue = db.ChangeTracker.Entries<OptionValue>().Select(e => e.Entity).FirstOrDefault(v => v.OptionType == type && v.Value == value)
+            ?? new OptionValue { OptionType = type, Value = value };
+        db.Add(new VariantOption { Variant = variant, OptionType = type, OptionValue = optionValue });
+    }
+
+    private static ProductVariant AddVariant(SqliteInMemoryFixture f, Product product, string sku, decimal? price, int stock, string? config = null, string? color = null, string? region = null, bool status = true)
+    {
+        var v = NewVariant(product, sku, price, stock, status);
+        f.Context.Add(v);
+        if (config is not null) Tag(f.Context, v, "config", config);
+        if (color is not null) Tag(f.Context, v, "color", color);
+        if (region is not null) Tag(f.Context, v, "region", region);
+        return v;
+    }
 
     [Fact]
     public async Task GetProductsAsync_returns_all_active_products_by_default()
@@ -159,60 +181,151 @@ public class ProductCatalogServiceTests
     }
 
     [Fact]
-    public async Task GetProductsAsync_sorts_by_price_ascending()
+    public async Task GetProductsAsync_from_price_ignores_variants_without_a_price()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var product = NewProduct(NewCategory("iPhone", "iphone"), "iPhone 18 Pro Max", "iphone-18-pro-max", 0m);
+        fixture.Context.Add(product);
+        AddVariant(fixture, product, "A", null, 5);
+        AddVariant(fixture, product, "B", 42_300_000m, 5);
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Equal(42_300_000m, result[0].FromPrice);
+    }
+
+    // A model rauvang lists without any price shows "Contact for price", never
+    // a made-up number such as the product's BasePrice or 0.
+    [Fact]
+    public async Task GetProductsAsync_from_price_is_null_when_no_variant_has_a_price()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var product = NewProduct(NewCategory("Watch", "watch"), "Apple Watch Ultra 4", "apple-watch-ultra-4", 999m);
+        fixture.Context.Add(product);
+        AddVariant(fixture, product, "A", null, 5);
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Null(result[0].FromPrice);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_featured_order_follows_sort_order()
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
         var iphone = NewCategory("iPhone", "iphone");
         fixture.Context.AddRange(
-            NewProduct(iphone, "Expensive", "expensive", 1999m),
-            NewProduct(iphone, "Cheap", "cheap", 299m));
+            NewProduct(iphone, "iPhone 15", "iphone-15", 0m, sortOrder: 2),
+            NewProduct(iphone, "iPhone Duo", "iphone-duo", 0m, sortOrder: 0),
+            NewProduct(iphone, "iPhone 18 Pro Max", "iphone-18-pro-max", 0m, sortOrder: 1));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync();
+
+        Assert.Equal(new[] { "iphone-duo", "iphone-18-pro-max", "iphone-15" }, result.Select(p => p.Slug));
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_sorts_by_price_ascending_with_contact_for_price_last()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var expensive = NewProduct(iphone, "Expensive", "expensive", 0m);
+        var contact = NewProduct(iphone, "Contact", "contact", 0m);
+        var cheap = NewProduct(iphone, "Cheap", "cheap", 0m);
+        fixture.Context.AddRange(expensive, contact, cheap);
+        AddVariant(fixture, expensive, "E", 60_000_000m, 1);
+        AddVariant(fixture, contact, "C", null, 1);
+        AddVariant(fixture, cheap, "H", 9_000_000m, 1);
         await fixture.Context.SaveChangesAsync();
 
         var result = await sut.GetProductsAsync(sort: ProductSort.PriceAscending);
 
-        Assert.Equal("cheap", result[0].Slug);
-        Assert.Equal("expensive", result[1].Slug);
+        Assert.Equal(new[] { "cheap", "expensive", "contact" }, result.Select(p => p.Slug));
     }
 
     [Fact]
-    public async Task GetProductsAsync_sorts_by_price_descending()
+    public async Task GetProductsAsync_sorts_by_price_descending_with_contact_for_price_last()
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
         var iphone = NewCategory("iPhone", "iphone");
-        fixture.Context.AddRange(
-            NewProduct(iphone, "Cheap", "cheap", 299m),
-            NewProduct(iphone, "Expensive", "expensive", 1999m));
+        var cheap = NewProduct(iphone, "Cheap", "cheap", 0m);
+        var contact = NewProduct(iphone, "Contact", "contact", 0m);
+        var expensive = NewProduct(iphone, "Expensive", "expensive", 0m);
+        fixture.Context.AddRange(cheap, contact, expensive);
+        AddVariant(fixture, cheap, "H", 9_000_000m, 1);
+        AddVariant(fixture, contact, "C", null, 1);
+        AddVariant(fixture, expensive, "E", 60_000_000m, 1);
         await fixture.Context.SaveChangesAsync();
 
         var result = await sut.GetProductsAsync(sort: ProductSort.PriceDescending);
 
-        Assert.Equal("expensive", result[0].Slug);
-        Assert.Equal("cheap", result[1].Slug);
+        Assert.Equal(new[] { "expensive", "cheap", "contact" }, result.Select(p => p.Slug));
     }
 
+    // rauvang.com's model page: one card per configuration, in the order the
+    // store lists them, each "From" its cheapest colour.
     [Fact]
-    public async Task GetBySlugAsync_returns_product_with_variants_and_images()
+    public async Task GetBySlugAsync_groups_variants_into_configurations_in_catalog_order()
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
-        var iphone = NewCategory("iPhone", "iphone");
-        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
-        product.Description = "The latest iPhone.";
+        var product = NewProduct(NewCategory("iPhone", "iphone"), "iPhone 18 Pro Max", "iphone-18-pro-max", 0m);
+        product.Description = "desc";
         fixture.Context.Add(product);
-        fixture.Context.Add(NewVariant(product, "IP17-128", 999m, 10));
-        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/iphone-17.svg", SortOrder = 0 });
+        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/products/iphone-18-pro-max.jpg", SortOrder = 0 });
+        AddVariant(fixture, product, "256-BLACK", 42_300_000m, 0, "iPhone 18 Pro Max 256GB ( VN )", "Black", "VN");
+        AddVariant(fixture, product, "256-SILVER", 43_600_000m, 5, "iPhone 18 Pro Max 256GB ( VN )", "Silver", "VN");
+        AddVariant(fixture, product, "2TB-BLACK", null, 3, "iPhone 18 Pro Max 2TB ( Mỹ )", "Black", "Mỹ");
+        AddVariant(fixture, product, "512-OLD", 1m, 3, "iPhone 18 Pro Max 512GB ( VN )", "Black", "VN", status: false);
         await fixture.Context.SaveChangesAsync();
 
-        var result = await sut.GetBySlugAsync("iphone-17");
+        var result = await sut.GetBySlugAsync("iphone-18-pro-max");
 
         Assert.NotNull(result);
-        Assert.Equal("iPhone 17", result!.Name);
-        Assert.Equal("The latest iPhone.", result.Description);
-        Assert.Single(result.Variants);
+        Assert.Equal("iphone", result!.CategorySlug);
         Assert.Single(result.ImageUrls);
-        Assert.Equal("iphone", result.CategorySlug);
+        Assert.Collection(result.Configurations,
+            c =>
+            {
+                Assert.Equal("iPhone 18 Pro Max 256GB ( VN )", c.Name);
+                Assert.Equal("iphone-18-pro-max-256gb-vn", c.Slug);
+                Assert.Equal(42_300_000m, c.FromPrice);
+                Assert.True(c.InStock);
+            },
+            c =>
+            {
+                Assert.Equal("iphone-18-pro-max-2tb-my", c.Slug);
+                Assert.Null(c.FromPrice);
+            });
+        Assert.Equal(42_300_000m, result.FromPrice);
+    }
+
+    // Products sold as a single item (AirPods, accessories) carry no "config"
+    // option; they form one configuration named after the product.
+    [Fact]
+    public async Task GetBySlugAsync_variants_without_a_config_form_one_configuration_named_after_the_product()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var product = NewProduct(NewCategory("AirPods", "airpods"), "AirPods Max 2", "airpods-max-2", 0m);
+        fixture.Context.Add(product);
+        AddVariant(fixture, product, "MAX2-MIDNIGHT", 11_600_000m, 4, color: "Midnight");
+        AddVariant(fixture, product, "MAX2-BLUE", 11_600_000m, 0, color: "Blue");
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetBySlugAsync("airpods-max-2");
+
+        var config = Assert.Single(result!.Configurations);
+        Assert.Equal("AirPods Max 2", config.Name);
+        Assert.Equal("airpods-max-2", config.Slug);
     }
 
     [Fact]
@@ -231,8 +344,7 @@ public class ProductCatalogServiceTests
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
-        var mac = NewCategory("Mac", "mac");
-        fixture.Context.Add(NewProduct(mac, "Discontinued Mac", "discontinued-mac", 899m, status: false));
+        fixture.Context.Add(NewProduct(NewCategory("Mac", "mac"), "Discontinued Mac", "discontinued-mac", 899m, status: false));
         await fixture.Context.SaveChangesAsync();
 
         var result = await sut.GetBySlugAsync("discontinued-mac");
@@ -241,91 +353,70 @@ public class ProductCatalogServiceTests
     }
 
     [Fact]
-    public async Task GetVariantAsync_returns_variant_with_product_context_when_found()
+    public async Task GetConfigurationAsync_returns_the_colour_and_region_choices_with_product_context()
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
-        var iphone = NewCategory("iPhone", "iphone");
-        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        var product = NewProduct(NewCategory("iPad", "ipad"), "iPad Mini 7", "ipad-mini-7", 0m);
         fixture.Context.Add(product);
-        fixture.Context.Add(NewVariant(product, "IP17-128", 999m, 10));
-        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/products/iphone-17.jpg", SortOrder = 0 });
+        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/products/ipad-mini.jpg", SortOrder = 0 });
+        AddVariant(fixture, product, "128-BLUE-VN", 13_600_000m, 7, "iPad Mini Gen 7 WIFI - 128GB", "Blue", "VN");
+        AddVariant(fixture, product, "128-BLUE-US", 13_600_000m, 2, "iPad Mini Gen 7 WIFI - 128GB", "Blue", "Mỹ");
+        AddVariant(fixture, product, "256-GRAY-US", 16_900_000m, 2, "iPad Mini Gen 7 WIFI - 256GB", "Space Gray", "Mỹ");
+        AddVariant(fixture, product, "128-OLD", 1m, 2, "iPad Mini Gen 7 WIFI - 128GB", "Purple", "VN", status: false);
         await fixture.Context.SaveChangesAsync();
 
-        var result = await sut.GetVariantAsync("iphone-17", "IP17-128");
+        var result = await sut.GetConfigurationAsync("ipad-mini-7", "ipad-mini-gen-7-wifi-128gb");
 
         Assert.NotNull(result);
-        Assert.Equal("IP17-128", result!.SKU);
-        Assert.Equal(999m, result.Price);
-        Assert.Equal("iPhone 17", result.ProductName);
-        Assert.Equal("iphone-17", result.ProductSlug);
-        Assert.Equal("iPhone", result.CategoryName);
-        Assert.Equal("iphone", result.CategorySlug);
-        Assert.Equal("/img/products/iphone-17.jpg", result.ImageUrl);
+        Assert.Equal("iPad Mini Gen 7 WIFI - 128GB", result!.Name);
+        Assert.Equal("iPad Mini 7", result.ProductName);
+        Assert.Equal("ipad", result.CategorySlug);
+        Assert.Equal("/img/products/ipad-mini.jpg", result.ImageUrl);
+        Assert.Equal(new[] { "128-BLUE-VN", "128-BLUE-US" }, result.Choices.Select(c => c.SKU));
+        Assert.Equal(("Blue", "Mỹ", 13_600_000m, 2), (result.Choices[1].Color, result.Choices[1].Region, result.Choices[1].Price, result.Choices[1].StockQty));
     }
 
     [Fact]
-    public async Task GetVariantAsync_returns_null_for_unknown_sku()
+    public async Task GetConfigurationAsync_returns_null_for_an_unknown_configuration()
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
-        var iphone = NewCategory("iPhone", "iphone");
-        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        var product = NewProduct(NewCategory("iPad", "ipad"), "iPad Mini 7", "ipad-mini-7", 0m);
         fixture.Context.Add(product);
-        fixture.Context.Add(NewVariant(product, "IP17-128", 999m, 10));
+        AddVariant(fixture, product, "128-BLUE-VN", 13_600_000m, 7, "iPad Mini Gen 7 WIFI - 128GB", "Blue", "VN");
         await fixture.Context.SaveChangesAsync();
 
-        var result = await sut.GetVariantAsync("iphone-17", "DOES-NOT-EXIST");
-
-        Assert.Null(result);
+        Assert.Null(await sut.GetConfigurationAsync("ipad-mini-7", "does-not-exist"));
     }
 
+    // A real configuration slug under another product's URL must 404, not
+    // quietly serve that configuration under the wrong product.
     [Fact]
-    public async Task GetVariantAsync_returns_null_when_sku_belongs_to_a_different_product()
+    public async Task GetConfigurationAsync_returns_null_when_the_configuration_belongs_to_another_product()
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
-        var iphone = NewCategory("iPhone", "iphone");
-        var realProduct = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
-        var otherProduct = NewProduct(iphone, "iPhone 17 Pro", "iphone-17-pro", 1199m);
-        fixture.Context.AddRange(realProduct, otherProduct);
-        fixture.Context.Add(NewVariant(realProduct, "IP17-128", 999m, 10));
+        var ipad = NewCategory("iPad", "ipad");
+        var mini = NewProduct(ipad, "iPad Mini 7", "ipad-mini-7", 0m);
+        var air = NewProduct(ipad, "iPad Air 8 11\"", "ipad-air-8-11", 0m);
+        fixture.Context.AddRange(mini, air);
+        AddVariant(fixture, mini, "128-BLUE-VN", 13_600_000m, 7, "iPad Mini Gen 7 WIFI - 128GB", "Blue", "VN");
         await fixture.Context.SaveChangesAsync();
 
-        var result = await sut.GetVariantAsync("iphone-17-pro", "IP17-128");
-
-        Assert.Null(result);
+        Assert.Null(await sut.GetConfigurationAsync("ipad-air-8-11", "ipad-mini-gen-7-wifi-128gb"));
     }
 
     [Fact]
-    public async Task GetVariantAsync_returns_null_for_inactive_variant()
+    public async Task GetConfigurationAsync_returns_null_for_an_inactive_product()
     {
         var (sut, fixture) = CreateSut();
         using var _ = fixture;
-        var iphone = NewCategory("iPhone", "iphone");
-        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        var product = NewProduct(NewCategory("Mac", "mac"), "Old Mac", "old-mac", 0m, status: false);
         fixture.Context.Add(product);
-        fixture.Context.Add(NewVariant(product, "IP17-512-DISC", 899m, 0, status: false));
+        AddVariant(fixture, product, "OLD", 1m, 1, "Old Mac 256GB");
         await fixture.Context.SaveChangesAsync();
 
-        var result = await sut.GetVariantAsync("iphone-17", "IP17-512-DISC");
-
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public async Task GetVariantAsync_returns_null_for_inactive_product()
-    {
-        var (sut, fixture) = CreateSut();
-        using var _ = fixture;
-        var mac = NewCategory("Mac", "mac");
-        var product = NewProduct(mac, "Discontinued Mac", "discontinued-mac", 899m, status: false);
-        fixture.Context.Add(product);
-        fixture.Context.Add(NewVariant(product, "DISC-MAC-256", 899m, 5));
-        await fixture.Context.SaveChangesAsync();
-
-        var result = await sut.GetVariantAsync("discontinued-mac", "DISC-MAC-256");
-
-        Assert.Null(result);
+        Assert.Null(await sut.GetConfigurationAsync("old-mac", "old-mac-256gb"));
     }
 }

@@ -1,4 +1,5 @@
 @model AppleStore.Web.Models.HomeViewModel
+@using AppleStore.Web.Formatting
 @{
     ViewData["Title"] = "Home";
 }
@@ -51,14 +52,10 @@
 @foreach (var banner in Model.Banners)
 {
     var image = banner.ImageUrls.FirstOrDefault();
-    var fromPrice = banner.Variants.Select(v => v.Price).DefaultIfEmpty(0).Min();
     <a class="home-banner" asp-controller="Products" asp-action="Details" asp-route-slug="@banner.Slug">
         <h2 class="home-banner-title">@banner.Name</h2>
         <p class="home-banner-tagline">@banner.Description</p>
-        @if (fromPrice > 0)
-        {
-            <span class="home-banner-price">From $@fromPrice.ToString("N2")</span>
-        }
+        <span class="home-banner-price">@(banner.FromPrice is null ? PriceText.Vnd(null) : "From " + PriceText.Vnd(banner.FromPrice))</span>
         @if (image is not null)
         {
             <span class="home-banner-media"><img src="@Url.Content(image)" alt="@banner.Name" loading="lazy" /></span>
