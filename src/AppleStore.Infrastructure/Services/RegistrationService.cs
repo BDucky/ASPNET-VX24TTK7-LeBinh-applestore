@@ -32,7 +32,7 @@ public class RegistrationService : IRegistrationService
             return new RegistrationStartResult(false, null, RegistrationError.EmailAlreadyUsed);
 
         if (!string.IsNullOrWhiteSpace(request.Phone) &&
-            await _db.Users.AnyAsync(u => u.Phone == request.Phone, ct))
+            await _db.Users.PhoneTakenAsync(request.Phone, ct: ct))
             return new RegistrationStartResult(false, null, RegistrationError.PhoneAlreadyUsed);
 
         // Identity's password rules (AddAppleStoreIdentityCore) are checked here,
