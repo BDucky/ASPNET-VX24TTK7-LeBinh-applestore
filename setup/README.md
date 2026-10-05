@@ -9,3 +9,10 @@ project from source. If a point is reached where not everything needed can be
 committed here (for example, a licensed dependency or a large dataset), that
 exception and a deployment diagram will be documented in this file instead of
 silently leaving setup incomplete.
+
+## Verification scripts
+
+| Script | What it checks |
+|---|---|
+| `rauvang-sync/verify.py` | catalog, model, and price data against rauvang.com |
+| `verify-account/verify.py` | register, OTP, sign in, sign out, lockout, live in a browser |
