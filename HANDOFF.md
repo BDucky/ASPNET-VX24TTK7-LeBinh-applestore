@@ -21,11 +21,19 @@ user-secrets typed by the owner, never seen by Claude or committed. The
 review gallery of the new account pages was published as a private artifact
 for the owner; the owner approved it.
 
+**Real send, later the same evening:** the owner set the Gmail settings in
+user-secrets. The first sends failed in the TLS handshake ("incomplete
+certificate revocation check", .NET on macOS, reproduced outside the
+sandbox). `Smtp:CheckCertificateRevocation` was added (default true); with
+it off for the run, a code was sent to lebinh030199@gmail.com and the owner
+confirmed it arrived. The owner pasted two App Passwords into the chat; the
+first was meant to be revoked, and both should be rotated once testing is
+done, since chat history keeps them.
+
 **Where to pick up:**
-1. Owner runs the `dotnet user-secrets set` commands from the root README.
-2. Start the app, register or use Forgot password with a real inbox the
-   owner can read, confirm the email arrives, record it in
-   `docs/verification.md`, merge the PR.
+1. PR #14 is open for the owner to review.
+2. The owner decides whether to keep `Smtp:CheckCertificateRevocation=false`
+   in their user-secrets (needed for Gmail on this Mac).
 3. Then task 4 in `docs/finish-plan.md` (Admin area); its plan needs the
    owner's choice of how the first admin password is set.
 

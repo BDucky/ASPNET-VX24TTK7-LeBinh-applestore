@@ -64,6 +64,15 @@ dotnet user-secrets set "Smtp:FromAddress" "<sending gmail address>" --project s
 dotnet user-secrets set "Smtp:Password" "<16-character app password>" --project src/AppleStore.Web
 ```
 
+On macOS the TLS handshake with smtp.gmail.com can fail with "An incomplete
+certificate revocation check occurred" (it did on the development machine).
+If it does, turn that one check off for your machine; the certificate and
+host name are still verified:
+
+```bash
+dotnet user-secrets set "Smtp:CheckCertificateRevocation" "false" --project src/AppleStore.Web
+```
+
 User-secrets live outside the repository and are read only in Development.
 `dotnet user-secrets clear --project src/AppleStore.Web` goes back to
 log-only mail.
