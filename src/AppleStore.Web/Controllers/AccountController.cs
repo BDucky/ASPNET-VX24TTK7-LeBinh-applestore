@@ -7,25 +7,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppleStore.Web.Controllers;
 
-// Use cases 1-3 (register with OTP, send OTP, log in) plus log out, built on
-// ASP.NET Core Identity: UserManager finds users, SignInManager checks
+// Use cases 1-6 (register with OTP, send OTP, log in, forgot password,
+// change password, update profile) plus log out, built on ASP.NET Core
+// Identity: UserManager finds and changes users, SignInManager checks
 // passwords, counts failures toward lockout, and writes the sign-in cookie.
+// Delivery addresses live in AddressesController.
 public class AccountController : Controller
 {
     private const string LoginFailed = "Email or password is incorrect.";
+    private const string LockedOut = "Too many failed attempts. This account is locked for a few minutes.";
+    private const string PasswordRule = "Password must be at least 8 characters.";
+    private const string CodeRefused = "The code is incorrect or has expired.";
+    private const string StatusKey = "AccountStatus";
 
     private readonly IRegistrationService _registration;
+    private readonly IPasswordResetService _passwordReset;
+    private readonly IProfileService _profile;
     private readonly UserManager<User> _users;
     private readonly SignInManager<User> _signIn;
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         IRegistrationService registration,
+        IPasswordResetService passwordReset,
+        IProfileService profile,
         UserManager<User> users,
         SignInManager<User> signIn,
         ILogger<AccountController> logger)
     {
         _registration = registration;
+        _passwordReset = passwordReset;
+        _profile = profile;
         _users = users;
         _signIn = signIn;
         _logger = logger;
@@ -42,6 +54,7 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
+        ViewData["Status"] = TempData[StatusKey] as string;
         return View(new AccountSummaryViewModel(user.FullName, user.Email, user.Phone, user.Role.ToString(), user.CreatedAt));
     }
 
@@ -64,7 +77,7 @@ public class AccountController : Controller
             {
                 RegistrationError.EmailAlreadyUsed => (nameof(model.Email), "An account with this email already exists."),
                 RegistrationError.PhoneAlreadyUsed => (nameof(model.Phone), "This phone number is already used by another account."),
-                RegistrationError.PasswordTooWeak => (nameof(model.Password), "Password must be at least 8 characters."),
+                RegistrationError.PasswordTooWeak => (nameof(model.Password), PasswordRule),
                 _ => (string.Empty, "Registration failed. Please try again."),
             };
             ModelState.AddModelError(field, message);
@@ -99,7 +112,7 @@ public class AccountController : Controller
             ViewData["OtpExpired"] = result.Error is RegistrationError.AttemptNotFound or RegistrationError.EmailAlreadyUsed;
             ModelState.AddModelError(string.Empty, result.Error switch
             {
-                RegistrationError.InvalidOtp => "The code is incorrect or has expired.",
+                RegistrationError.InvalidOtp => CodeRefused,
                 RegistrationError.AttemptNotFound => "This registration has expired. Please register again.",
                 RegistrationError.EmailAlreadyUsed => "An account with this email already exists. Please sign in.",
                 _ => "Verification failed. Please try again.",
@@ -134,9 +147,7 @@ public class AccountController : Controller
         if (result.Succeeded)
             return LocalRedirect(Url.IsLocalUrl(model.ReturnUrl) ? model.ReturnUrl! : "/");
 
-        ModelState.AddModelError(string.Empty, result.IsLockedOut
-            ? "Too many failed attempts. This account is locked for a few minutes."
-            : LoginFailed);
+        ModelState.AddModelError(string.Empty, result.IsLockedOut ? LockedOut : LoginFailed);
         return View(model);
     }
 
@@ -149,4 +160,138 @@ public class AccountController : Controller
 
     [HttpGet]
     public IActionResult AccessDenied() => View();
+
+    [HttpGet]
+    public IActionResult ForgotPassword(string? email = null) => View(new ForgotPasswordViewModel { Email = email ?? string.Empty });
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var email = model.Email.Trim();
+        var result = await _passwordReset.StartAsync(email, ct);
+        if (!result.Success)
+        {
+            // Registration already tells a visitor an email is taken, so
+            // hiding it here would protect nothing and only confuse.
+            ModelState.AddModelError(nameof(model.Email), "No account uses this email.");
+            return View(model);
+        }
+
+        return RedirectToAction(nameof(ResetPassword), new { email });
+    }
+
+    [HttpGet]
+    public IActionResult ResetPassword(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return RedirectToAction(nameof(ForgotPassword));
+
+        return View(new ResetPasswordViewModel { Email = email });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(model.Email))
+            return RedirectToAction(nameof(ForgotPassword));
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var result = await _passwordReset.ResetAsync(model.Email.Trim(), model.Code.Trim(), model.NewPassword, ct);
+        if (!result.Success)
+        {
+            var (field, message) = result.Error switch
+            {
+                PasswordResetError.PasswordTooWeak => (nameof(model.NewPassword), PasswordRule),
+                PasswordResetError.LockedOut => (string.Empty, LockedOut),
+                PasswordResetError.NoAccount => (string.Empty, "No account uses this email."),
+                _ => (string.Empty, CodeRefused),
+            };
+            ModelState.AddModelError(field, message);
+            return View(model);
+        }
+
+        var user = await _users.FindByIdAsync(result.UserId!.Value.ToString());
+        if (user is null)
+        {
+            _logger.LogError("User {UserId} reset their password but cannot be found", result.UserId);
+            return RedirectToAction(nameof(Login));
+        }
+
+        await _signIn.SignInAsync(user, isPersistent: false);
+        TempData[StatusKey] = "Your password was reset.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [Authorize, HttpGet]
+    public IActionResult ChangePassword() => View(new ChangePasswordViewModel());
+
+    [Authorize, HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var user = await _users.GetUserAsync(User);
+        if (user is null)
+            return RedirectToAction(nameof(Login));
+
+        var result = await _users.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                if (error.Code == nameof(IdentityErrorDescriber.PasswordMismatch))
+                    ModelState.AddModelError(nameof(model.CurrentPassword), "Current password is incorrect.");
+                else if (error.Code.StartsWith("Password", StringComparison.Ordinal))
+                    ModelState.AddModelError(nameof(model.NewPassword), PasswordRule);
+                else
+                    ModelState.AddModelError(string.Empty, "Your password could not be changed. Please try again.");
+            }
+            return View(model);
+        }
+
+        // The new security stamp would sign this session out at its next
+        // check; refresh the cookie so only the other sessions end.
+        await _signIn.RefreshSignInAsync(user);
+        TempData[StatusKey] = "Your password was changed.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [Authorize, HttpGet]
+    public async Task<IActionResult> Profile()
+    {
+        var user = await _users.GetUserAsync(User);
+        if (user is null)
+            return RedirectToAction(nameof(Login));
+
+        return View(new ProfileViewModel { FullName = user.FullName, Phone = user.Phone });
+    }
+
+    [Authorize, HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Profile(ProfileViewModel model, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var userId = int.Parse(_users.GetUserId(User)!);
+        var result = await _profile.UpdateAsync(userId, new ProfileUpdate(model.FullName, model.Phone), ct);
+        if (!result.Success)
+        {
+            if (result.Error == ProfileError.UserNotFound)
+                return RedirectToAction(nameof(Login));
+            ModelState.AddModelError(nameof(model.Phone), "This phone number is already used by another account.");
+            return View(model);
+        }
+
+        // The nav reads the name from the cookie; rebuild it.
+        var user = await _users.FindByIdAsync(userId.ToString());
+        if (user is not null)
+            await _signIn.RefreshSignInAsync(user);
+        TempData[StatusKey] = "Your details were saved.";
+        return RedirectToAction(nameof(Index));
+    }
 }

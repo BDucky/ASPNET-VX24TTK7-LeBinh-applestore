@@ -1,0 +1,32 @@
+@model AppleStore.Web.Models.Account.ProfileViewModel
+@{
+    ViewData["Title"] = "My details";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card">
+        <div class="hero-eyebrow">Account</div>
+        <h1 class="account-title">My details</h1>
+        <p class="account-lead">Your email is your sign-in name and cannot be changed here.</p>
+
+        <partial name="_AccountErrors" />
+
+        <form asp-action="Profile" method="post" class="account-form" novalidate>
+            <label asp-for="FullName"></label>
+            <input asp-for="FullName" autocomplete="name" />
+            <span asp-validation-for="FullName" class="account-field-error"></span>
+
+            <label asp-for="Phone">Phone (optional)</label>
+            <input asp-for="Phone" autocomplete="tel" />
+            <span asp-validation-for="Phone" class="account-field-error"></span>
+
+            <button type="submit" class="btn-store-primary">Save</button>
+        </form>
+
+        <p class="account-switch"><a asp-action="Index">Back to my account</a></p>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

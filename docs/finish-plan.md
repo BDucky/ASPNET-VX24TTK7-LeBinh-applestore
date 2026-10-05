@@ -59,7 +59,7 @@ puts a demoable buying flow and the admin area first.
 |---|---|---|---|---|---|
 | 1 | Resolve OrderStatus, week 3 report | | `chore/order-status-confirmed` | | done, PR #11 |
 | 2 | Register, OTP, sign in, sign out, lockout | 1-3 | `feat/identity-login` | Identity with a custom `UserStore`, cookie, `[Authorize]`, anti-forgery | done, verified 31/31, PR #12 |
-| 3 | Forgot password, change password, profile and addresses | 4-6 | `feat/account-password-profile` | `UserManager.ChangePasswordAsync`, `ResetPasswordAsync`, security stamp sign-out | next, plan pending |
+| 3 | Forgot password, change password, profile and addresses | 4-6 | `feat/account-password-profile` | `UserManager.ChangePasswordAsync`, `ResetPasswordAsync`, security stamp sign-out | done, verified 67/67, PR #13 |
 | 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager` | not started |
 | 5 | Cart | 11-14 | `feat/cart` | session or DB cart, view components for the nav count | not started |
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, transactions in EF Core | not started |
@@ -74,11 +74,18 @@ puts a demoable buying flow and the admin area first.
 
 | Decision | Needed by task | Notes |
 |---|---|---|
-| Forgot-password code: reuse the `UserTokens` table (`ResetPasswordOtp`) or Identity's built-in reset token sent as a link | 3 | the schema already has `UserTokenType.ResetPasswordOtp`; the report says OTP |
 | Admin account: how its first password is set (user secrets, environment variable, or printed once at seed) | 4 | never a password committed to the repo |
 | Vouchers: own table or configuration | 6 | the report's schema has no voucher table, only `Order.VoucherCode` |
 | VNPay and MoMo sandbox credentials | 7 | without them both are simulated |
 | Report language and who writes which chapter | 11 | sample report is Vietnamese |
+
+## Decided
+
+| Decision | Date | Outcome |
+|---|---|---|
+| Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
+| Email change | 2026-10-05 | not offered; the email is the sign-in name |
+| Number of addresses | 2026-10-05 | no limit |
 
 ## Known gaps carried forward
 
@@ -90,3 +97,7 @@ puts a demoable buying flow and the admin area first.
   still has the template's "Development mode" paragraph (pre-existing, see
   `docs/verification.md`, 2026-10-05).
 - Instructor collaborator acceptance not yet verifiable.
+- Other sessions end within 30 minutes after a password change, not at
+  once (Identity's default stamp check interval).
+- Deleting an address asks no confirmation.
+- No limit on how often a reset code can be requested.

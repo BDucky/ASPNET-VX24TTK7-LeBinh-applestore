@@ -1474,3 +1474,102 @@ body.has-custom-cursor button {
   margin: 0;
   overflow-wrap: anywhere;
 }
+
+.account-card.is-wide {
+  max-width: 640px;
+}
+
+.account-status {
+  color: #7ee2a8;
+  background: rgba(126, 226, 168, 0.08);
+  border: 1px solid rgba(126, 226, 168, 0.3);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 16px 0 0;
+}
+
+.account-forgot {
+  align-self: flex-end;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin-top: 4px;
+}
+
+.account-links {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: grid;
+  gap: 10px;
+}
+
+.account-links a,
+.account-forgot:hover {
+  color: var(--text);
+}
+
+.address-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 24px;
+  display: grid;
+  gap: 12px;
+}
+
+.address-item {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.address-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.address-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.address-text {
+  color: var(--text-muted);
+  margin: 8px 0 10px;
+  overflow-wrap: anywhere;
+}
+
+.address-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.address-actions form {
+  margin: 0;
+}
+
+.address-actions a,
+.address-actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.address-actions .is-danger {
+  color: #ff7a7a;
+}
+
+/* A link styled as the primary button keeps the button look, not a link underline. */
+a.btn-store-primary {
+  display: inline-block;
+  text-decoration: none;
+}

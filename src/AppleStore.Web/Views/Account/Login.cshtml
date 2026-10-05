@@ -19,6 +19,8 @@
             <input asp-for="Password" autocomplete="current-password" />
             <span asp-validation-for="Password" class="account-field-error"></span>
 
+            <a asp-action="ForgotPassword" class="account-forgot">Forgot password?</a>
+
             <label class="account-check">
                 <input asp-for="RememberMe" />
                 <span>@Html.DisplayNameFor(m => m.RememberMe)</span>

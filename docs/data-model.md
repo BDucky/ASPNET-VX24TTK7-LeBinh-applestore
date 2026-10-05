@@ -53,11 +53,19 @@ codebase constructs one yet. It stays reserved for a future design that does
 persist a pending registration (which would need `UserTokens.UserId` to become
 nullable, a real schema change, not made here). `UserTokenType.ResetPasswordOtp`
 does not have this problem: forgot-password always has an existing `User` row to
-attach the token to, so it can use `UserTokens` as the schema intends once that
-use case is built (M1, not yet started).
+attach the token to, so it uses `UserTokens` as the schema intends. Built
+2026-10-05 (`PasswordResetService`): `Token` holds the code hashed with
+Identity's password hasher (never the plain code), `ExpiredAt` is 5 minutes
+after creation, `UsedAt` is set when the code is used or replaced by a newer
+one, and the code is claimed with a conditional update so it works only once.
 
 ### Addresses
 `Id (PK)`, `UserId (FK -> Users)`, `Label (nvarchar 60, nullable)`, `FullName (nvarchar 120)`, `Phone (varchar 20)`, `AddressLine (nvarchar 255)`, `Ward/District/City (nvarchar 100, nullable)`, `IsDefault (bit)`
+
+Rules (`ProfileService`, 2026-10-05): a user's first address becomes the
+default; making another one default clears the previous one, so there is at
+most one; unticking the current default keeps it (another address has to be
+made default instead). A user only ever sees and changes their own addresses.
 
 ### Carts
 `Id (PK)`, `UserId (FK -> Users)`

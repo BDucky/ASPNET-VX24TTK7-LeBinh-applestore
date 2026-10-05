@@ -1,5 +1,6 @@
 """Live check of the account pages (register, verify code, sign in, sign out,
-lockout) in a real browser, against the real app and a throwaway copy of the
+forgot and change password, profile, delivery addresses, lockout) in a real
+browser, against the real app and a throwaway copy of the
 database.
 
 Usage (from the repo root, playwright-cli installed, nothing on port 5286):
@@ -260,7 +261,176 @@ def main():
         check("without remember me the cookie ends with the browser", r["sessionCookie"] == -1, str(r["sessionCookie"]))
         check("remember me makes the cookie persistent", (r["rememberCookie"] or 0) > time.time() + 86400, str(r["rememberCookie"]))
 
-        # 7. Lockout: 5 wrong passwords, then the right one.
+        # 7. Forgot password: unknown email, wrong code, right code.
+        r = step(r"""
+  const out = {};
+  await page.goto(APP + '/Account/Login');
+  out.forgotLink = await page.locator('a[href="/Account/ForgotPassword"]').count();
+  await page.goto(APP + '/Account/ForgotPassword');
+  await fill(page, { Email: 'nobody__STAMP__@example.com' }); await submit(page);
+  out.unknown = await fieldErrors(page);
+  out.registerLink = await page.locator('.account-switch a[href="/Account/Register"]').count();
+  await fill(page, { Email: '__EMAIL__' }); await submit(page);
+  out.url = page.url().replace(APP, '');
+  return JSON.stringify(out);
+""".replace("__EMAIL__", EMAIL).replace("__STAMP__", STAMP))
+        check("login page links to forgot password", r["forgotLink"] == 1, str(r["forgotLink"]))
+        check("forgot password with an unknown email says so and links to register",
+              r["unknown"] == ["No account uses this email."] and r["registerLink"] == 1, str(r))
+        check("forgot password with a known email goes to the reset page", r["url"].startswith("/Account/ResetPassword?email="), r["url"])
+        reset_code = otp_for(log, EMAIL)
+        check("reset code email was produced", reset_code is not None and reset_code != code)
+        new_password = "Password2"
+        r = step(r"""
+  const out = {};
+  await fill(page, { Code: '__WRONG__', NewPassword: '__NEW__', ConfirmPassword: '__NEW__' }); await submit(page);
+  out.wrong = await errors(page);
+  await fill(page, { Code: '__CODE__', NewPassword: '__NEW__', ConfirmPassword: '__NEW__' }); await submit(page);
+  out.url = page.url().replace(APP, '');
+  out.status = await text(page, '.account-status');
+  await page.screenshot({ path: 'reset-done.png' });
+  await signOut(page);
+  await page.goto(APP + '/Account/Login');
+  await fill(page, { Email: '__EMAIL__', Password: '__OLD__' }); await submit(page);
+  out.oldPassword = await errors(page);
+  await fill(page, { Email: '__EMAIL__', Password: '__NEW__' }); await submit(page);
+  out.newPassword = page.url().replace(APP, '');
+  return JSON.stringify(out);
+""".replace("__WRONG__", "000000" if reset_code != "000000" else "111111").replace("__CODE__", reset_code or "")
+     .replace("__NEW__", new_password).replace("__OLD__", PASSWORD).replace("__EMAIL__", EMAIL))
+        check("wrong reset code stays on the page", r["wrong"] == ["The code is incorrect or has expired."], str(r["wrong"]))
+        check("right reset code signs in with a confirmation", r["url"] == "/Account" and r["status"] == ["Your password was reset."], str(r))
+        check("after reset the old password fails and the new one works",
+              r["oldPassword"] == ["Email or password is incorrect."] and r["newPassword"] == "/", str(r))
+
+        # 8. Change password (signed in from step 7).
+        changed_password = "Password3"
+        r = step(r"""
+  const out = {};
+  await page.goto(APP + '/Account/ChangePassword');
+  await fill(page, { CurrentPassword: 'WrongPass9', NewPassword: '__CHANGED__', ConfirmPassword: '__CHANGED__' }); await submit(page);
+  out.wrong = await fieldErrors(page);
+  await fill(page, { CurrentPassword: '__CURRENT__', NewPassword: '__CHANGED__', ConfirmPassword: '__CHANGED__' }); await submit(page);
+  out.url = page.url().replace(APP, '');
+  out.status = await text(page, '.account-status');
+  await signOut(page);
+  await page.goto(APP + '/Account/Login');
+  await fill(page, { Email: '__EMAIL__', Password: '__CHANGED__' }); await submit(page);
+  out.relogin = page.url().replace(APP, '');
+  return JSON.stringify(out);
+""".replace("__CHANGED__", changed_password).replace("__CURRENT__", new_password).replace("__EMAIL__", EMAIL))
+        check("change password refuses a wrong current password", r["wrong"] == ["Current password is incorrect."], str(r["wrong"]))
+        check("change password keeps the session with a confirmation",
+              r["url"] == "/Account" and r["status"] == ["Your password was changed."], str(r))
+        check("the changed password signs in", r["relogin"] == "/", r["relogin"])
+
+        # 9. Profile: a phone another account uses, then a real change.
+        db = sqlite3.connect(TMP / "app.db")
+        other_phone = "08" + STAMP[-8:]
+        db.execute("insert into Users (Email, NormalizedEmail, PasswordHash, FullName, Phone, Role, CreatedAt, UpdatedAt, SecurityStamp, AccessFailedCount)"
+                   " values (?, ?, 'x', 'Other', ?, 0, datetime('now'), datetime('now'), 'stamp', 0)",
+                   (f"other{STAMP}@example.com", f"OTHER{STAMP}@EXAMPLE.COM", other_phone))
+        other_id = db.execute("select last_insert_rowid()").fetchone()[0]
+        db.execute("insert into Addresses (UserId, FullName, Phone, AddressLine, IsDefault) values (?, 'Other', ?, 'Not yours', 1)",
+                   (other_id, other_phone))
+        other_address = db.execute("select last_insert_rowid()").fetchone()[0]
+        db.commit()
+        db.close()
+        r = step(r"""
+  const out = {};
+  await page.goto(APP + '/Account/Profile');
+  await fill(page, { FullName: 'Verify Renamed', Phone: '__OTHER_PHONE__' }); await submit(page);
+  out.taken = await fieldErrors(page);
+  await fill(page, { FullName: 'Verify Renamed', Phone: '__PHONE__' }); await submit(page);
+  out.status = await text(page, '.account-status');
+  out.nav = (await page.locator('.site-nav-account').innerText()).replace(/\n/g, ' | ');
+  return JSON.stringify(out);
+""".replace("__OTHER_PHONE__", other_phone).replace("__PHONE__", PHONE))
+        check("profile refuses a phone another account uses",
+              r["taken"] == ["This phone number is already used by another account."], str(r["taken"]))
+        check("profile change is saved and shown in the nav",
+              r["status"] == ["Your details were saved."] and r["nav"] == "Verify Renamed | Sign out", str(r))
+
+        # 10. Addresses: default rules, edit, delete, someone else's address.
+        r = step(r"""
+  const out = {};
+  const add = async (line, makeDefault) => {
+    await page.goto(APP + '/Account/Addresses/Create');
+    await fill(page, { Label: line, FullName: 'Verify User', Phone: '0911111111', AddressLine: line, Ward: 'Ben Nghe', District: 'District 1', City: 'Ho Chi Minh City' });
+    if (makeDefault) await page.check('.account-form #IsDefault');
+    await submit(page);
+  };
+  const defaultLabel = async () => (await page.locator('.address-item:has(.address-badge) .address-head strong').allTextContents());
+  await page.goto(APP + '/Account/Addresses/Create');
+  await page.click('.account-form button[type=submit]'); await page.waitForTimeout(300);
+  out.emptyErrors = (await fieldErrors(page)).length;
+  await add('First street', false);
+  out.firstDefault = await defaultLabel();
+  await add('Second street', true);
+  out.secondDefault = await defaultLabel();
+  await page.click('.address-item:has-text("First street") button:has-text("Make default")'); await page.waitForLoadState('load');
+  out.backToFirst = await defaultLabel();
+  await page.click('.address-item:has-text("Second street") a:has-text("Edit")'); await page.waitForLoadState('load');
+  await fill(page, { AddressLine: 'Second street, floor 3' }); await submit(page);
+  out.edited = (await text(page, '.address-text')).some(t => t.includes('floor 3'));
+  await page.screenshot({ path: 'addresses.png', fullPage: true });
+  await page.click('.address-item:has-text("floor 3") button:has-text("Delete")'); await page.waitForLoadState('load');
+  out.afterDelete = (await page.locator('.address-item').count());
+  out.otherEdit = (await page.request.get(APP + '/Account/Addresses/Edit/__OTHER__')).status();
+  return JSON.stringify(out);
+""".replace("__OTHER__", str(other_address)))
+        check("empty address form is stopped in the browser", r["emptyErrors"] >= 3, str(r["emptyErrors"]))
+        check("first address becomes the default", r["firstDefault"] == ["First street"], str(r["firstDefault"]))
+        check("ticking default on a new address moves the default", r["secondDefault"] == ["Second street"], str(r["secondDefault"]))
+        check("make default moves it back", r["backToFirst"] == ["First street"], str(r["backToFirst"]))
+        check("address edit is saved", r["edited"], str(r["edited"]))
+        check("address delete removes it", r["afterDelete"] == 1, str(r["afterDelete"]))
+        check("another user's address is 404", r["otherEdit"] == 404, str(r["otherEdit"]))
+        db = sqlite3.connect(TMP / "app.db")
+        still = db.execute("select AddressLine from Addresses where Id = ?", (other_address,)).fetchone()
+        db.close()
+        check("another user's address is untouched", still == ("Not yours",), str(still))
+
+        # 11. Signed-in and new pages: load, no sideways scroll, no console errors.
+        r = step(r"""
+  const consoleErrors = [];
+  page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
+  const out = {};
+  for (const [w, h] of [[1440, 900], [390, 844]]) {
+    await page.setViewportSize({ width: w, height: h });
+    for (const p of ['/Account', '/Account/Profile', '/Account/ChangePassword', '/Account/Addresses', '/Account/Addresses/Create']) {
+      const resp = await page.goto(APP + p);
+      out[p + '@' + w] = { status: resp.status(), scroll: await page.evaluate(() => document.documentElement.scrollWidth) };
+    }
+    if (w === 390) await page.screenshot({ path: 'addresses-mobile.png', fullPage: true });
+  }
+  // Still 390px wide: the account links sit in the collapsed menu, so open
+  // it the way a phone user would, then sign out from there.
+  await page.click('.navbar-toggler');
+  await page.locator('.site-nav-account-out').waitFor({ state: 'visible' });
+  out.mobileMenu = (await page.locator('.site-nav-account').innerText()).replace(/\n/g, ' | ');
+  await page.screenshot({ path: 'mobile-menu.png' });
+  await signOut(page);
+  for (const [w, h] of [[1440, 900], [390, 844]]) {
+    await page.setViewportSize({ width: w, height: h });
+    for (const p of ['/Account/ForgotPassword', '/Account/ResetPassword?email=a%40example.com']) {
+      const resp = await page.goto(APP + p);
+      out[p + '@' + w] = { status: resp.status(), scroll: await page.evaluate(() => document.documentElement.scrollWidth) };
+    }
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  out.consoleErrors = consoleErrors;
+  return JSON.stringify(out);
+""")
+        for key, v in r.items():
+            if "@" in key:
+                width = int(key.split("@")[1])
+                check(f"page {key} loads without sideways scroll", v["status"] == 200 and v["scroll"] <= width, json.dumps(v))
+        check("no console errors on the signed-in and password pages", not r["consoleErrors"], "; ".join(r["consoleErrors"]))
+        check("on a phone the menu button reveals the name and sign out", r["mobileMenu"] == "Verify Renamed | Sign out", r["mobileMenu"])
+        current_password = changed_password
+
+        # 12. Lockout: 5 wrong passwords, then the right one.
         r = step(r"""
   const out = {};
   for (let i = 0; i < 5; i++) {
@@ -272,7 +442,7 @@ def main():
   out.msg = await errors(page);
   out.url = page.url().replace(APP, '');
   return JSON.stringify(out);
-""".replace("__EMAIL__", EMAIL).replace("__PASSWORD__", PASSWORD))
+""".replace("__EMAIL__", EMAIL).replace("__PASSWORD__", current_password))
         check("right password after 5 wrong ones is locked out",
               r["msg"] == ["Too many failed attempts. This account is locked for a few minutes."] and r["url"].startswith("/Account/Login"), str(r))
         row = sqlite3.connect(TMP / "app.db").execute(
@@ -282,7 +452,7 @@ def main():
     finally:
         stop_app(proc)
 
-    # 8. Server error (no tables): the page says so and offers a way back.
+    # 13. Server error (no tables): the page says so and offers a way back.
     proc = start_app("Production", TMP / "empty.db", TMP / "app-prod.log")
     try:
         r = step(r"""

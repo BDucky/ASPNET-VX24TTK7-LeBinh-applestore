@@ -4,6 +4,42 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-05: use cases 4-6, forgot and change password, profile, addresses (`feat/account-password-profile`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 102 of 102 (27 new: 9 `PasswordResetServiceTests`, 6 `ProfileServiceTests`, 12 `AccountSettingsFlowTests` through the real app) |
+| `python3 setup/verify-account/verify.py` | **67 of 67** live browser checks (the 31 from the first entry plus 36 new) |
+
+New live checks: login links to forgot password; unknown email is told so
+with a register link; wrong reset code stays; right code signs in with
+"Your password was reset."; afterwards the old password fails and the new
+works; change password refuses a wrong current password, keeps the session,
+and the changed password signs in; profile refuses another account's phone
+and shows the new name in the nav; first address is the default, ticking
+default moves it, "Make default" moves it back, edit and delete work;
+another user's address is 404 and its row is untouched; Account, Profile,
+ChangePassword, Addresses, Addresses/Create, ForgotPassword, ResetPassword
+load at 1440px and 390px with no sideways scroll and no console errors; on a
+phone the menu button reveals the name and sign out.
+
+**Found and fixed during this pass:**
+1. Address defaults were first cleared with `ExecuteUpdate`, which left the
+   tracked rows stale, so a later "make default" in the same context was not
+   saved. Caught by `ProfileServiceTests`; defaults are now set on tracked
+   rows and saved once.
+2. "Add an address" (a link styled as a button) was underlined; seen in the
+   screenshot, fixed in CSS.
+3. The first live run timed out signing out at 390px: the sign-out button is
+   inside the collapsed menu, as designed. The script now opens the menu
+   button first, which also checks that phone users can reach it.
+
+**Not checked:** that other sessions end after a password change. Identity
+checks the stamp every 30 minutes by default, so a live check would have to
+wait that long; the unit test checks that the stamp changes.
+
 ## 2026-10-05: M1 account pages on ASP.NET Core Identity (`feat/identity-login`)
 
 **Scope checked:** build, format, full test suite, migration on the real dev

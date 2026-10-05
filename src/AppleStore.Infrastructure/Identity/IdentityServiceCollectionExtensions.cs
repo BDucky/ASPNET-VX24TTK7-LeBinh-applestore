@@ -8,8 +8,11 @@ public static class IdentityServiceCollectionExtensions
 {
     // The one place Identity's rules for this app are set, shared by the web
     // app and the tests so both run the same policy.
-    public static IdentityBuilder AddAppleStoreIdentityCore(this IServiceCollection services) =>
-        services.AddIdentityCore<User>(options =>
+    public static IdentityBuilder AddAppleStoreIdentityCore(this IServiceCollection services)
+    {
+        // Signs the one-off token PasswordResetService hands to ResetPasswordAsync.
+        services.AddDataProtection();
+        return services.AddIdentityCore<User>(options =>
             {
                 // Agreed 2026-10-05: at least 8 characters, no other complexity rule.
                 options.Password.RequiredLength = 8;
@@ -26,5 +29,7 @@ public static class IdentityServiceCollectionExtensions
                 options.User.AllowedUserNameCharacters = string.Empty;
             })
             .AddUserStore<UserStore>()
-            .AddClaimsPrincipalFactory<AppUserClaimsPrincipalFactory>();
+            .AddClaimsPrincipalFactory<AppUserClaimsPrincipalFactory>()
+            .AddDefaultTokenProviders();
+    }
 }
