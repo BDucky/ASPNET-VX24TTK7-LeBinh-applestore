@@ -38,8 +38,7 @@ public class RegistrationServiceTests
     {
         var (sut, fixture, _) = CreateSut();
         using var _ = fixture;
-        fixture.Fixture.Context.Users.Add(NewExistingUser("taken@example.com", null));
-        await fixture.Fixture.Context.SaveChangesAsync();
+        await fixture.UserManager.CreateAsync(NewExistingUser("taken@example.com", null), "Password1");
 
         var result = await sut.StartAsync(new RegisterRequest("taken@example.com", "Password123!", "New User", null));
 

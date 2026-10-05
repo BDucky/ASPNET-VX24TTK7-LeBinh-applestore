@@ -20,6 +20,10 @@ public static class IdentityServiceCollectionExtensions
                 // Lockout: Identity's own defaults (5 failed attempts, 5 minutes),
                 // agreed 2026-10-05 because the report asks for a limit but gives no number.
                 options.User.RequireUniqueEmail = true;
+                // The user name is the email, already checked by the register
+                // form; Identity's default character list would reject some
+                // valid addresses only after the OTP step.
+                options.User.AllowedUserNameCharacters = null;
             })
             .AddUserStore<UserStore>()
             .AddClaimsPrincipalFactory<AppUserClaimsPrincipalFactory>();

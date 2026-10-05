@@ -5,7 +5,9 @@ using Microsoft.Extensions.Options;
 
 namespace AppleStore.Infrastructure.Identity;
 
-// RED stub: adds nothing yet.
+// Builds the signed-in user's cookie identity. Identity adds the id, email
+// and security stamp; this adds the role (so [Authorize(Roles = "Admin")]
+// and User.IsInRole work) and the full name shown in the nav.
 public class AppUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<User>
 {
     public const string FullNameClaim = "full_name";
@@ -15,5 +17,11 @@ public class AppUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<User>
     {
     }
 
-    protected override Task<ClaimsIdentity> GenerateClaimsAsync(User user) => base.GenerateClaimsAsync(user);
+    protected override async Task<ClaimsIdentity> GenerateClaimsAsync(User user)
+    {
+        var identity = await base.GenerateClaimsAsync(user);
+        identity.AddClaim(new Claim(Options.ClaimsIdentity.RoleClaimType, user.Role.ToString()));
+        identity.AddClaim(new Claim(FullNameClaim, user.FullName));
+        return identity;
+    }
 }

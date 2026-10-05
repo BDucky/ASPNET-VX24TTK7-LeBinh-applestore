@@ -15,7 +15,6 @@ public class RegistrationService : IRegistrationService
     private readonly IMemoryCache _cache;
     private readonly IOtpService _otp;
     private readonly IEmailSender _emailSender;
-    private readonly PasswordHasher<User> _passwordHasher = new();
 
     private readonly UserManager<User> _userManager;
 
@@ -30,19 +29,29 @@ public class RegistrationService : IRegistrationService
 
     public async Task<RegistrationStartResult> StartAsync(RegisterRequest request, CancellationToken ct = default)
     {
-        if (await _db.Users.AnyAsync(u => u.Email == request.Email, ct))
+        // Identity's lookup is case-insensitive, so "A@x.com" and "a@x.com" are one account.
+        if (await _userManager.FindByEmailAsync(request.Email) is not null)
             return new RegistrationStartResult(false, null, RegistrationError.EmailAlreadyUsed);
 
         if (!string.IsNullOrWhiteSpace(request.Phone) &&
             await _db.Users.AnyAsync(u => u.Phone == request.Phone, ct))
             return new RegistrationStartResult(false, null, RegistrationError.PhoneAlreadyUsed);
 
+        // Identity's password rules (AddAppleStoreIdentityCore) are checked here,
+        // before the OTP is sent, not only when the account is finally created.
+        foreach (var validator in _userManager.PasswordValidators)
+        {
+            var check = await validator.ValidateAsync(_userManager, null!, request.Password);
+            if (!check.Succeeded)
+                return new RegistrationStartResult(false, null, RegistrationError.PasswordTooWeak);
+        }
+
         var attemptId = Guid.NewGuid().ToString("N");
         var code = _otp.GenerateCode();
         var expiresAtUtc = DateTime.UtcNow.Add(OtpValidity);
 
         // Hash immediately; the plaintext password never sits in the cache.
-        var passwordHash = _passwordHasher.HashPassword(null!, request.Password);
+        var passwordHash = _userManager.PasswordHasher.HashPassword(null!, request.Password);
 
         var pending = new PendingRegistration(request.Email, request.Phone, request.FullName, passwordHash, code, expiresAtUtc);
         _cache.Set(CacheKey(attemptId), pending, expiresAtUtc);
@@ -75,13 +84,25 @@ public class RegistrationService : IRegistrationService
             UpdatedAt = DateTime.UtcNow,
         };
 
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync(ct);
-
+        // CreateAsync (not a direct insert) so Identity sets the normalized
+        // email and security stamp the user needs to sign in. It also rejects
+        // an email that another pending attempt has confirmed since StartAsync.
+        var created = await _userManager.CreateAsync(user);
         _cache.Remove(CacheKey(attemptId));
+        if (!created.Succeeded)
+        {
+            if (created.Errors.Any(e => EmailTakenCodes.Contains(e.Code)))
+                return new RegistrationConfirmResult(false, null, RegistrationError.EmailAlreadyUsed);
+            throw new InvalidOperationException(
+                "Creating the confirmed user failed: " + string.Join(", ", created.Errors.Select(e => e.Code)));
+        }
 
         return new RegistrationConfirmResult(true, user.Id, null);
     }
+
+    // DuplicateUserName/DuplicateEmail: Identity's validator saw the email
+    // taken. DbUpdateFailed: the unique index caught a write that raced it.
+    private static readonly HashSet<string> EmailTakenCodes = ["DuplicateUserName", "DuplicateEmail", "DbUpdateFailed"];
 
     private static string CacheKey(string attemptId) => $"registration-attempt:{attemptId}";
 
