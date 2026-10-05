@@ -73,7 +73,11 @@ public class EmailTests
         // Real socket to a closed local port: no mock between the sender and the failure.
         var options = Options.Create(new SmtpOptions
         {
-            Host = "127.0.0.1", Port = 1, UserName = "u", Password = "p", FromAddress = "store@example.com",
+            Host = "127.0.0.1",
+            Port = 1,
+            UserName = "u",
+            Password = "p",
+            FromAddress = "store@example.com",
         });
         var sender = new SmtpEmailSender(options, NullLogger<SmtpEmailSender>.Instance);
         var clock = Stopwatch.StartNew();
