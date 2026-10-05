@@ -122,21 +122,27 @@ carries a code comment saying so. Summary:
 | `UserRole` | Customer=0, Employee=1, Admin=2 | our assignment, report gives no domain |
 | `UserTokenType` | RegisterOtp=0, ResetPasswordOtp=1 | inferred from the use-case narrative, not explicit |
 | `PaymentMethod` | Cod=0, VnPay=1, MoMo=2 | our assignment, report names the three methods but never numbers them |
-| `OrderStatus` | see below | explicit but incomplete |
+| `OrderStatus` | Pending=0, Confirmed=1, Shipping=2, Completed=3, Cancelled=4 | report gives the 0-4 domain; 5th value decided 2026-10-05, see below |
 
-## Open gap: OrderStatus
+## OrderStatus (resolved 2026-10-05)
 
-This is the most important unresolved item from the source report. The schema
-chapter states the value domain is "0 to 4" (five values) but only names four:
-`0 = Cho xu ly (pending)`, `1 = Dang giao (shipping)`, `2 = Hoan tat (completed)`,
-`3 = Huy (cancelled)`. Chapter 2's order-tracking use case separately lists six
-narrative states, including a distinct "confirmed" step between pending and
-shipping, and a "returned" outcome distinct from cancelled, that do not map onto
-this four-value numbering.
+The schema chapter states the value domain is "0 to 4" (five values) but only
+names four: `0 = Cho xu ly (pending)`, `1 = Dang giao (shipping)`,
+`2 = Hoan tat (completed)`, `3 = Huy (cancelled)`. Chapter 2's order-tracking
+use case separately lists a distinct "confirmed" step between pending and
+shipping.
 
-`AppleStore.Domain.Enums.OrderStatus` currently implements only the four explicit
-values, unchanged from the report, with a code comment flagging this gap. Do not
-add a fifth value without the team deciding what it represents (most likely
-"confirmed" or "returned") and whether the existing three non-zero values need to
-shift. This decision should happen before the order-management milestone in
-`docs/roadmap.md` starts, not silently during it.
+Decision (project owner, 2026-10-05): the fifth value is "confirmed", placed in
+lifecycle order, and the later values shift by one:
+
+| Value | Name | Vietnamese |
+|---|---|---|
+| 0 | Pending | Cho xu ly |
+| 1 | Confirmed | Da xac nhan |
+| 2 | Shipping | Dang giao |
+| 3 | Completed | Hoan tat |
+| 4 | Cancelled | Huy |
+
+Shifting was safe because no order rows existed yet and the column has no
+default or check constraint, so no migration was needed. The "returned" outcome
+from chapter 2 is not modelled.

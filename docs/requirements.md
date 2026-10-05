@@ -110,14 +110,14 @@ Grouped by the actor who initiates them.
 | Data interoperability | Import/export CSV/Excel/PDF for categories, products, users, and revenue reports |
 | Maintainability | Clear logging, low-stock alerts, a dashboard for system health |
 
-## Order status flow (narrative, see docs/data-model.md for the schema gap)
+## Order status flow (narrative)
 
 The requirements chapter describes the flow as: new -> processing -> cancelled or
 shipping -> completed or returned. The order-tracking use case separately lists six
 states: pending confirmation, confirmed, shipping, delivered, returned, cancelled.
 Neither maps one-to-one onto the four values the schema chapter actually names.
-This gap is carried into `OrderStatus` in `AppleStore.Domain.Enums` deliberately
-unresolved; see `docs/data-model.md`.
+Resolved 2026-10-05: `OrderStatus` has five values, Pending, Confirmed, Shipping,
+Completed, Cancelled; see `docs/data-model.md`.
 
 ## BM_* form glossary
 

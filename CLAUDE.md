@@ -134,8 +134,9 @@ task as done; these are graded requirements, not optional polish.
 
 ## Known Gaps (see docs/data-model.md for full detail)
 
-- `Order.OrderStatus` in the source report has an unresolved 5th value slot. Do not
-  add a value to the `OrderStatus` enum without the team resolving this first.
+- `Order.OrderStatus` 5th value resolved 2026-10-05 as `Confirmed` (between
+  `Pending` and `Shipping`), see `docs/data-model.md`. Do not add further values
+  without asking.
 - Payment method and a few other enum ordinals were assigned during scaffolding
   because the report names the values but never numbers them; these are safe to
   treat as fixed, but are noted in `docs/data-model.md` for transparency.
