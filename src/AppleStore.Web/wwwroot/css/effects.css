@@ -1567,3 +1567,9 @@ body.has-custom-cursor button {
 .address-actions .is-danger {
   color: #ff7a7a;
 }
+
+/* A link styled as the primary button keeps the button look, not a link underline. */
+a.btn-store-primary {
+  display: inline-block;
+  text-decoration: none;
+}
