@@ -75,12 +75,21 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult VerifyOtp(string attemptId, string? email) =>
-        View(new VerifyOtpViewModel { AttemptId = attemptId, Email = email ?? string.Empty });
+    public IActionResult VerifyOtp(string? attemptId, string? email)
+    {
+        // Without an attempt there is no code to check; start over instead of
+        // showing a form that can only fail.
+        if (string.IsNullOrWhiteSpace(attemptId))
+            return RedirectToAction(nameof(Register));
+
+        return View(new VerifyOtpViewModel { AttemptId = attemptId, Email = email ?? string.Empty });
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model, CancellationToken ct)
     {
+        if (string.IsNullOrWhiteSpace(model.AttemptId))
+            return RedirectToAction(nameof(Register));
         if (!ModelState.IsValid)
             return View(model);
 
