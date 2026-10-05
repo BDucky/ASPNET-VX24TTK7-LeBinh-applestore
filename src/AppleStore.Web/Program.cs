@@ -30,9 +30,8 @@ builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IProductCatalogService, ProductCatalogService>();
-// DevEmailSender logs instead of sending; swap for a real provider before
-// deploying (see docs/architecture.md).
-builder.Services.AddScoped<IEmailSender, DevEmailSender>();
+// Real SMTP when the "Smtp" section is configured, otherwise log-only.
+builder.Services.AddAppleStoreEmail(builder.Configuration);
 
 var app = builder.Build();
 
