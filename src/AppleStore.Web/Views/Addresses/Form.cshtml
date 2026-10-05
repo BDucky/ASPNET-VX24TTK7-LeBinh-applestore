@@ -1,0 +1,57 @@
+@model AppleStore.Web.Models.Account.AddressViewModel
+@{
+    var id = ViewData["AddressId"] as int?;
+    ViewData["Title"] = id is null ? "Add an address" : "Edit address";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card">
+        <div class="hero-eyebrow">Account</div>
+        <h1 class="account-title">@ViewData["Title"]</h1>
+
+        <partial name="~/Views/Account/_AccountErrors.cshtml" />
+
+        <form asp-action="@(id is null ? "Create" : "Edit")" asp-route-id="@id" method="post" class="account-form" novalidate>
+            <label asp-for="Label"></label>
+            <input asp-for="Label" />
+            <span asp-validation-for="Label" class="account-field-error"></span>
+
+            <label asp-for="FullName"></label>
+            <input asp-for="FullName" autocomplete="name" />
+            <span asp-validation-for="FullName" class="account-field-error"></span>
+
+            <label asp-for="Phone"></label>
+            <input asp-for="Phone" autocomplete="tel" />
+            <span asp-validation-for="Phone" class="account-field-error"></span>
+
+            <label asp-for="AddressLine"></label>
+            <input asp-for="AddressLine" autocomplete="street-address" />
+            <span asp-validation-for="AddressLine" class="account-field-error"></span>
+
+            <label asp-for="Ward"></label>
+            <input asp-for="Ward" />
+            <span asp-validation-for="Ward" class="account-field-error"></span>
+
+            <label asp-for="District"></label>
+            <input asp-for="District" />
+            <span asp-validation-for="District" class="account-field-error"></span>
+
+            <label asp-for="City"></label>
+            <input asp-for="City" autocomplete="address-level1" />
+            <span asp-validation-for="City" class="account-field-error"></span>
+
+            <label class="account-check">
+                <input asp-for="IsDefault" />
+                <span>@Html.DisplayNameFor(m => m.IsDefault)</span>
+            </label>
+
+            <button type="submit" class="btn-store-primary">Save address</button>
+        </form>
+
+        <p class="account-switch"><a asp-action="Index">Back to my addresses</a></p>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

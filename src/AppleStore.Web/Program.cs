@@ -27,6 +27,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IProductCatalogService, ProductCatalogService>();
 // DevEmailSender logs instead of sending; swap for a real provider before
 // deploying (see docs/architecture.md).

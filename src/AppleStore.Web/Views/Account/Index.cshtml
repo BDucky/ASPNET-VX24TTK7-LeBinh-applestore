@@ -8,6 +8,8 @@
         <div class="hero-eyebrow">Account</div>
         <h1 class="account-title">@Model.FullName</h1>
 
+        <partial name="_AccountStatus" />
+
         <dl class="account-details">
             <dt>Email</dt>
             <dd>@Model.Email</dd>
@@ -18,6 +20,12 @@
             <dt>Member since</dt>
             <dd>@Model.MemberSince.ToString("dd/MM/yyyy")</dd>
         </dl>
+
+        <ul class="account-links">
+            <li><a asp-action="Profile">Edit my details</a></li>
+            <li><a asp-controller="Addresses" asp-action="Index">Delivery addresses</a></li>
+            <li><a asp-action="ChangePassword">Change password</a></li>
+        </ul>
 
         <form asp-action="Logout" method="post">
             <button type="submit" class="btn-store-ghost">Sign out</button>

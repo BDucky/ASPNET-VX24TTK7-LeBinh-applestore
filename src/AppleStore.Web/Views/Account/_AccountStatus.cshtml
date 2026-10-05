@@ -1,0 +1,5 @@
+@* One-line confirmation after a redirect (password changed, details saved). *@
+@if (ViewData["Status"] is string status)
+{
+    <p class="account-status" role="status">@status</p>
+}
