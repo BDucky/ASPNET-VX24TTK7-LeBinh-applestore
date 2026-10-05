@@ -5,6 +5,24 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-05 (later): M1 finished, use cases 4-6
+
+**What landed.** PR #13, `feat/account-password-profile`: forgot password by
+emailed code (stored hashed in `UserTokens`, Identity's `ResetPasswordAsync`),
+change password, profile and delivery addresses. 102 of 102 tests; live check
+`setup/verify-account/verify.py` 67 of 67 on the final commit. M1 (use cases
+1-6) is complete.
+
+**Decisions:** owner chose the emailed code over a reset link because
+`docs/requirements.md` use case 4 says OTP. Owner rejected the "same message
+whether or not the email exists" idea as bad UX; it also protected nothing,
+since registration already reveals taken emails. Email change not offered,
+no limit on addresses (Claude's assumptions, accepted).
+
+**Where to pick up:** task 4 in `docs/finish-plan.md`, the Admin area and a
+seeded admin account. Its PLAN gate needs the open decision on how the first
+admin password is set.
+
 ## 2026-10-05: finish push starts, OrderStatus resolved, M1 sign-in on Identity
 
 **Read `docs/finish-plan.md` first.** It holds the task order, the status of
