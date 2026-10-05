@@ -10,8 +10,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.12" />
+  </ItemGroup>
+
+  <!-- Identity's token providers (password reset) and data protection live in
+       the ASP.NET Core shared framework. Domain still references none of it. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -9,8 +9,6 @@ namespace AppleStore.Infrastructure.Services;
 
 public class RegistrationService : IRegistrationService
 {
-    private static readonly TimeSpan OtpValidity = TimeSpan.FromMinutes(5);
-
     private readonly AppDbContext _db;
     private readonly IMemoryCache _cache;
     private readonly IOtpService _otp;
@@ -48,7 +46,7 @@ public class RegistrationService : IRegistrationService
 
         var attemptId = Guid.NewGuid().ToString("N");
         var code = _otp.GenerateCode();
-        var expiresAtUtc = DateTime.UtcNow.Add(OtpValidity);
+        var expiresAtUtc = DateTime.UtcNow.Add(OtpService.Validity);
 
         // Hash immediately; the plaintext password never sits in the cache.
         var passwordHash = _userManager.PasswordHasher.HashPassword(null!, request.Password);
@@ -59,7 +57,7 @@ public class RegistrationService : IRegistrationService
         await _emailSender.SendAsync(
             request.Email,
             "Your Apple Store verification code",
-            $"Your code is {code}. It expires in 5 minutes.",
+            $"Your code is {code}. It expires in {OtpService.Validity.TotalMinutes:0} minutes.",
             ct);
 
         return new RegistrationStartResult(true, attemptId, null);
