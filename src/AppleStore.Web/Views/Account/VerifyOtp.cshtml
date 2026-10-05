@@ -1,0 +1,43 @@
+@model AppleStore.Web.Models.Account.VerifyOtpViewModel
+@{
+    ViewData["Title"] = "Verify email";
+    var expired = ViewData["OtpExpired"] as bool? == true;
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card">
+        <div class="hero-eyebrow">Account</div>
+        <h1 class="account-title">Check your email</h1>
+        <p class="account-lead">
+            Enter the 6-digit code we sent@(string.IsNullOrEmpty(Model.Email) ? "" : " to ")<strong>@Model.Email</strong>.
+            The code is valid for 5 minutes.
+        </p>
+
+        <partial name="_AccountErrors" />
+
+        @if (expired)
+        {
+            <p class="account-switch">
+                <a asp-action="Register">Register again</a> or <a asp-action="Login">sign in</a>.
+            </p>
+        }
+        else
+        {
+            <form asp-action="VerifyOtp" method="post" class="account-form" novalidate>
+                <input asp-for="AttemptId" type="hidden" />
+                <input asp-for="Email" type="hidden" />
+
+                <label asp-for="Code"></label>
+                <input asp-for="Code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="account-otp" />
+                <span asp-validation-for="Code" class="account-field-error"></span>
+
+                <button type="submit" class="btn-store-primary">Confirm</button>
+            </form>
+            <p class="account-switch">Code expired? <a asp-action="Register">Register again</a> to get a new one.</p>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -25,6 +25,8 @@ avoid colliding with `System.Attribute`; mapped back to table `Attributes` via
 ### Users
 `Id (PK)`, `Email (varchar 120, unique)`, `PasswordHash`, `FullName (nvarchar 120)`, `Phone (varchar 20, nullable)`, `UserRole (int)`, `CreatedAt`, `UpdatedAt`
 
+Added 2026-10-05 for ASP.NET Core Identity (not in the source report): `NormalizedEmail (varchar 120, unique)`, the upper-cased email Identity looks users up by, so sign-in and the duplicate-email check ignore case; `SecurityStamp (varchar 64)`, changed whenever credentials change so other sessions are signed out; `AccessFailedCount (int)` and `LockoutEnd (datetimeoffset, nullable)`, which back the lockout after repeated wrong passwords. Identity works on this table through `AppleStore.Infrastructure.Identity.UserStore`, so none of Identity's own `AspNet*` tables exist. Roles come from `UserRole` and are added to the sign-in cookie as claims.
+
 ### CategoryAttributes
 Junction, composite PK `(CategoryId, AttributeId)`, both FK.
 

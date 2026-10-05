@@ -4,6 +4,63 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-05: M1 account pages on ASP.NET Core Identity (`feat/identity-login`)
+
+**Scope checked:** build, format, full test suite, migration on the real dev
+database, and a live browser pass over every account page and path.
+
+### Build, format, test, migration
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors (a full rebuild found one CS8625 warning that incremental builds had hidden; fixed in its own commit) |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 75 of 75 pass (53 existing, 22 new: 7 `UserStoreTests`, 4 new `RegistrationServiceTests`, 11 `AccountFlowTests` running the real app through `WebApplicationFactory`) |
+| `dotnet ef database update` on `src/AppleStore.Web/AppleStore.db` | applied `AddIdentityColumnsToUsers`, 4 new columns present |
+
+### Live browser check
+
+Rerunnable script: `python3 setup/verify-account/verify.py`. It starts the app
+against a temp copy of the dev database (the dev database is not written to),
+drives Chromium with `playwright-cli`, reads each OTP from the app log, and
+prints one line per check. Result: **31 of 31 checks passed.**
+
+| Area | Checks |
+|---|---|
+| Pages | Login, Register, AccessDenied: HTTP 200 at 1440px and 390px, no sideways scroll, 0 console errors |
+| Redirects | anonymous `/Account` goes to sign in with `ReturnUrl`; `/Account/VerifyOtp` with no registration goes to Register |
+| Register | empty form and mismatched passwords stopped in the browser with no POST sent; short password shows the 8-character rule; same email in other case refused; same phone refused |
+| Code page | wrong code refused; right code creates the user and signs them in; reusing a spent code says expired and offers Register again or sign in |
+| Sign in | wrong password and unknown email show the identical message; upper-case email works; local return URL followed; external return URL lands on `/`; cookie is a session cookie without "remember me" and persistent (about 14 days) with it |
+| Sign out | GET `/Account/Logout` is 404 and keeps the session; POST without anti-forgery token is 400; the nav button signs out |
+| Lockout | right password after 5 wrong ones is refused with the lockout message; the row has `LockoutEnd` set, upper-case `NormalizedEmail`, a 32-character `SecurityStamp` |
+| Server error | app in Production against an empty database: sign in ends on "Something went wrong" with a "Back to home" link, not a hang |
+
+**Observed and explained, not bugs:**
+- After lockout the row shows `AccessFailedCount = 0`. Identity resets the
+  count when it sets `LockoutEnd`; the lock itself is `LockoutEnd`.
+- The Production error page renders without CSS. That is the
+  run-from-source Production gotcha already in `docs/architecture.md`
+  ("Running locally"): static assets are only served from the Development
+  manifest or a published build. It predates this branch. The page also
+  still carries the template's "Development mode" paragraph, also
+  pre-existing (`Views/Shared/Error.cshtml` is not touched here).
+
+### Found and fixed during this pass
+
+1. Two pending registrations for one email: confirming the second crashed
+   with `DbUpdateException` (HTTP 500) on the base branch. Now it returns
+   "already exists". Covered by `RegistrationServiceTests`.
+2. Opening the code page without a registration showed a form that could
+   only fail with no visible message. Now it redirects to Register.
+   Covered by `AccountFlowTests`.
+
+### Not checked in this pass
+
+- Forgot password, change password, update profile: not built yet.
+- No admin account exists yet, so `[Authorize(Roles = "Admin")]` has no
+  page to check; that comes with M7.
+
 ## 2026-09-17: scaffold plus M1 registration service
 
 **Scope checked:** full solution build, full test suite, and a live browser

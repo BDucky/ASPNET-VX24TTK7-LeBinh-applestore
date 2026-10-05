@@ -8,6 +8,7 @@ public enum RegistrationError
     PhoneAlreadyUsed,
     AttemptNotFound,
     InvalidOtp,
+    PasswordTooWeak,
 }
 
 public record RegistrationStartResult(bool Success, string? AttemptId, RegistrationError? Error);

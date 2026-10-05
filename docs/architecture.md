@@ -86,3 +86,21 @@ present in `wwwroot`, so overriding the launch profile (for example passing
 `ASPNETCORE_ENVIRONMENT=Development` explicitly produces a working app with a
 500 on every page's stylesheet request. See `docs/verification.md` for how this
 was found.
+
+## Authentication: ASP.NET Core Identity
+
+Added 2026-10-05. Sign-up, sign-in, lockout and roles use ASP.NET Core
+Identity (`UserManager<User>`, `SignInManager<User>`, the Identity
+application cookie, `[Authorize]`), the same mechanism the course's sample
+project uses, but over this project's own `Users` table:
+
+| Piece | File | Role |
+|---|---|---|
+| `UserStore` | `Infrastructure/Identity/UserStore.cs` | Lets Identity read and write `Users`; the email is the user name |
+| `AppUserClaimsPrincipalFactory` | `Infrastructure/Identity/` | Puts the role (`Customer`, `Employee`, `Admin`) and full name into the cookie |
+| `AddAppleStoreIdentityCore` | `Infrastructure/Identity/IdentityServiceCollectionExtensions.cs` | The one place the password and lockout rules are set; the tests use it too |
+| `AccountController` | `Web/Controllers/AccountController.cs` | Register, verify OTP, sign in, sign out, account page |
+
+Rules: password at least 8 characters, no other complexity rule; 5 wrong
+passwords lock the account for 5 minutes (Identity's defaults). `Domain`
+still has no ASP.NET reference: `User` only gained plain columns.

@@ -7,6 +7,8 @@ share technically. Treat this as a starting point to adjust, not a fixed plan.
 Each milestone is sized to be its own set of feature branches and TDD sessions, not
 one big session.
 
+Order and status of the remaining work: `docs/finish-plan.md`.
+
 ## M1: Auth and OTP
 
 Use cases 1-6 (register, send OTP, log in, forgot password, change password,
@@ -21,8 +23,8 @@ an authenticated user.
 | `OtpService` (generate, validate) | done, tested, merged path via PR #2 |
 | `RegistrationService` (duplicate checks, pending state, OTP confirm, hashed password) | done, tested, PR #2 |
 | `IEmailSender` / `DevEmailSender` | done, PR #2 |
-| Register + verify-OTP controller and views | not started |
-| Log in | not started |
+| Register + verify-OTP controller and views | done, ASP.NET Core Identity, `feat/identity-login` |
+| Log in, log out, lockout after 5 wrong passwords | done, `feat/identity-login` |
 | Forgot password | not started |
 | Change password | not started |
 | Update profile | not started |

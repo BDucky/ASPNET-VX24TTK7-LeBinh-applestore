@@ -5,6 +5,44 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-05: finish push starts, OrderStatus resolved, M1 sign-in on Identity
+
+**Read `docs/finish-plan.md` first.** It holds the task order, the status of
+each task, the definition of done, and the open decisions. This entry is the
+story of how it got there.
+
+**What landed.**
+1. PR #9 and PR #10 (catalog and storefront) merged into `dev`.
+2. PR #11: `OrderStatus` gets its fifth value, `Confirmed` (Pending 0,
+   Confirmed 1, Shipping 2, Completed 3, Cancelled 4), plus the week 3
+   progress report.
+3. `feat/identity-login`: use cases 1-3 on ASP.NET Core Identity. A custom
+   `UserStore` keeps the report's own `Users` table (4 Identity columns added
+   by migration), `AppUserClaimsPrincipalFactory` puts the role and full name
+   in the cookie, `AccountController` has register, verify code, sign in,
+   sign out, and the account page. 74 of 74 tests; live browser check
+   `setup/verify-account/verify.py` 31 of 31.
+
+**Decisions made this session, and whose call each was:**
+
+| Decision | Who decided | Why |
+|---|---|---|
+| Finish the project this week; scope M1, M3, M4, M5, M7, then the report | owner | deadline near, date unknown |
+| Claude merges its own PRs into `dev` when green | owner | standing rule from 2026-10-05 |
+| OrderStatus fifth value is Confirmed, values shifted | owner | matches the order-tracking use case; no order rows existed |
+| Use ASP.NET Core Identity, not a hand-rolled cookie | owner ("đây là dự án asp.net") | the course grades ASP.NET mechanisms; the sample report has a chapter on Identity |
+| Identity over the existing `Users` table with a custom store, not `IdentityUser` and `AspNet*` tables | Claude recommended, owner approved | keeps the report's 24-table schema and keeps `Domain` free of ASP.NET types |
+| Password 8 characters minimum, no other rule; lockout 5 failures for 5 minutes | Claude proposed, owner approved | the report asks for a limit without numbers; these are Identity's defaults |
+| `NormalizedEmail` added as a fourth column (plan said three) | Claude, reported after | Identity looks users up by it; it also fixed the case-sensitive duplicate check |
+| UI text stays English | Claude, following the existing storefront | the whole site is English today; the report can still be Vietnamese |
+
+**Found on the way:** on the base branch, two pending registrations for one
+email crashed the second confirmation with a 500. Fixed and covered by a test.
+
+**Where to pick up:** task 3 in `docs/finish-plan.md` (forgot password,
+change password, profile). Start with the PLAN gate; it needs the
+forgot-password decision listed there.
+
 ## 2026-09-22: course submission closed out, PRs merged (session 2 continued)
 
 **What landed, on top of the entry below.** Confirmed this is an individual

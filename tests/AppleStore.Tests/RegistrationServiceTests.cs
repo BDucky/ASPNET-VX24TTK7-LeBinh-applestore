@@ -8,14 +8,14 @@ namespace AppleStore.Tests;
 
 public class RegistrationServiceTests
 {
-    private static (RegistrationService Sut, SqliteInMemoryFixture Fixture, FakeEmailSender Email) CreateSut()
+    // The fixture returned is the host's; disposing the host disposes it.
+    private static (RegistrationService Sut, IdentityTestHost Fixture, FakeEmailSender Email) CreateSut()
     {
-        var fixture = new SqliteInMemoryFixture();
-        fixture.Context.Database.EnsureCreated();
+        var host = new IdentityTestHost();
         var cache = new MemoryCache(new MemoryCacheOptions());
         var email = new FakeEmailSender();
-        var sut = new RegistrationService(fixture.Context, cache, new OtpService(), email);
-        return (sut, fixture, email);
+        var sut = new RegistrationService(host.Fixture.Context, cache, new OtpService(), email, host.UserManager);
+        return (sut, host, email);
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class RegistrationServiceTests
 
         Assert.True(result.Success);
         Assert.NotNull(result.AttemptId);
-        Assert.Empty(fixture.Context.Users);
+        Assert.Empty(fixture.Fixture.Context.Users);
         Assert.Single(email.Sent);
         Assert.Equal("new@example.com", email.Sent[0].To);
     }
@@ -38,8 +38,7 @@ public class RegistrationServiceTests
     {
         var (sut, fixture, _) = CreateSut();
         using var _ = fixture;
-        fixture.Context.Users.Add(NewExistingUser("taken@example.com", null));
-        await fixture.Context.SaveChangesAsync();
+        await fixture.UserManager.CreateAsync(NewExistingUser("taken@example.com", null), "Password1");
 
         var result = await sut.StartAsync(new RegisterRequest("taken@example.com", "Password123!", "New User", null));
 
@@ -52,8 +51,8 @@ public class RegistrationServiceTests
     {
         var (sut, fixture, _) = CreateSut();
         using var _ = fixture;
-        fixture.Context.Users.Add(NewExistingUser("other@example.com", "0900000000"));
-        await fixture.Context.SaveChangesAsync();
+        fixture.Fixture.Context.Users.Add(NewExistingUser("other@example.com", "0900000000"));
+        await fixture.Fixture.Context.SaveChangesAsync();
 
         var result = await sut.StartAsync(new RegisterRequest("new@example.com", "Password123!", "New User", "0900000000"));
 
@@ -73,7 +72,7 @@ public class RegistrationServiceTests
 
         Assert.True(confirm.Success);
         Assert.NotNull(confirm.UserId);
-        var user = Assert.Single(fixture.Context.Users);
+        var user = Assert.Single(fixture.Fixture.Context.Users);
         Assert.Equal("new@example.com", user.Email);
         Assert.NotEqual("Password123!", user.PasswordHash);
         var verify = new Microsoft.AspNetCore.Identity.PasswordHasher<User>()
@@ -92,7 +91,7 @@ public class RegistrationServiceTests
 
         Assert.False(confirm.Success);
         Assert.Equal(RegistrationError.InvalidOtp, confirm.Error);
-        Assert.Empty(fixture.Context.Users);
+        Assert.Empty(fixture.Fixture.Context.Users);
     }
 
     [Fact]
@@ -105,6 +104,64 @@ public class RegistrationServiceTests
 
         Assert.False(confirm.Success);
         Assert.Equal(RegistrationError.AttemptNotFound, confirm.Error);
+    }
+
+    [Fact]
+    public async Task StartAsync_returns_email_already_used_when_only_case_differs()
+    {
+        var (sut, fixture, email) = CreateSut();
+        using var _ = fixture;
+        await fixture.UserManager.CreateAsync(NewExistingUser("Taken@Example.com", null), "Password1");
+
+        var result = await sut.StartAsync(new RegisterRequest("taken@example.com", "Password123!", "New User", null));
+
+        Assert.False(result.Success);
+        Assert.Equal(RegistrationError.EmailAlreadyUsed, result.Error);
+        Assert.Empty(email.Sent);
+    }
+
+    [Fact]
+    public async Task StartAsync_rejects_password_shorter_than_8_without_sending_otp()
+    {
+        var (sut, fixture, email) = CreateSut();
+        using var _ = fixture;
+
+        var result = await sut.StartAsync(new RegisterRequest("new@example.com", "short1", "New User", null));
+
+        Assert.False(result.Success);
+        Assert.Equal(RegistrationError.PasswordTooWeak, result.Error);
+        Assert.Empty(email.Sent);
+    }
+
+    [Fact]
+    public async Task ConfirmAsync_creates_a_user_identity_can_sign_in()
+    {
+        var (sut, fixture, email) = CreateSut();
+        using var _ = fixture;
+        var start = await sut.StartAsync(new RegisterRequest("New@Example.com", "Password123!", "New User", null));
+
+        await sut.ConfirmAsync(start.AttemptId!, ExtractCode(email.Sent[0].Body));
+
+        var found = await fixture.UserManager.FindByEmailAsync("new@example.com");
+        Assert.NotNull(found);
+        Assert.False(string.IsNullOrEmpty(found.SecurityStamp));
+        Assert.True(await fixture.UserManager.CheckPasswordAsync(found, "Password123!"));
+    }
+
+    [Fact]
+    public async Task ConfirmAsync_second_pending_attempt_for_same_email_returns_email_already_used()
+    {
+        var (sut, fixture, email) = CreateSut();
+        using var _ = fixture;
+        var first = await sut.StartAsync(new RegisterRequest("new@example.com", "Password123!", "First", null));
+        var second = await sut.StartAsync(new RegisterRequest("new@example.com", "Password123!", "Second", null));
+        await sut.ConfirmAsync(first.AttemptId!, ExtractCode(email.Sent[0].Body));
+
+        var confirm = await sut.ConfirmAsync(second.AttemptId!, ExtractCode(email.Sent[1].Body));
+
+        Assert.False(confirm.Success);
+        Assert.Equal(RegistrationError.EmailAlreadyUsed, confirm.Error);
+        Assert.Single(fixture.Fixture.Context.Users);
     }
 
     private static User NewExistingUser(string email, string? phone) => new()

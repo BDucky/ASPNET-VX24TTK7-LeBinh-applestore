@@ -1,0 +1,12 @@
+@* Form-level errors (wrong password, wrong code, expired attempt). Field
+   errors sit under their own input via asp-validation-for. *@
+@{
+    var errors = ViewData.ModelState.TryGetValue(string.Empty, out var entry) ? entry.Errors : null;
+}
+@if (errors is not null)
+{
+    foreach (var error in errors)
+    {
+        <p class="account-error" role="alert">@error.ErrorMessage</p>
+    }
+}

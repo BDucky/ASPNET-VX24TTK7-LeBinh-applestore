@@ -1,0 +1,45 @@
+@model AppleStore.Web.Models.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "Create account";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card">
+        <div class="hero-eyebrow">Account</div>
+        <h1 class="account-title">Create your account</h1>
+        <p class="account-lead">We will email you a 6-digit code to confirm the address.</p>
+
+        <partial name="_AccountErrors" />
+
+        <form asp-action="Register" method="post" class="account-form" novalidate>
+            <label asp-for="Email"></label>
+            <input asp-for="Email" autocomplete="email" />
+            <span asp-validation-for="Email" class="account-field-error"></span>
+
+            <label asp-for="FullName"></label>
+            <input asp-for="FullName" autocomplete="name" />
+            <span asp-validation-for="FullName" class="account-field-error"></span>
+
+            <label asp-for="Phone">Phone (optional)</label>
+            <input asp-for="Phone" autocomplete="tel" />
+            <span asp-validation-for="Phone" class="account-field-error"></span>
+
+            <label asp-for="Password"></label>
+            <input asp-for="Password" autocomplete="new-password" aria-describedby="password-hint" />
+            <small id="password-hint" class="account-hint">At least 8 characters.</small>
+            <span asp-validation-for="Password" class="account-field-error"></span>
+
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" autocomplete="new-password" />
+            <span asp-validation-for="ConfirmPassword" class="account-field-error"></span>
+
+            <button type="submit" class="btn-store-primary">Send code</button>
+        </form>
+
+        <p class="account-switch">Already have an account? <a asp-action="Login">Sign in</a></p>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
