@@ -1,0 +1,87 @@
+using System.Net;
+using System.Text.RegularExpressions;
+using AppleStore.Domain.Entities;
+using AppleStore.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace AppleStore.Tests;
+
+// Shared plumbing for tests that drive the real app over HTTP: one app and
+// one cookie-keeping client per test, plus form posting with the page's
+// anti-forgery token, sign-in, and users created through UserManager.
+public abstract class WebFlowTestBase : IDisposable
+{
+    protected readonly AppleStoreWebFactory Factory = new();
+    protected readonly HttpClient Client;
+
+    protected WebFlowTestBase()
+    {
+        Client = NewClient();
+    }
+
+    public void Dispose()
+    {
+        Client.Dispose();
+        Factory.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    // A second browser: its own cookies, same app and database.
+    protected HttpClient NewClient() => Factory.CreateClient(new WebApplicationFactoryClientOptions
+    {
+        AllowAutoRedirect = false,
+        BaseAddress = new Uri("https://localhost"),
+    });
+
+    protected Task<HttpResponseMessage> LoginAsync(string email, string password, string? returnUrl = null) =>
+        LoginAsync(Client, email, password, returnUrl);
+
+    protected async Task<HttpResponseMessage> LoginAsync(HttpClient client, string email, string password, string? returnUrl = null)
+    {
+        var url = returnUrl is null ? "/Account/Login" : $"/Account/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        return await PostFormAsync(client, url, new() { ["Email"] = email, ["Password"] = password });
+    }
+
+    protected Task<HttpResponseMessage> PostFormAsync(string url, Dictionary<string, string> fields, string? formPage = null) =>
+        PostFormAsync(Client, url, fields, formPage);
+
+    // GETs the page holding the form (the post URL itself unless formPage is
+    // given), takes its anti-forgery token, and posts the fields with it.
+    protected static async Task<HttpResponseMessage> PostFormAsync(HttpClient client, string url, Dictionary<string, string> fields, string? formPage = null)
+    {
+        var page = await client.GetStringAsync(formPage ?? url);
+        var token = Regex.Match(page, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value;
+        Assert.False(string.IsNullOrEmpty(token), $"No anti-forgery token on {formPage ?? url}");
+        fields["__RequestVerificationToken"] = token;
+        return await client.PostAsync(url, new FormUrlEncodedContent(fields));
+    }
+
+    protected static string ErrorMessage(string html) =>
+        WebUtility.HtmlDecode(Regex.Match(html, "class=\"account-error\"[^>]*>\\s*([^<]+?)\\s*<").Groups[1].Value);
+
+    protected async Task<User> CreateUserAsync(string email, string password, string fullName = "Test User", string? phone = null)
+    {
+        using var scope = Factory.Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var user = new User
+        {
+            Email = email,
+            FullName = fullName,
+            Phone = phone,
+            Role = UserRole.Customer,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        var result = await users.CreateAsync(user, password);
+        Assert.True(result.Succeeded);
+        return user;
+    }
+
+    protected async Task<User?> FindUserAsync(string email)
+    {
+        using var scope = Factory.Services.CreateScope();
+        return await scope.ServiceProvider.GetRequiredService<UserManager<User>>().FindByEmailAsync(email);
+    }
+}

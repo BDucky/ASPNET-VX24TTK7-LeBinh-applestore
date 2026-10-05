@@ -1,37 +1,14 @@
 using System.Net;
 using System.Text.RegularExpressions;
-using AppleStore.Domain.Entities;
-using AppleStore.Domain.Enums;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AppleStore.Tests;
 
-public class AccountFlowTests : IDisposable
+public class AccountFlowTests : WebFlowTestBase
 {
-    private readonly AppleStoreWebFactory _factory = new();
-    private readonly HttpClient _client;
-
-    public AccountFlowTests()
-    {
-        _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = false,
-            BaseAddress = new Uri("https://localhost"),
-        });
-    }
-
-    public void Dispose()
-    {
-        _client.Dispose();
-        _factory.Dispose();
-    }
-
     [Fact]
     public async Task Account_page_sends_anonymous_visitors_to_login()
     {
-        var response = await _client.GetAsync("/Account");
+        var response = await Client.GetAsync("/Account");
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.StartsWith("/Account/Login", response.Headers.Location!.PathAndQuery);
@@ -52,11 +29,11 @@ public class AccountFlowTests : IDisposable
         var verifyUrl = register.Headers.Location!.OriginalString;
         Assert.StartsWith("/Account/VerifyOtp", verifyUrl);
 
-        var code = Regex.Match(Assert.Single(_factory.Email.Sent).Body, @"\d{6}").Value;
+        var code = Regex.Match(Assert.Single(Factory.Email.Sent).Body, @"\d{6}").Value;
         var verify = await PostFormAsync(verifyUrl, new() { ["Code"] = code });
         Assert.Equal(HttpStatusCode.Redirect, verify.StatusCode);
 
-        var account = await _client.GetStringAsync("/Account");
+        var account = await Client.GetStringAsync("/Account");
         Assert.Contains("Nguyen Van A", account);
         Assert.Contains("new@example.com", account);
     }
@@ -93,7 +70,7 @@ public class AccountFlowTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, register.StatusCode);
         Assert.Contains("at least 8 characters", await register.Content.ReadAsStringAsync());
-        Assert.Empty(_factory.Email.Sent);
+        Assert.Empty(Factory.Email.Sent);
     }
 
     [Fact]
@@ -145,7 +122,7 @@ public class AccountFlowTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("locked", ErrorMessage(await response.Content.ReadAsStringAsync()));
-        Assert.Equal(HttpStatusCode.Redirect, (await _client.GetAsync("/Account")).StatusCode);
+        Assert.Equal(HttpStatusCode.Redirect, (await Client.GetAsync("/Account")).StatusCode);
     }
 
     [Fact]
@@ -154,23 +131,23 @@ public class AccountFlowTests : IDisposable
         await CreateUserAsync("user@example.com", "Password1");
         await LoginAsync("user@example.com", "Password1");
 
-        await _client.GetAsync("/Account/Logout");
-        Assert.Equal(HttpStatusCode.OK, (await _client.GetAsync("/Account")).StatusCode);
+        await Client.GetAsync("/Account/Logout");
+        Assert.Equal(HttpStatusCode.OK, (await Client.GetAsync("/Account")).StatusCode);
 
         var logout = await PostFormAsync("/Account/Logout", new(), formPage: "/Account");
         Assert.Equal(HttpStatusCode.Redirect, logout.StatusCode);
-        Assert.Equal(HttpStatusCode.Redirect, (await _client.GetAsync("/Account")).StatusCode);
+        Assert.Equal(HttpStatusCode.Redirect, (await Client.GetAsync("/Account")).StatusCode);
     }
 
     [Fact]
     public async Task Nav_shows_sign_in_when_anonymous_and_the_name_when_signed_in()
     {
-        Assert.Contains("Sign in", await _client.GetStringAsync("/"));
+        Assert.Contains("Sign in", await Client.GetStringAsync("/"));
 
         await CreateUserAsync("user@example.com", "Password1", "Tran Thi B");
         await LoginAsync("user@example.com", "Password1");
 
-        var home = await _client.GetStringAsync("/");
+        var home = await Client.GetStringAsync("/");
         Assert.Contains("Tran Thi B", home);
         Assert.DoesNotContain(">Sign in<", home);
     }
@@ -178,50 +155,9 @@ public class AccountFlowTests : IDisposable
     [Fact]
     public async Task Verify_page_without_a_registration_sends_the_visitor_to_register()
     {
-        var response = await _client.GetAsync("/Account/VerifyOtp");
+        var response = await Client.GetAsync("/Account/VerifyOtp");
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("/Account/Register", response.Headers.Location!.OriginalString);
-    }
-
-    private async Task<HttpResponseMessage> LoginAsync(string email, string password, string? returnUrl = null)
-    {
-        var url = returnUrl is null ? "/Account/Login" : $"/Account/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
-        return await PostFormAsync(url, new() { ["Email"] = email, ["Password"] = password });
-    }
-
-    // GETs the page holding the form (the post URL itself unless formPage is
-    // given), takes its anti-forgery token, and posts the fields with it.
-    private async Task<HttpResponseMessage> PostFormAsync(string url, Dictionary<string, string> fields, string? formPage = null)
-    {
-        var page = await _client.GetStringAsync(formPage ?? url);
-        var token = Regex.Match(page, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"([^\"]+)\"").Groups[1].Value;
-        Assert.False(string.IsNullOrEmpty(token), $"No anti-forgery token on {formPage ?? url}");
-        fields["__RequestVerificationToken"] = token;
-        return await _client.PostAsync(url, new FormUrlEncodedContent(fields));
-    }
-
-    private static string ErrorMessage(string html) =>
-        WebUtility.HtmlDecode(Regex.Match(html, "class=\"account-error\"[^>]*>\\s*([^<]+?)\\s*<").Groups[1].Value);
-
-    private async Task CreateUserAsync(string email, string password, string fullName = "Test User")
-    {
-        using var scope = _factory.Services.CreateScope();
-        var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-        var result = await users.CreateAsync(new User
-        {
-            Email = email,
-            FullName = fullName,
-            Role = UserRole.Customer,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        }, password);
-        Assert.True(result.Succeeded);
-    }
-
-    private async Task<User?> FindUserAsync(string email)
-    {
-        using var scope = _factory.Services.CreateScope();
-        return await scope.ServiceProvider.GetRequiredService<UserManager<User>>().FindByEmailAsync(email);
     }
 }
