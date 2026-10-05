@@ -19,6 +19,7 @@ public class AccountController : Controller
     private const string PasswordRule = "Password must be at least 8 characters.";
     private const string CodeRefused = "The code is incorrect or has expired.";
     private const string StatusKey = "AccountStatus";
+    private const string EmailNotSent = "We could not send the email. Please try again in a moment.";
 
     private readonly IRegistrationService _registration;
     private readonly IPasswordResetService _passwordReset;
@@ -78,6 +79,7 @@ public class AccountController : Controller
                 RegistrationError.EmailAlreadyUsed => (nameof(model.Email), "An account with this email already exists."),
                 RegistrationError.PhoneAlreadyUsed => (nameof(model.Phone), "This phone number is already used by another account."),
                 RegistrationError.PasswordTooWeak => (nameof(model.Password), PasswordRule),
+                RegistrationError.EmailSendFailed => (string.Empty, EmailNotSent),
                 _ => (string.Empty, "Registration failed. Please try again."),
             };
             ModelState.AddModelError(field, message);
@@ -174,6 +176,12 @@ public class AccountController : Controller
         var result = await _passwordReset.StartAsync(email, ct);
         if (!result.Success)
         {
+            if (result.Error == PasswordResetError.EmailSendFailed)
+            {
+                ModelState.AddModelError(string.Empty, EmailNotSent);
+                return View(model);
+            }
+
             // Registration already tells a visitor an email is taken, so
             // hiding it here would protect nothing and only confuse.
             ModelState.AddModelError(nameof(model.Email), "No account uses this email.");

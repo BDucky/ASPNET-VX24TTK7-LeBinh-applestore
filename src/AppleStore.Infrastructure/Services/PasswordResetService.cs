@@ -35,7 +35,7 @@ public class PasswordResetService : IPasswordResetService
             .ExecuteUpdateAsync(set => set.SetProperty(t => t.UsedAt, now), ct);
 
         var code = _otp.GenerateCode();
-        _db.UserTokens.Add(new UserToken
+        var token = new UserToken
         {
             UserId = user.Id,
             Type = UserTokenType.ResetPasswordOtp,
@@ -43,14 +43,25 @@ public class PasswordResetService : IPasswordResetService
             Token = _userManager.PasswordHasher.HashPassword(user, code),
             ExpiredAt = now.Add(OtpService.Validity),
             CreatedAt = now,
-        });
+        };
+        _db.UserTokens.Add(token);
         await _db.SaveChangesAsync(ct);
 
-        await _emailSender.SendAsync(
-            user.Email,
-            "Your Apple Store password reset code",
-            $"Your code is {code}. It expires in {OtpService.Validity.TotalMinutes:0} minutes. If you did not ask to reset your password, ignore this email.",
-            ct);
+        try
+        {
+            await _emailSender.SendAsync(
+                user.Email,
+                "Your Apple Store password reset code",
+                $"Your code is {code}. It expires in {OtpService.Validity.TotalMinutes:0} minutes. If you did not ask to reset your password, ignore this email.",
+                ct);
+        }
+        catch (EmailSendException)
+        {
+            // The code never reached anyone; retire it so it cannot be used.
+            token.UsedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync(ct);
+            return new PasswordResetStartResult(false, PasswordResetError.EmailSendFailed);
+        }
 
         return new PasswordResetStartResult(true, null);
     }
