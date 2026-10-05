@@ -55,6 +55,16 @@ public class EmailTests
     }
 
     [Fact]
+    public void Certificate_revocation_is_checked_unless_turned_off()
+    {
+        using var defaults = Build(FullSmtp);
+        Assert.True(defaults.GetRequiredService<IOptions<SmtpOptions>>().Value.CheckCertificateRevocation);
+
+        using var off = Build(new(FullSmtp) { ["Smtp:CheckCertificateRevocation"] = "false" });
+        Assert.False(off.GetRequiredService<IOptions<SmtpOptions>>().Value.CheckCertificateRevocation);
+    }
+
+    [Fact]
     public void Message_has_sender_receiver_subject_and_plain_text_body()
     {
         var options = new SmtpOptions { FromAddress = "store@example.com", FromName = "Apple Store" };

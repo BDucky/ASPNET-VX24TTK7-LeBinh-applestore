@@ -25,4 +25,7 @@ public class SmtpOptions
     public string FromAddress { get; set; } = string.Empty;
 
     public string FromName { get; set; } = "Apple Store";
+
+    // RED stub: wrong default.
+    public bool CheckCertificateRevocation { get; set; }
 }
