@@ -60,6 +60,7 @@ puts a demoable buying flow and the admin area first.
 | 1 | Resolve OrderStatus, week 3 report | | `chore/order-status-confirmed` | | done, PR #11 |
 | 2 | Register, OTP, sign in, sign out, lockout | 1-3 | `feat/identity-login` | Identity with a custom `UserStore`, cookie, `[Authorize]`, anti-forgery | done, verified 31/31, PR #12 |
 | 3 | Forgot password, change password, profile and addresses | 4-6 | `feat/account-password-profile` | `UserManager.ChangePasswordAsync`, `ResetPasswordAsync`, security stamp sign-out | done, verified 67/67, PR #13 |
+| 3b | Send codes by real email (SMTP) | 2 | `feat/smtp-email` | options pattern with startup validation, user-secrets, MailKit | code done, verified 69/69 with log-only mail; real Gmail send waits on the owner's App Password |
 | 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager` | not started |
 | 5 | Cart | 11-14 | `feat/cart` | session or DB cart, view components for the nav count | not started |
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, transactions in EF Core | not started |
@@ -86,6 +87,7 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Real email | 2026-10-05 | Gmail SMTP with an App Password held in user-secrets on the owner's machine; without SMTP settings mail stays in the log |
 
 ## Known gaps carried forward
 
@@ -101,3 +103,5 @@ puts a demoable buying flow and the admin area first.
   once (Identity's default stamp check interval).
 - Deleting an address asks no confirmation.
 - No limit on how often a reset code can be requested.
+- Real email works only on a machine whose user-secrets hold the SMTP
+  settings; a deployed copy would need them as environment variables.

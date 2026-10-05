@@ -5,6 +5,30 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-05 (evening): real email over SMTP
+
+**What landed.** Branch `feat/smtp-email` (PR open, not merged until a real
+email is confirmed): `SmtpEmailSender` (MailKit), `SmtpOptions` bound and
+validated at startup, `AddAppleStoreEmail` as the one place that picks the
+sender (SMTP when `Smtp:Host` is set, log-only otherwise), and a visible
+"could not send" message on Register and Forgot password. 111 tests; live
+check 69 of 69, including an unreachable mail server. The Web project has a
+UserSecretsId; the live check forces log-only mail so it never emails anyone.
+
+**Decisions:** owner wants codes sent for real; Gmail SMTP with an App
+Password (Claude's recommendation, accepted). The password goes into
+user-secrets typed by the owner, never seen by Claude or committed. The
+review gallery of the new account pages was published as a private artifact
+for the owner; the owner approved it.
+
+**Where to pick up:**
+1. Owner runs the `dotnet user-secrets set` commands from the root README.
+2. Start the app, register or use Forgot password with a real inbox the
+   owner can read, confirm the email arrives, record it in
+   `docs/verification.md`, merge the PR.
+3. Then task 4 in `docs/finish-plan.md` (Admin area); its plan needs the
+   owner's choice of how the first admin password is set.
+
 ## 2026-10-05 (later): M1 finished, use cases 4-6
 
 **What landed.** PR #13, `feat/account-password-profile`: forgot password by

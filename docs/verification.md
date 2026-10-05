@@ -4,6 +4,34 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-05: real email over SMTP (`feat/smtp-email`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 111 of 111 (9 new: 7 `EmailTests`, 2 in `AccountSettingsFlowTests`) |
+| `python3 setup/verify-account/verify.py` | **69 of 69** |
+
+`EmailTests` use real collaborators: the sender choice is resolved from a
+real `ServiceCollection` and configuration, and the failure test opens a
+real socket to a closed local port (refused at once, well under the 30
+seconds the test allows). The two new live checks start the app with SMTP
+pointed at that closed port: Register shows "We could not send the email.
+Please try again in a moment.", keeps the typed email, and the server log
+has the failure.
+
+**Found during this pass:** the GREEN commit went in before
+`dotnet format` was checked (the command chain did not stop on the format
+error); a separate style commit fixed the one initializer. Also: once
+user-secrets hold SMTP settings, a Development run would send real mail and
+the live check could no longer read codes from the log; the script now sets
+`Smtp__Host` to empty.
+
+**Not checked yet:** a real message reaching a real inbox. That needs the
+owner's Gmail App Password in user-secrets; the PR stays open until it is
+done and recorded here.
+
 ## 2026-10-05: use cases 4-6, forgot and change password, profile, addresses (`feat/account-password-profile`)
 
 | Command | Result |
