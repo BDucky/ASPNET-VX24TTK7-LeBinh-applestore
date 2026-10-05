@@ -1,69 +1,77 @@
 @model AppleStore.Web.Models.Products.ProductListViewModel
+@using AppleStore.Infrastructure.Services
+@using AppleStore.Web.Models.Products
 @{
-    ViewData["Title"] = Model.SelectedCategory switch
+    var categoryName = Model.SelectedCategory switch
     {
         "iphone" => "iPhone",
         "mac" => "Mac",
         "ipad" => "iPad",
         "watch" => "Watch",
         "accessories" => "Accessories",
-        _ => "All Products",
+        "airpods" => "AirPods",
+        "home" => "TV & Home",
+        _ => null,
     };
+    // rauvang.com's category page (live-browsed 2026-09-25) is only the
+    // model strip and a promo banner: no grid, no toolbar. A search, or no
+    // category at all, still gets the grid with sort, because search and
+    // sort are report requirements (use cases 7-10).
+    var isCategoryLanding = categoryName is not null && string.IsNullOrWhiteSpace(Model.Query);
+    ViewData["Title"] = categoryName ?? (string.IsNullOrWhiteSpace(Model.Query) ? "All products" : $"Search: {Model.Query}");
+    ViewData["NavCategory"] = Model.SelectedCategory;
 }
 
-<section class="statement is-compact" style="padding-bottom: 0;">
-    <div class="container-fluid">
-        <div class="hero-eyebrow">Shop</div>
-        <h1 style="font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 18px;">@ViewData["Title"]</h1>
-
-        <form method="get" asp-controller="Products" asp-action="Index" class="product-search" role="search">
-            @if (!string.IsNullOrEmpty(Model.SelectedCategory))
-            {
-                <input type="hidden" name="category" value="@Model.SelectedCategory" />
-            }
-            <input type="search" name="q" value="@Model.Query" placeholder="Search products&hellip;" class="product-search-input" aria-label="Search products" />
-            <button type="submit" class="btn-store-primary">Search</button>
-        </form>
-
-        <div class="filter-pills">
-            <a href="@Url.Action("Index", new { category = (string?)null, q = Model.Query })"
-               class="filter-pill @(string.IsNullOrEmpty(Model.SelectedCategory) ? "is-active" : "")">All</a>
-            <a href="@Url.Action("Index", new { category = "iphone", q = Model.Query })"
-               class="filter-pill @(Model.SelectedCategory == "iphone" ? "is-active" : "")">iPhone</a>
-            <a href="@Url.Action("Index", new { category = "mac", q = Model.Query })"
-               class="filter-pill @(Model.SelectedCategory == "mac" ? "is-active" : "")">Mac</a>
-            <a href="@Url.Action("Index", new { category = "ipad", q = Model.Query })"
-               class="filter-pill @(Model.SelectedCategory == "ipad" ? "is-active" : "")">iPad</a>
-            <a href="@Url.Action("Index", new { category = "watch", q = Model.Query })"
-               class="filter-pill @(Model.SelectedCategory == "watch" ? "is-active" : "")">Watch</a>
-            <a href="@Url.Action("Index", new { category = "accessories", q = Model.Query })"
-               class="filter-pill @(Model.SelectedCategory == "accessories" ? "is-active" : "")">Accessories</a>
-        </div>
+@if (isCategoryLanding)
+{
+    <section class="shop-page is-shop">
+        <h1 class="visually-hidden">@categoryName</h1>
+        @if (Model.Products.Any())
+        {
+            <partial name="_ModelStrip" model="new ModelStripViewModel(Model.Products, null)" />
+        }
+        else
+        {
+            <p class="empty-state">No @categoryName models are in stock right now.</p>
+        }
+        <partial name="_PromoBanner" />
+    </section>
+}
+else
+{
+    <section class="shop-page is-shop">
+        <h1 class="shop-heading">@ViewData["Title"]</h1>
 
         <div class="listing-toolbar">
-            <span class="result-count">@Model.Products.Count product@(Model.Products.Count == 1 ? "" : "s")</span>
-            <form method="get" asp-controller="Products" asp-action="Index" class="sort-form">
+            <form method="get" asp-controller="Products" asp-action="Index" class="product-search" role="search">
                 @if (!string.IsNullOrEmpty(Model.SelectedCategory))
                 {
                     <input type="hidden" name="category" value="@Model.SelectedCategory" />
                 }
-                @if (!string.IsNullOrEmpty(Model.Query))
-                {
-                    <input type="hidden" name="q" value="@Model.Query" />
-                }
-                <label for="sort-select">Sort</label>
-                <select id="sort-select" name="sort" class="sort-select" onchange="this.form.submit()">
-                    <option value="Featured" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.Featured)">Featured</option>
-                    <option value="PriceAscending" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.PriceAscending)">Price: low to high</option>
-                    <option value="PriceDescending" selected="@(Model.Sort == AppleStore.Infrastructure.Services.ProductSort.PriceDescending)">Price: high to low</option>
-                </select>
+                <input type="search" name="q" value="@Model.Query" placeholder="Search products&hellip;" class="product-search-input" aria-label="Search products" />
+                <button type="submit" class="btn-store-primary">Search</button>
             </form>
+            <div class="listing-toolbar-end">
+                <span class="result-count">@Model.Products.Count product@(Model.Products.Count == 1 ? "" : "s")</span>
+                <form method="get" asp-controller="Products" asp-action="Index" class="sort-form">
+                    @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+                    {
+                        <input type="hidden" name="category" value="@Model.SelectedCategory" />
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Query))
+                    {
+                        <input type="hidden" name="q" value="@Model.Query" />
+                    }
+                    <label for="sort-select">Sort</label>
+                    <select id="sort-select" name="sort" class="sort-select" onchange="this.form.submit()">
+                        <option value="Featured" selected="@(Model.Sort == ProductSort.Featured)">Featured</option>
+                        <option value="PriceAscending" selected="@(Model.Sort == ProductSort.PriceAscending)">Price: low to high</option>
+                        <option value="PriceDescending" selected="@(Model.Sort == ProductSort.PriceDescending)">Price: high to low</option>
+                    </select>
+                </form>
+            </div>
         </div>
-    </div>
-</section>
 
-<section class="statement is-compact">
-    <div class="container-fluid">
         @if (!Model.Products.Any())
         {
             <p class="empty-state">No products match. Try a different search or category.</p>
@@ -73,21 +81,10 @@
             <div class="product-grid">
                 @foreach (var product in Model.Products)
                 {
-                    <a class="product-card" asp-controller="Products" asp-action="Details" asp-route-slug="@product.Slug">
-                        <div class="product-card-media">
-                            @if (product.ImageUrl is not null)
-                            {
-                                <img src="@Url.Content(product.ImageUrl)" alt="@product.Name" loading="lazy" />
-                            }
-                        </div>
-                        <div class="product-card-body">
-                            <div class="k">@product.CategoryName</div>
-                            <h3>@product.Name</h3>
-                            <div class="price">From $@product.FromPrice.ToString("N2")</div>
-                        </div>
-                    </a>
+                    var card = new ShopCardViewModel(Url.Action("Details", "Products", new { slug = product.Slug })!, product.ImageUrl, product.Name, product.CategoryName, product.FromPrice);
+                    <partial name="_ShopCard" model="card" />
                 }
             </div>
         }
-    </div>
-</section>
+    </section>
+}

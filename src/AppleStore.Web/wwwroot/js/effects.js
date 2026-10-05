@@ -42,6 +42,24 @@
         },
       });
     });
+
+    // ---- Banner scroll parallax (apple.com-style product depth) ----
+    // Each homepage banner's photo drifts and grows slightly as it scrolls
+    // through the viewport.
+    document.querySelectorAll(".home-banner").forEach(function (banner) {
+      var img = banner.querySelector(".home-banner-media img");
+      if (!img) return;
+      gsap.fromTo(
+        img,
+        { scale: 0.94, yPercent: 6 },
+        {
+          scale: 1.06,
+          yPercent: -6,
+          ease: "none",
+          scrollTrigger: { trigger: banner, start: "top bottom", end: "bottom top", scrub: true },
+        }
+      );
+    });
   } else {
     // No GSAP or motion disabled: just show the full text, no fill animation.
     document.querySelectorAll(".statement-text .word").forEach(function (w) {
@@ -69,8 +87,10 @@
       },
       { threshold: 0.2 }
     );
-    document.querySelectorAll(".category-card, .product-card").forEach(function (el, i) {
-      el.style.transitionDelay = (i % 4) * 0.06 + "s";
+    document.querySelectorAll(".product-card, .model-tile, .home-banner, .promo-banner").forEach(function (el, i) {
+      if (el.classList.contains("product-card") || el.classList.contains("model-tile")) {
+        el.style.transitionDelay = (i % 6) * 0.04 + "s";
+      }
       revealObserver.observe(el);
     });
 
@@ -105,11 +125,83 @@
       counterObserver.observe(el);
     });
   } else {
-    document.querySelectorAll(".category-card").forEach(function (el) {
+    document.querySelectorAll(".product-card, .model-tile, .home-banner, .promo-banner").forEach(function (el) {
       el.classList.add("is-revealed");
     });
     document.querySelectorAll("[data-count-to]").forEach(function (el) {
       el.textContent = (el.dataset.countTo || "0") + (el.dataset.countSuffix || "");
+    });
+  }
+
+  // ---- Homepage carousel (rauvang.com's rotating top banner) ----
+  // Auto-advances every 6s, pauses on hover and keyboard focus, and never
+  // auto-advances under prefers-reduced-motion. Arrows and dots always work.
+  document.querySelectorAll("[data-carousel]").forEach(function (root) {
+    var slides = root.querySelectorAll(".home-slide");
+    var dots = root.querySelectorAll("[data-carousel-dot]");
+    if (slides.length < 2) return;
+    var current = 0;
+    var timer = null;
+
+    function show(index) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach(function (s, i) {
+        var active = i === current;
+        s.classList.toggle("is-active", active);
+        s.setAttribute("aria-hidden", active ? "false" : "true");
+        s.tabIndex = active ? 0 : -1;
+      });
+      dots.forEach(function (d, i) { d.classList.toggle("is-active", i === current); });
+    }
+    function start() {
+      if (prefersReducedMotion || timer) return;
+      timer = setInterval(function () { show(current + 1); }, 6000);
+    }
+    function stop() {
+      clearInterval(timer);
+      timer = null;
+    }
+
+    root.querySelector("[data-carousel-prev]").addEventListener("click", function () { show(current - 1); });
+    root.querySelector("[data-carousel-next]").addEventListener("click", function () { show(current + 1); });
+    dots.forEach(function (d) {
+      d.addEventListener("click", function () { show(parseInt(d.dataset.carouselDot, 10)); });
+    });
+    root.addEventListener("mouseenter", stop);
+    root.addEventListener("mouseleave", start);
+    root.addEventListener("focusin", stop);
+    root.addEventListener("focusout", start);
+    start();
+  });
+
+  // ---- Nav search toggle (rauvang.com opens a search field under the bar) ----
+  var searchToggle = document.querySelector("[data-search-toggle]");
+  var searchForm = document.getElementById("site-search");
+  if (searchToggle && searchForm) {
+    searchToggle.addEventListener("click", function () {
+      var open = searchForm.hidden;
+      searchForm.hidden = !open;
+      searchToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) searchForm.querySelector("input").focus();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !searchForm.hidden) {
+        searchForm.hidden = true;
+        searchToggle.setAttribute("aria-expanded", "false");
+        searchToggle.focus();
+      }
+    });
+  }
+
+  // ---- Back-to-top button (rauvang.com's round button, bottom right) ----
+  var toTop = document.querySelector("[data-back-to-top]");
+  if (toTop) {
+    var updateToTop = function () { toTop.hidden = window.scrollY < 480; };
+    window.addEventListener("scroll", updateToTop, { passive: true });
+    updateToTop();
+    toTop.addEventListener("click", function () {
+      if (lenis) lenis.scrollTo(0);
+      else window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
     });
   }
 
@@ -132,7 +224,7 @@
       dot.style.transform = "translate(" + e.clientX + "px," + e.clientY + "px) translate(-50%,-50%)";
     });
 
-    document.querySelectorAll("a, button, .category-card").forEach(function (el) {
+    document.querySelectorAll("a, button").forEach(function (el) {
       el.addEventListener("mouseenter", function () { ring.classList.add("is-active"); });
       el.addEventListener("mouseleave", function () { ring.classList.remove("is-active"); });
     });

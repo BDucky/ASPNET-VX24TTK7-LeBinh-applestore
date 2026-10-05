@@ -14,7 +14,9 @@ Shopee is a client-rendered SPA with no server HTML), so that section is general
 UX knowledge, not a live citation, marked as such below. A few specific pages
 (apple.com's live price-update behavior on the configurator, the VN sites'
 order-tracking pages) could not be reached either; noted where relevant rather
-than guessed at.
+than guessed at. A follow-up pass on 2026-09-23 (below, "apple.com/vn/store and
+rauvang.com") live-fetched apple.com/vn/store's category pages and multiple
+rauvang.com page types, for the `feat/catalog-vn-expansion` branch.
 
 ## Apple.com (live-fetched)
 
@@ -140,11 +142,48 @@ on Amazon rather than a dedicated add-to-compare flow; our `CompareList` /
 `CompareItem` model is closer to the electronics-retailer pattern (Apple,
 CellphoneS) than to Amazon/Shopee's.
 
+## apple.com/vn/store and rauvang.com (live-fetched 2026-09-23)
+
+Follow-up pass for the `feat/catalog-vn-expansion` branch: apple.com/vn/store
+browsed across every category page (not just the homepage), and rauvang.com
+browsed across its listing, product, and other page types. Both live-fetched
+today, not general knowledge.
+
+**apple.com/vn/store, current lineup found live:** iPhone Duo, iPhone 18
+Pro/Pro Max, iPhone Air, iPhone 17/17e, iPhone 16 (iPhone); MacBook Neo,
+MacBook Air 13"/15", MacBook Pro 14"/16", iMac, Mac mini, Mac Studio (Mac);
+iPad Pro, iPad Air, iPad, iPad mini (iPad); Watch Series 12, Watch Ultra 4,
+Watch SE 3, Watch Nike (Watch); AirPods 5, AirPods Pro 3, AirPods Max 2
+(AirPods, no dedicated top-level category in this app before this branch);
+Apple TV 4K (TV & Home); a long accessories list (cases, MagSafe
+chargers/battery packs, USB-C adapters/cables, bands, Magic
+Keyboard/Mouse/Trackpad, Apple Pencil Pro, Studio Display, AirTag sold
+individually or as a 4-pack). No VND prices render server-side anywhere,
+consistent with the earlier apple.com/iphone finding above.
+
+**rauvang.com, resolves the open variant-picker decision below:** browsing
+an actual listing page (`danh-muc/14-iphone.htm`) and two product pages
+(`danh-muc-san-pham/213-iphone-18-pro-max.htm`,
+`danh-muc-san-pham/186-iphone-16-pro-max.htm`) shows the real pattern is
+**one URL per storage+region combination**, not an in-page selector and not
+CellphoneS's separate-pages-per-storage-tier-only. Neither product page
+reached had a spec table, image gallery, reviews, or related products, at
+any tier; each was just "Giá từ: X VNĐ" plus a down-payment line. This is
+more minimal than CellphoneS or Apple, not a middle ground between them.
+
+**Decision made (M2, `feat/catalog-vn-expansion`):** adopted rauvang's
+separate-URL-per-variant pattern over the in-page list this app had.
+`ProductVariant.SKU` doubles as the route segment
+(`/Products/{productSlug}/{sku}`) rather than adding a new slug column, and
+the variant page keeps this app's own value beyond rauvang's minimalism
+(product name, description, category, image) rather than copying its
+bare price-only rows.
+
 ## What this suggests for the roadmap, concretely
 
 | Milestone | Open decision or concrete pattern to use |
 |---|---|
-| M2 (catalog) | Decide variant-picker approach explicitly: separate pages per storage tier (CellphoneS) vs in-page selector (Apple). Product tile: image, name, color swatches, starting price, tagline. Comparison page: spec table, attributes as rows, products as columns. |
+| M2 (catalog) | Variant picker: **resolved above**, separate-URL-per-variant, done on `feat/catalog-vn-expansion`. Product tile: image, name, color swatches, starting price, tagline. Comparison page: spec table, attributes as rows, products as columns. |
 | M2 (catalog) | Price display leads with the sale price; shows both percentage-off and absolute savings from `DiscountAmount`, not list price first. |
 | M3 (cart/checkout) | Address form uses the 3-level Tỉnh/Quận/Phường cascade, already matches `Address`/`Order` fields. Cart: quantity stepper, remove, live subtotal (can start as a full-page-reload form, add AJAX later, not a blocker). |
 | M4 (payment) | Expect COD/VNPay/MoMo to look sparse next to real VN sites' 6+ payment options. That is in scope as specified by the report; do not silently add installment/trade-in to match competitors, that would be scope the report never asked for. |

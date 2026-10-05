@@ -212,6 +212,7 @@ public class ProductCatalogServiceTests
         Assert.Equal("The latest iPhone.", result.Description);
         Assert.Single(result.Variants);
         Assert.Single(result.ImageUrls);
+        Assert.Equal("iphone", result.CategorySlug);
     }
 
     [Fact]
@@ -235,6 +236,95 @@ public class ProductCatalogServiceTests
         await fixture.Context.SaveChangesAsync();
 
         var result = await sut.GetBySlugAsync("discontinued-mac");
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetVariantAsync_returns_variant_with_product_context_when_found()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        fixture.Context.Add(product);
+        fixture.Context.Add(NewVariant(product, "IP17-128", 999m, 10));
+        fixture.Context.Add(new ProductImage { Product = product, ImageUrl = "/img/products/iphone-17.jpg", SortOrder = 0 });
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetVariantAsync("iphone-17", "IP17-128");
+
+        Assert.NotNull(result);
+        Assert.Equal("IP17-128", result!.SKU);
+        Assert.Equal(999m, result.Price);
+        Assert.Equal("iPhone 17", result.ProductName);
+        Assert.Equal("iphone-17", result.ProductSlug);
+        Assert.Equal("iPhone", result.CategoryName);
+        Assert.Equal("iphone", result.CategorySlug);
+        Assert.Equal("/img/products/iphone-17.jpg", result.ImageUrl);
+    }
+
+    [Fact]
+    public async Task GetVariantAsync_returns_null_for_unknown_sku()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        fixture.Context.Add(product);
+        fixture.Context.Add(NewVariant(product, "IP17-128", 999m, 10));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetVariantAsync("iphone-17", "DOES-NOT-EXIST");
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetVariantAsync_returns_null_when_sku_belongs_to_a_different_product()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var realProduct = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        var otherProduct = NewProduct(iphone, "iPhone 17 Pro", "iphone-17-pro", 1199m);
+        fixture.Context.AddRange(realProduct, otherProduct);
+        fixture.Context.Add(NewVariant(realProduct, "IP17-128", 999m, 10));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetVariantAsync("iphone-17-pro", "IP17-128");
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetVariantAsync_returns_null_for_inactive_variant()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var product = NewProduct(iphone, "iPhone 17", "iphone-17", 999m);
+        fixture.Context.Add(product);
+        fixture.Context.Add(NewVariant(product, "IP17-512-DISC", 899m, 0, status: false));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetVariantAsync("iphone-17", "IP17-512-DISC");
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task GetVariantAsync_returns_null_for_inactive_product()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var mac = NewCategory("Mac", "mac");
+        var product = NewProduct(mac, "Discontinued Mac", "discontinued-mac", 899m, status: false);
+        fixture.Context.Add(product);
+        fixture.Context.Add(NewVariant(product, "DISC-MAC-256", 899m, 5));
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetVariantAsync("discontinued-mac", "DISC-MAC-256");
 
         Assert.Null(result);
     }
