@@ -33,6 +33,16 @@ public class UserStoreTests
     }
 
     [Fact]
+    public async Task CreateAsync_accepts_an_email_outside_identitys_default_character_list()
+    {
+        using var host = new IdentityTestHost();
+
+        var result = await host.UserManager.CreateAsync(NewUser("first!last@example.com"), "Password1");
+
+        Assert.True(result.Succeeded, string.Join(", ", result.Errors.Select(e => e.Code)));
+    }
+
+    [Fact]
     public async Task CheckPasswordAsync_accepts_the_right_password_only()
     {
         using var host = new IdentityTestHost();

@@ -22,8 +22,8 @@ public static class IdentityServiceCollectionExtensions
                 options.User.RequireUniqueEmail = true;
                 // The user name is the email, already checked by the register
                 // form; Identity's default character list would reject some
-                // valid addresses only after the OTP step.
-                options.User.AllowedUserNameCharacters = null;
+                // valid addresses only after the OTP step. Empty means any character.
+                options.User.AllowedUserNameCharacters = string.Empty;
             })
             .AddUserStore<UserStore>()
             .AddClaimsPrincipalFactory<AppUserClaimsPrincipalFactory>();
