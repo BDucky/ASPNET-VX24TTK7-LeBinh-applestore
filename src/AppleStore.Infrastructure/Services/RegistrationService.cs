@@ -17,8 +17,11 @@ public class RegistrationService : IRegistrationService
     private readonly IEmailSender _emailSender;
     private readonly PasswordHasher<User> _passwordHasher = new();
 
-    public RegistrationService(AppDbContext db, IMemoryCache cache, IOtpService otp, IEmailSender emailSender)
+    private readonly UserManager<User> _userManager;
+
+    public RegistrationService(AppDbContext db, IMemoryCache cache, IOtpService otp, IEmailSender emailSender, UserManager<User> userManager)
     {
+        _userManager = userManager;
         _db = db;
         _cache = cache;
         _otp = otp;
