@@ -85,6 +85,22 @@ public abstract class WebFlowTestBase : IDisposable
         return user;
     }
 
+    protected const string PhoneVariantUrl = "/Products/iphone-17/iphone-17-256gb";
+
+    // One product with three colours of one configuration: blue (3 in stock),
+    // black (5) and pink (sold out). Used by the cart and checkout tests.
+    protected (int Blue, int Black, int SoldOut) Seed()
+    {
+        using var scope = Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppleStore.Infrastructure.Data.AppDbContext>();
+        var product = ProductCatalogServiceTests.NewProduct(ProductCatalogServiceTests.NewCategory("iPhone", "iphone"), "iPhone 17", "iphone-17", 20_000_000m);
+        var blue = ProductCatalogServiceTests.AddVariant(db, product, "IP17-256-BLUE", 24_990_000m, stock: 3, config: "iPhone 17 256GB", color: "Blue", region: "VN/A");
+        var black = ProductCatalogServiceTests.AddVariant(db, product, "IP17-256-BLACK", 25_490_000m, stock: 5, config: "iPhone 17 256GB", color: "Black", region: "VN/A");
+        var soldOut = ProductCatalogServiceTests.AddVariant(db, product, "IP17-256-PINK", 24_990_000m, stock: 0, config: "iPhone 17 256GB", color: "Pink", region: "VN/A");
+        db.SaveChanges();
+        return (blue.Id, black.Id, soldOut.Id);
+    }
+
     protected async Task<User?> FindUserAsync(string email)
     {
         using var scope = Factory.Services.CreateScope();

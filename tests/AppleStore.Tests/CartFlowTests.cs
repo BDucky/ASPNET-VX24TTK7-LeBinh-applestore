@@ -15,20 +15,8 @@ namespace AppleStore.Tests;
 public class CartFlowTests : WebFlowTestBase
 {
     private const string Password = "Password1";
-    private const string VariantUrl = "/Products/iphone-17/iphone-17-256gb";
+    private const string VariantUrl = PhoneVariantUrl;
     private const string Email = "shopper@example.com";
-
-    private (int Blue, int Black, int SoldOut) Seed()
-    {
-        using var scope = Factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var product = NewProduct(NewCategory("iPhone", "iphone"), "iPhone 17", "iphone-17", 20_000_000m);
-        var blue = AddVariant(db, product, "IP17-256-BLUE", 24_990_000m, stock: 3, config: "iPhone 17 256GB", color: "Blue", region: "VN/A");
-        var black = AddVariant(db, product, "IP17-256-BLACK", 25_490_000m, stock: 5, config: "iPhone 17 256GB", color: "Black", region: "VN/A");
-        var soldOut = AddVariant(db, product, "IP17-256-PINK", 24_990_000m, stock: 0, config: "iPhone 17 256GB", color: "Pink", region: "VN/A");
-        db.SaveChanges();
-        return (blue.Id, black.Id, soldOut.Id);
-    }
 
     private async Task SignInAsync(string email = Email)
     {
