@@ -112,14 +112,8 @@ public class ProductCatalogService : IProductCatalogService
             .Where(v => v.ProductId == product.Id && v.Status)
             .OrderBy(v => v.Id)
             .ToListAsync(ct);
-        var variantIds = variants.Select(v => v.Id).ToList();
-
-        var options = await _db.VariantOptions
-            .Where(o => variantIds.Contains(o.VariantId))
-            .Select(o => new { o.VariantId, o.OptionType.Code, o.OptionValue.Value })
-            .ToListAsync(ct);
-        string? Option(int variantId, string code) =>
-            options.FirstOrDefault(o => o.VariantId == variantId && o.Code == code)?.Value;
+        var options = await VariantOptionLookup.LoadAsync(_db, variants.Select(v => v.Id).ToList(), ct);
+        string? Option(int variantId, string code) => options.Get(variantId, code);
 
         return variants
             .GroupBy(v => Option(v.Id, "config") ?? product.Name)
