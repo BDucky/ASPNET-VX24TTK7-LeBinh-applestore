@@ -13,10 +13,10 @@ public class AdminSeederTests
     private const string AdminEmail = "admin@applestore.test";
     private const string AdminPassword = "Seeded-Admin-1";
 
-    private static (AdminSeeder Seeder, ListLogger<AdminSeeder> Log) NewSeeder(IdentityTestHost host, string? email, string? password)
+    private static (AdminSeeder Seeder, ListLogger<AdminSeeder> Log) NewSeeder(IdentityTestHost host, string? email, string? password, string fullName = "Store Admin")
     {
         var log = new ListLogger<AdminSeeder>();
-        var options = Options.Create(new SeedAdminOptions { Email = email, Password = password, FullName = "Store Admin" });
+        var options = Options.Create(new SeedAdminOptions { Email = email, Password = password, FullName = fullName });
         return (new AdminSeeder(host.UserManager, host.Fixture.Context, options, log), log);
     }
 
@@ -48,6 +48,19 @@ public class AdminSeederTests
         Assert.True(await host.UserManager.CheckPasswordAsync(admin, AdminPassword));
         Assert.Contains(log.Entries, e => e.Level == LogLevel.Information && e.Message.Contains(AdminEmail));
         AssertPasswordNeverLogged(log, AdminPassword);
+    }
+
+    // The full name is what the nav shows; an empty one would leave a blank link.
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task A_blank_full_name_falls_back_to_administrator(string fullName)
+    {
+        using var host = new IdentityTestHost();
+
+        await NewSeeder(host, AdminEmail, AdminPassword, fullName).Seeder.SeedAsync();
+
+        Assert.Equal("Administrator", Assert.Single(host.Fixture.Context.Users).FullName);
     }
 
     [Fact]
