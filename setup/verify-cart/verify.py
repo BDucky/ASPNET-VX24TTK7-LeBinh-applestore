@@ -24,7 +24,7 @@ from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from verifylib import Harness, migrate, otp_for, scalar  # noqa: E402
+from verifylib import Harness, migrate, otp_for, rows, scalar  # noqa: E402
 
 h = Harness("verify-cart", 5288)
 APP, TMP = h.app, h.tmp
@@ -39,27 +39,12 @@ with opt as (select vo.VariantId, ot.Code, ov.Value from VariantOptions vo
 """
 
 
-def rows(db_path, sql, *args):
-    with sqlite3.connect(db_path) as db:
-        return db.execute(sql, args).fetchall()
-
-
 def variants(db_path, config, color):
     return [r[0] for r in rows(db_path, OPTIONS + """
         select v.Id from ProductVariants v
         join opt c on c.VariantId = v.Id and c.Code = 'config' and c.Value = ?
         join opt col on col.VariantId = v.Id and col.Code = 'color' and col.Value = ?
         where v.Status = 1 order by v.Id""", config, color)]
-
-
-def config_url(slug, config):
-    """The product page's own link to a configuration, so the slug rule is the app's."""
-    r = step(r"""
-  await page.goto(APP + '/Products/__SLUG__');
-  const links = await page.locator('a[href^="/Products/__SLUG__/"]').evaluateAll(as => as.map(a => [a.innerText.trim(), a.getAttribute('href')]));
-  return JSON.stringify(links);
-""".replace("__SLUG__", slug))
-    return next(href.split("?")[0] for text, href in r if config in text)
 
 
 def main():
@@ -93,8 +78,8 @@ def main():
 
     proc = h.start_app("Development", db, log)
     try:
-        url = config_url(slug, config)
-        unpriced_url = config_url(unpriced_slug, unpriced_config)
+        url = h.config_url(slug, config)
+        unpriced_url = h.config_url(unpriced_slug, unpriced_config)
         print(f"      using {url} ({stocked} has 3, {sold_out} sold out), unpriced {unpriced_url}")
 
         # 0. A customer, registered through the real form, then signed out.

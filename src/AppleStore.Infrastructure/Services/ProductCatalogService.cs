@@ -116,7 +116,7 @@ public class ProductCatalogService : IProductCatalogService
         string? Option(int variantId, string code) => options.Get(variantId, code);
 
         return variants
-            .GroupBy(v => Option(v.Id, "config") ?? product.Name)
+            .GroupBy(v => options.ConfigurationName(v.Id, product.Name))
             .Select(g => new ConfigurationGroup(
                 g.Key,
                 CatalogSlug.From(g.Key),

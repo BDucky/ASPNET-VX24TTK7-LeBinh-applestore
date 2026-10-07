@@ -1,8 +1,6 @@
 using AppleStore.Domain.Entities;
-using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Data;
 using AppleStore.Infrastructure.Services;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using static AppleStore.Tests.ProductCatalogServiceTests;
@@ -14,7 +12,7 @@ namespace AppleStore.Tests;
 // second context write just before the service's own save.
 public sealed class CartServiceTests : IDisposable
 {
-    private readonly SqliteConnection _connection = new("Data Source=:memory:");
+    private readonly ShopTestDb _shop = new();
     private readonly RaceInterceptor _race = new();
     private readonly AppDbContext _db;
     private readonly CartService _sut;
@@ -26,12 +24,10 @@ public sealed class CartServiceTests : IDisposable
 
     public CartServiceTests()
     {
-        _connection.Open();
-        _db = NewContext(_race);
-        _db.Database.EnsureCreated();
+        _db = _shop.Context(_race);
 
-        _alice = NewUser("alice@example.com");
-        _bob = NewUser("bob@example.com");
+        _alice = ShopTestDb.NewUser("alice@example.com");
+        _bob = ShopTestDb.NewUser("bob@example.com");
         var category = NewCategory("iPhone", "iphone");
         _iphone = NewProduct(category, "iPhone 17", "iphone-17", 20_000_000m);
         _blue = AddVariant(_db, _iphone, "IP17-256-BLUE", 24_990_000m, stock: 5, config: "256GB", color: "Blue", region: "VN/A");
@@ -47,21 +43,10 @@ public sealed class CartServiceTests : IDisposable
     public void Dispose()
     {
         _db.Dispose();
-        _connection.Dispose();
+        _shop.Dispose();
     }
 
-    private AppDbContext NewContext(params IInterceptor[] interceptors) =>
-        new(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).AddInterceptors(interceptors).Options);
-
-    private static User NewUser(string email) => new()
-    {
-        Email = email,
-        NormalizedEmail = email.ToUpperInvariant(),
-        FullName = email,
-        Role = UserRole.Customer,
-        CreatedAt = DateTime.UtcNow,
-        UpdatedAt = DateTime.UtcNow,
-    };
+    private AppDbContext NewContext() => _shop.Context();
 
     private ProductVariant Variant(string sku, decimal? price, int stock, bool status = true, string? config = "256GB")
     {

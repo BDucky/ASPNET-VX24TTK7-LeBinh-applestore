@@ -34,6 +34,11 @@ def migrate(db_path):
                    cwd=ROOT, check=True, capture_output=True)
 
 
+def rows(db_path, sql, *args):
+    with sqlite3.connect(db_path) as db:
+        return db.execute(sql, args).fetchall()
+
+
 def scalar(db_path, sql, *args):
     with sqlite3.connect(db_path) as db:
         return db.execute(sql, args).fetchone()[0]
@@ -117,6 +122,15 @@ class Harness:
 
     def step(self, body):
         return self.run("async page => {\n" + LIB.replace("__APP__", self.app) + body + "\n}")
+
+    def config_url(self, slug, config):
+        """The product page's own link to a configuration, so the slug rule is the app's."""
+        links = self.step(r"""
+  await page.goto(APP + '/Products/__SLUG__');
+  const links = await page.locator('a[href^="/Products/__SLUG__/"]').evaluateAll(as => as.map(a => [a.innerText.trim(), a.getAttribute('href')]));
+  return JSON.stringify(links);
+""".replace("__SLUG__", slug))
+        return next(href.split("?")[0] for text, href in links if config in text)
 
     def finish(self):
         failed = [n for n, ok in self.results if not ok]

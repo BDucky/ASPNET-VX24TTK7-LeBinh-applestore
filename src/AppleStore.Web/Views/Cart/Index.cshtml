@@ -74,7 +74,17 @@
                 <strong data-cart-subtotal>@PriceText.Vnd(Model.Subtotal)</strong>
             </div>
             <p class="account-hint">Prices are checked again when you place the order. Lines that cannot be bought are left out of the subtotal.</p>
-            <a class="btn-store-ghost" asp-controller="Products" asp-action="Index">Continue shopping</a>
+            <div class="cart-actions">
+                @if (Model.Lines.All(l => l.Problem == CartLineProblem.None))
+                {
+                    <a class="btn-store-primary" asp-controller="Checkout" asp-action="Index">Checkout</a>
+                }
+                else
+                {
+                    <p class="cart-line-problem">Remove or change the lines marked in red to check out.</p>
+                }
+                <a class="btn-store-ghost" asp-controller="Products" asp-action="Index">Continue shopping</a>
+            </div>
         }
     </div>
 </section>

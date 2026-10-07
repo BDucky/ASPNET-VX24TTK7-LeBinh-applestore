@@ -4,6 +4,43 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-07: checkout and vouchers, use cases 15-16 (`feat/checkout`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 227 of 227 (43 new: 28 `CheckoutServiceTests`, 15 in `CheckoutFlowTests` and `CheckoutFailureTests`) |
+| `python3 setup/verify-checkout/verify.py` | **25 of 25** |
+| `python3 setup/verify-cart/verify.py` | 23 of 23 |
+| `python3 setup/verify-account/verify.py` (after the shared delivery fields) | 69 of 69 |
+| `dotnet ef database update` on the dev database (backed up first) | `AddVouchers` applied, 3 demo vouchers present |
+
+`CheckoutServiceTests` use the real `CartService` and SQLite. A competing
+request is staged by a command interceptor that runs its SQL just before
+the service's stock, voucher or cart write, on the same transaction.
+
+**Mutation checks** (each caught by one test): stock condition removed;
+voucher-use condition removed; cart-changed check removed; expected-total
+check removed; rounding changed to banker's; anti-forgery removed from the
+checkout post; the page keeping the posted total instead of the new one.
+
+**Found during this pass:**
+1. Three web tests placed orders for a user with no saved address and were
+   stopped by validation (street address required), which is the intended
+   behavior; they now type an address.
+2. A `ModelState.Remove("ExpectedTotal")` in the controller did nothing (the
+   input used another key) and a mutation of it survived; the line was
+   removed and the hidden input rendered directly, and the mutation on the
+   line that matters is caught.
+3. The 390px order screenshot first showed the page twice; it was taken in
+   the middle of a resize. After a reload the page is correct, and the
+   check now reloads before measuring.
+
+**Not checked:** two requests truly in parallel on the live server (staged
+in unit tests instead); cancelling an order (task 8); the order email
+(task 8).
+
 ## 2026-10-07: cart, use cases 11-14 (`feat/cart`)
 
 | Command | Result |

@@ -46,7 +46,9 @@ selector) this milestone needs to settle explicitly.
 
 ## M3: Cart and checkout
 
-Done so far (2026-10-07): the cart, use cases 11-14 (`docs/architecture.md`, "Cart").
+Done so far (2026-10-07): the cart, use cases 11-14 (`docs/architecture.md`, "Cart"),
+and checkout with vouchers, use cases 15-16 ("Checkout and vouchers"). Vouchers got
+their own table (owner's choice).
 
 Use cases 11-17 (cart CRUD, place order, apply voucher, pay). Entities: `Cart`,
 `CartItem`, `Order`, `OrderItem`. Voucher itself has no dedicated table in the

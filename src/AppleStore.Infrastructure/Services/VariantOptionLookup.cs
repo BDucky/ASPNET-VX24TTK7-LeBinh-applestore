@@ -23,4 +23,8 @@ internal sealed class VariantOptionLookup
 
     public string? Get(int variantId, string code) =>
         _options[variantId].Where(o => o.Code == code).Select(o => o.Value).FirstOrDefault();
+
+    // A variant with no "config" option belongs to one configuration named
+    // after its product (items sold as a single model).
+    public string ConfigurationName(int variantId, string productName) => Get(variantId, "config") ?? productName;
 }

@@ -1,0 +1,56 @@
+@model AppleStore.Infrastructure.Services.OrderSummary
+@using AppleStore.Web.Formatting
+@using AppleStore.Web.Models.Checkout
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+    var place = string.Join(", ", new[] { Model.AddressLine, Model.Ward, Model.District, Model.City }.Where(s => !string.IsNullOrWhiteSpace(s)));
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Order</div>
+        <h1 class="account-title">Order #@Model.Id</h1>
+        <p class="account-lead">Placed @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm"). @CheckoutMessages.Status(Model.Status).</p>
+
+        <ul class="checkout-lines">
+            @foreach (var line in Model.Lines)
+            {
+                <li>
+                    <span class="checkout-line-name">@line.Name</span>
+                    <span class="checkout-line-meta">@string.Join(" · ", new[] { line.Color, line.Region }.OfType<string>()) × @line.Quantity, @PriceText.Vnd(line.Price) each</span>
+                    <span class="checkout-line-total">@PriceText.Vnd(line.LineTotal)</span>
+                </li>
+            }
+        </ul>
+
+        <dl class="checkout-totals">
+            <dt>Subtotal</dt>
+            <dd>@PriceText.Vnd(Model.Subtotal)</dd>
+            @if (Model.Discount > 0)
+            {
+                <dt>Voucher @Model.VoucherCode</dt>
+                <dd>-@PriceText.Vnd(Model.Discount)</dd>
+            }
+            <dt>Shipping</dt>
+            <dd>@(Model.ShippingFee == 0 ? "Free" : PriceText.Vnd(Model.ShippingFee))</dd>
+            <dt class="checkout-total-label">Total</dt>
+            <dd class="checkout-total">@PriceText.Vnd(Model.Total)</dd>
+        </dl>
+
+        <dl class="account-details">
+            <dt>Deliver to</dt>
+            <dd>@Model.ReceiverName, @Model.Phone</dd>
+            <dt>Address</dt>
+            <dd>@place</dd>
+            @if (Model.Note is not null)
+            {
+                <dt>Note</dt>
+                <dd>@Model.Note</dd>
+            }
+            <dt>Payment</dt>
+            <dd>@CheckoutMessages.Method(Model.PaymentMethod), @CheckoutMessages.Payment(Model.PaymentStatus).ToLowerInvariant()</dd>
+        </dl>
+
+        <a class="btn-store-ghost" asp-controller="Products" asp-action="Index">Continue shopping</a>
+    </div>
+</section>

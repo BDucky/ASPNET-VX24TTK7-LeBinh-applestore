@@ -1,0 +1,79 @@
+@model AppleStore.Web.Models.Checkout.CheckoutPage
+@using AppleStore.Web.Formatting
+@{
+    ViewData["Title"] = "Checkout";
+    var quote = Model.Quote;
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Checkout</div>
+        <h1 class="account-title">Place your order</h1>
+
+        @if (Model.Error is not null)
+        {
+            <p class="account-error" role="alert">@Model.Error</p>
+        }
+
+        @* One form: "Apply" comes first so Enter in any field prices the order
+           again instead of placing it; it skips validation (formnovalidate). *@
+        <form asp-action="Index" method="post" class="checkout" novalidate>
+            @* The total on this page, which placing holds the shopper to. *@
+            <input type="hidden" name="ExpectedTotal" value="@Model.Form.ExpectedTotal" />
+            <div class="checkout-details account-form">
+                <h2 class="checkout-heading">Delivery</h2>
+                <partial name="_DeliveryFields" model="Model.Form" />
+
+                <label for="Note">Note for the delivery (optional)</label>
+                <textarea id="Note" name="Note" rows="2" maxlength="400">@Model.Form.Note</textarea>
+
+                <h2 class="checkout-heading">Voucher</h2>
+                <div class="checkout-voucher">
+                    <label class="visually-hidden" for="VoucherCode">Voucher code</label>
+                    <input id="VoucherCode" name="VoucherCode" value="@Model.Form.VoucherCode" maxlength="40" autocomplete="off" placeholder="Voucher code" />
+                    <button type="submit" name="Intent" value="apply" class="btn-store-ghost" formnovalidate>Apply</button>
+                </div>
+                @if (Model.VoucherMessage is not null)
+                {
+                    <p class="@(Model.VoucherApplied ? "account-status" : "account-error")" data-voucher-message>@Model.VoucherMessage</p>
+                }
+
+                <h2 class="checkout-heading">Payment</h2>
+                <p class="account-hint">Cash on delivery. You pay when the order arrives.</p>
+            </div>
+
+            <aside class="checkout-summary" aria-label="Order summary">
+                <h2 class="checkout-heading">Your order</h2>
+                <ul class="checkout-lines">
+                    @foreach (var line in quote.Cart.Lines)
+                    {
+                        <li>
+                            <span class="checkout-line-name">@line.ConfigurationName</span>
+                            <span class="checkout-line-meta">@string.Join(" · ", new[] { line.Color, line.Region }.OfType<string>()) × @line.Quantity</span>
+                            <span class="checkout-line-total">@PriceText.Vnd(line.LineTotal)</span>
+                        </li>
+                    }
+                </ul>
+                <dl class="checkout-totals">
+                    <dt>Subtotal</dt>
+                    <dd>@PriceText.Vnd(quote.Subtotal)</dd>
+                    @if (quote.Discount > 0)
+                    {
+                        <dt>Voucher @quote.VoucherCode</dt>
+                        <dd>-@PriceText.Vnd(quote.Discount)</dd>
+                    }
+                    <dt>Shipping</dt>
+                    <dd>@(quote.ShippingFee == 0 ? "Free" : PriceText.Vnd(quote.ShippingFee))</dd>
+                    <dt class="checkout-total-label">Total</dt>
+                    <dd class="checkout-total" data-checkout-total>@PriceText.Vnd(quote.Total)</dd>
+                </dl>
+                <button type="submit" name="Intent" value="place" class="btn-store-primary">Place order</button>
+                <a class="account-switch" asp-controller="Cart" asp-action="Index">Back to the cart</a>
+            </aside>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
