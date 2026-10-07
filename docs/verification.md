@@ -4,6 +4,56 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-07: Admin area and seeded admin (`feat/admin-area`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 138 of 138 (26 new: 14 `AdminSeederTests`, 2 `AdminSeedingStartupTests`, 10 `AdminAreaTests`) |
+| `python3 setup/verify-admin/verify.py` | **31 of 31** |
+| `python3 setup/verify-account/verify.py` (after moving its harness to `setup/verifylib.py`) | **69 of 69** |
+
+The seeder tests run the real `UserManager`, `UserStore` and SQLite schema,
+so Identity's own password rule and unique-email rule decide. The area
+tests go through the real cookie handler and `[Authorize(Roles)]`.
+
+**Attack sequences checked:**
+
+| Sequence | How | Result |
+|---|---|---|
+| Owner's user-secrets or environment seed an admin into the tests | full suite run with `SEEDADMIN__EMAIL` and `SEEDADMIN__PASSWORD` set | 138 of 138 on the final commit; with the factory's blanking removed, `The_default_test_host_seeds_no_admin` fails (mutation check) |
+| Seeder runs inside `dotnet ef database update` | migrate a fresh database with the seed variables set | 0 users afterwards, no seeder log |
+| Seeder runs twice, or the settings change later | unit test, and the live check restarts with another password | one admin, first password still works, nothing logged |
+| Seed email already belongs to a customer | unit test | refused, customer not promoted, password unchanged |
+| Database never migrated | unit test, and live start in Production on an empty file | error names `dotnet ef database update`; the app still answers 200 |
+| Weak password | unit test, live start with `q7Z` | warning with the 8-character reason; the password is not in the log; no user |
+| `[Authorize]` without the role, or the on-sale count without its filter | mutation checks | 3 and 1 tests fail |
+
+**Live check** (`setup/verify-admin/verify.py`, fresh database from the
+real migrations, 69 products): a visitor sees no Admin link and `/Admin`
+sends them to sign in with `ReturnUrl=%2FAdmin`; signing in lands on the
+dashboard; counts match SQLite (69 products, 52 on sale, 0 customers, 0
+orders); after a customer registers through the real form the count is 1;
+no sideways scroll at 1440px or 390px; the Admin link works from the phone
+menu; a customer gets the access denied page with a link home; after
+signing out `/Admin` asks to sign in again. No console errors.
+
+**Found during this pass:**
+1. The first dashboard test expected seeded products, but `EnsureCreated`
+   does not load the catalog (migrations do). The test now adds its own
+   products, one of them hidden, so the on-sale filter is actually tested.
+2. Self-review: a blank `SeedAdmin:FullName` would leave a blank name link
+   in the nav. It now falls back to "Administrator" (RED and GREEN commits).
+3. One live check first failed because it matched the word "created" in
+   SQL column names and the existing HTTPS-redirect warning. It now looks
+   only for log lines from `AdminSeeder`.
+
+**Not checked:** two app instances seeding at the same moment (the unique
+email index would refuse the second; that path through `UserStore` is not
+tested); a role change while signed in (there is no page that changes roles
+yet).
+
 ## 2026-10-05: real email over SMTP (`feat/smtp-email`)
 
 | Command | Result |

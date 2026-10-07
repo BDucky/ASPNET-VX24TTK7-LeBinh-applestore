@@ -5,6 +5,36 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-07: Admin area and seeded admin (task 4)
+
+**What landed.** PR #14 (real email) merged into `dev` after a green
+rerun. PR #15: `CLAUDE.md` gains "Test Like a Senior Reviewer: Project
+Bindings", adapted from the owner's corjl webapp rules at the owner's
+request. Branch `feat/admin-area`: `/Admin` Area behind the Admin role,
+dashboard with four counts, Admin link in the nav for admins only, and
+`AdminSeeder` creating the first admin from `SeedAdmin` settings at
+startup. 138 tests; live check `setup/verify-admin/verify.py` 31 of 31;
+`setup/verify-account/verify.py` still 69 of 69 after its harness moved to
+`setup/verifylib.py`.
+
+**Decisions:**
+
+| Decision | Who decided |
+|---|---|
+| First admin password from user-secrets (env vars outside Development) | owner, asked directly |
+| Seeder never promotes an existing customer, never changes an existing admin | Claude, stated in the PLAN, accepted |
+| Employees are denied `/Admin` for now | Claude, stated in the PLAN, accepted; task 8 decides employee pages |
+| Nav label "Admin" in English instead of "Quản trị" from the PLAN | Claude: the UI is English everywhere else |
+| Live check builds a fresh database with migrations instead of copying the dev one | Claude: a dev database that already has an admin would make the seed checks meaningless |
+
+**Where to pick up:**
+1. The owner sets `SeedAdmin:Email` and `SeedAdmin:Password` in
+   user-secrets (README, "The first admin account") and starts the app once.
+2. Task 5 (cart). Its PLAN needs no open decision.
+3. Known gaps added to `docs/finish-plan.md`: role change does not refresh
+   the cookie, the access denied text for employees, the seeder recreating
+   a deleted admin.
+
 ## 2026-10-05 (evening): real email over SMTP
 
 **What landed.** Branch `feat/smtp-email` (PR open, not merged until a real

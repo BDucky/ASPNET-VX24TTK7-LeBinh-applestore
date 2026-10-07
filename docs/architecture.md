@@ -112,6 +112,34 @@ every 30 minutes by default. `Infrastructure` references the ASP.NET Core
 shared framework for Identity's token providers and data protection. `Domain`
 still has no ASP.NET reference: `User` only gained plain columns.
 
+## Admin area and the first admin
+
+Added 2026-10-07. The admin pages live in an ASP.NET Core Area,
+`Web/Areas/Admin/`, routed by `{area:exists}/{controller=Dashboard}/...`
+ahead of the default route, so `/Admin` is the dashboard. Every admin
+controller carries `[Area("Admin")]` and `[Authorize(Roles = "Admin")]`;
+the role comes from the claim `AppUserClaimsPrincipalFactory` writes at
+sign-in. A visitor is sent to sign in, any other role to
+`/Account/AccessDenied`. The area uses the store's `_Layout` (no copy) plus
+`Areas/Admin/Views/Shared/_AdminNav.cshtml`; the nav shows an Admin link
+only to admins.
+
+Nobody can register an admin. `AdminSeeder`
+(`Infrastructure/Identity/AdminSeeder.cs`) runs once in `Program.cs` before
+the app serves requests:
+
+| Database | `SeedAdmin` settings | Outcome |
+|---|---|---|
+| has an admin | anything | nothing changes, nothing logged |
+| no admin | email and password set | admin created through `UserManager` (same password policy), logged without the password |
+| no admin | missing | warning naming the settings to set |
+| no admin | password rejected, or email already a customer's | warning with Identity's reason; the customer is never promoted |
+| no tables yet | anything | error telling to run `dotnet ef database update`; the app still starts |
+
+`dotnet ef` builds the host but stops before code after `Build()`, so the
+seeder does not run during migrations (checked live, see
+`docs/verification.md`, 2026-10-07).
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`
