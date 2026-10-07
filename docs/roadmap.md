@@ -46,6 +46,8 @@ selector) this milestone needs to settle explicitly.
 
 ## M3: Cart and checkout
 
+Done so far (2026-10-07): the cart, use cases 11-14 (`docs/architecture.md`, "Cart").
+
 Use cases 11-17 (cart CRUD, place order, apply voucher, pay). Entities: `Cart`,
 `CartItem`, `Order`, `OrderItem`. Voucher itself has no dedicated table in the
 report's schema (it is referenced by `Order.VoucherCode` as a string); deciding

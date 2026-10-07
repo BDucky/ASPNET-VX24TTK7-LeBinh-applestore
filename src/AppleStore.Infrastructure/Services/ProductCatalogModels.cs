@@ -23,7 +23,8 @@ public record ProductDetail(
 }
 
 // One purchasable variant inside a configuration: a colour and region pair.
-public record VariantChoice(string SKU, string? Color, string? Region, decimal? Price, int StockQty);
+// VariantId is what the cart form posts: SKUs are not unique across variants.
+public record VariantChoice(int VariantId, string SKU, string? Color, string? Region, decimal? Price, int StockQty);
 
 public record ConfigurationDetail(
     int ProductId,

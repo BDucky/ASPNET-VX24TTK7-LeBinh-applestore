@@ -1,0 +1,80 @@
+@model AppleStore.Infrastructure.Services.CartView
+@using AppleStore.Infrastructure.Services
+@using AppleStore.Web.Formatting
+@using AppleStore.Web.Models.Cart
+@{
+    ViewData["Title"] = "Your cart";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Cart</div>
+        <h1 class="account-title">Your cart</h1>
+
+        @if (Model.Lines.Count == 0)
+        {
+            <p class="account-lead">Your cart is empty.</p>
+            <a class="btn-store-primary" asp-controller="Products" asp-action="Index">Browse products</a>
+        }
+        else
+        {
+            <ul class="cart-lines">
+                @foreach (var line in Model.Lines)
+                {
+                    var problem = CartMessages.ForLine(line.Problem, line.StockQty);
+                    var link = Url.Action("Variant", "Products", new { slug = line.ProductSlug, config = line.ConfigurationSlug, color = line.Color, region = line.Region });
+                    <li class="cart-line @(problem is null ? "" : "has-problem")" data-cart-line="@line.ItemId">
+                        <a class="cart-line-photo" href="@link">
+                            @if (line.ImageUrl is not null)
+                            {
+                                <img src="@Url.Content(line.ImageUrl)" alt="@line.ProductName" />
+                            }
+                            else
+                            {
+                                <partial name="_NoPhoto" model="(string?)null" />
+                            }
+                        </a>
+                        <div class="cart-line-info">
+                            <a class="cart-line-name" href="@link">@line.ConfigurationName</a>
+                            <div class="cart-line-options">
+                                @string.Join(" · ", new[] { line.Color, line.Region }.OfType<string>())
+                            </div>
+                            <div class="cart-line-price">@PriceText.Vnd(line.UnitPrice) each</div>
+                            @if (problem is not null)
+                            {
+                                <div class="cart-line-problem">@problem</div>
+                            }
+                        </div>
+                        <div class="cart-line-actions">
+                            @if (line.Problem is CartLineProblem.None or CartLineProblem.NotEnoughStock)
+                            {
+                                <form asp-action="Update" method="post" class="cart-qty-form">
+                                    <input type="hidden" name="ItemId" value="@line.ItemId" />
+                                    <label class="visually-hidden" for="qty-@line.ItemId">Quantity</label>
+                                    <input id="qty-@line.ItemId" type="number" name="Quantity" value="@line.Quantity" min="1" max="@line.StockQty" inputmode="numeric" />
+                                    <button type="submit" class="btn-store-ghost">Update</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="cart-line-qty">Qty @line.Quantity</span>
+                            }
+                            <form asp-action="Remove" method="post">
+                                <input type="hidden" name="ItemId" value="@line.ItemId" />
+                                <button type="submit" class="cart-remove">Remove</button>
+                            </form>
+                        </div>
+                        <div class="cart-line-total">@(line.Problem == CartLineProblem.None ? PriceText.Vnd(line.LineTotal) : "")</div>
+                    </li>
+                }
+            </ul>
+
+            <div class="cart-summary">
+                <span>Subtotal</span>
+                <strong data-cart-subtotal>@PriceText.Vnd(Model.Subtotal)</strong>
+            </div>
+            <p class="account-hint">Prices are checked again when you place the order. Lines that cannot be bought are left out of the subtotal.</p>
+            <a class="btn-store-ghost" asp-controller="Products" asp-action="Index">Continue shopping</a>
+        }
+    </div>
+</section>

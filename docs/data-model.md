@@ -70,6 +70,8 @@ made default instead). A user only ever sees and changes their own addresses.
 ### Carts
 `Id (PK)`, `UserId (FK -> Users)`
 
+**Added 2026-10-07 (`feat/cart`):** unique index on `UserId`, one cart per user.
+
 ### CompareLists
 `Id (PK)`, `UserId (FK -> Users)`
 
@@ -103,6 +105,8 @@ Option type codes in use (seeded 2026-09-25): `config` (the configuration card a
 
 ### CartItems
 `Id (PK)`, `CartId (FK -> Carts)`, `ProductId (FK -> Products)`, `VariantId (FK -> ProductVariants)`, `Quantity (int, >= 1)`
+
+**Added 2026-10-07 (`feat/cart`):** unique index on `(CartId, VariantId)`, one line per variant; adding the variant again raises `Quantity`. `Quantity >= 1` and `<= StockQty` are enforced by `CartService`, not by a check constraint (the schema has none elsewhere either). Note: `ProductVariants.SKU` is not unique (two retired AirTag variants share a SKU with active ones), so the cart form posts the variant id.
 
 ### OrderItems
 `Id (PK)`, `OrderId (FK -> Orders)`, `ProductId (FK -> Products)`, `VariantId (FK -> ProductVariants)`, `Price (decimal(12,2), >= 0)`, `Quantity (int, > 0)`

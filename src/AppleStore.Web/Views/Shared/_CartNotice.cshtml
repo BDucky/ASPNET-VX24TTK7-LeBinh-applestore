@@ -1,0 +1,20 @@
+@using AppleStore.Web.Models.Cart
+@* The result of the last cart action, shown once on whatever page the action
+   sent the shopper to (the cart, or back to the product). *@
+@{
+    var status = TempData[CartMessages.StatusKey] as string;
+    var error = TempData[CartMessages.ErrorKey] as string;
+}
+@if (status is not null || error is not null)
+{
+    <div class="cart-notice">
+        @if (error is not null)
+        {
+            <p class="cart-error" role="alert">@error</p>
+        }
+        @if (status is not null)
+        {
+            <p class="cart-status" role="status">@status</p>
+        }
+    </div>
+}

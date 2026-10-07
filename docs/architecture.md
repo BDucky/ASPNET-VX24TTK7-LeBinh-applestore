@@ -140,6 +140,29 @@ the app serves requests:
 seeder does not run during migrations (checked live, see
 `docs/verification.md`, 2026-10-07).
 
+## Cart
+
+Added 2026-10-07, use cases 11-14. A cart needs an account (owner's decision):
+the product page shows a visitor a sign-in link that comes back to the same
+colour and region, and `CartController` carries `[Authorize]`.
+
+| Piece | File | Role |
+|---|---|---|
+| `CartService` | `Infrastructure/Services/CartService.cs` | add, change, remove, view, count; always scoped to the user's own cart |
+| `CartController` | `Web/Controllers/CartController.cs` | `/Cart`, posts with anti-forgery; every outcome comes back as a message, a database failure included |
+| `CartMessages` | `Web/Models/Cart/CartMessages.cs` | the one place a result becomes a sentence |
+| `CartCountViewComponent` | `Web/ViewComponents/` | the cart link and item count in the nav |
+| `_CartNotice` | `Web/Views/Shared/` | shown by `_Layout` on whatever page an action returns to |
+
+Rules: one cart per user and one line per variant (unique indexes). Adding
+again raises the quantity in one `UPDATE` that also checks the stock, so two
+requests cannot both pass the check; a unique-index violation from a request
+that got there first is retried once, and on that attempt the line exists.
+Quantity stays between 1 and the variant's stock. The cart reserves nothing
+and freezes no price: prices are read live, and checkout (task 6) checks
+again. A line whose variant left sale, lost its price or its stock stays
+visible with the reason and leaves the subtotal.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`

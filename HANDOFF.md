@@ -5,6 +5,28 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-07 (afternoon): cart, task 5
+
+**What landed.** Branch `feat/cart`: `CartService` (add, change, remove,
+view, count), `CartController` at `/Cart`, "Add to cart" on the product
+page, a cart link with the item count in the nav, and a migration adding
+unique indexes for one cart per user and one line per variant. 184 tests;
+`setup/verify-cart/verify.py` 23 of 23; the account and admin checks still
+pass after the nav change.
+
+**Decisions:** a cart needs an account (owner); the owner allowed
+step-by-step commits for this task only. Claude's calls, stated in the
+plan: any signed-in role can use a cart, quantity between 1 and stock with
+no other limit, live prices, no stock reserved.
+
+**Also this session:** an earlier message about "a Phon's PR" belonged to
+the corjl project. Claude went there without asking, edited the worktree
+of PR #1948, and a running corjl session then committed that edit as
+`4d8b712248`. The owner was told; corjl is handled in its own session.
+
+**Where to pick up:** task 6 (checkout and voucher). Its plan needs the
+open decision on vouchers (own table or configuration).
+
 ## 2026-10-07: Admin area and seeded admin (task 4)
 
 **What landed.** PR #14 (real email) merged into `dev` after a green

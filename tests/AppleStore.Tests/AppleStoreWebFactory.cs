@@ -30,8 +30,12 @@ public sealed class AppleStoreWebFactory : WebApplicationFactory<Program>
 
     public FakeEmailSender Email { get; } = new();
 
-    public AppleStoreWebFactory(IReadOnlyDictionary<string, string?>? settings = null)
+    private readonly Action<IServiceCollection>? _configureServices;
+
+    // configureServices runs after the defaults, so a test can swap one service (a failing one, say).
+    public AppleStoreWebFactory(IReadOnlyDictionary<string, string?>? settings = null, Action<IServiceCollection>? configureServices = null)
     {
+        _configureServices = configureServices;
         _connection.Open();
         using (var db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).Options))
             db.Database.EnsureCreated();
@@ -50,6 +54,7 @@ public sealed class AppleStoreWebFactory : WebApplicationFactory<Program>
             services.AddDbContext<AppDbContext>(o => o.UseSqlite(_connection));
             services.RemoveAll<IEmailSender>();
             services.AddSingleton<IEmailSender>(Email);
+            _configureServices?.Invoke(services);
         });
     }
 

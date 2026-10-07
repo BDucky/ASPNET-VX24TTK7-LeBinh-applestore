@@ -119,7 +119,7 @@ def main():
   return JSON.stringify(out);
 """.replace("__CODE__", code or "").replace("__VERIFY__", verify_url))
         check("wrong code is refused", r["wrong"] == ["The code is incorrect or has expired."], str(r["wrong"]))
-        check("right code signs the new user in", r["after"] == "/Account" and r["nav"] == "Verify User | Sign out", f"{r['after']} {r['nav']}")
+        check("right code signs the new user in", r["after"] == "/Account" and r["nav"] == "Cart | 0 | Verify User | Sign out", f"{r['after']} {r['nav']}")
         check("account page shows the new user", EMAIL in r["details"] and PHONE in r["details"] and "Customer" in r["details"], r["details"])
         check("reusing a spent code says expired and offers a way out",
               r["reuse"] == ["This registration has expired. Please register again."] and r["reuseLinks"] == ["Register again", "sign in"], str(r))
@@ -273,7 +273,7 @@ def main():
         check("profile refuses a phone another account uses",
               r["taken"] == ["This phone number is already used by another account."], str(r["taken"]))
         check("profile change is saved and shown in the nav",
-              r["status"] == ["Your details were saved."] and r["nav"] == "Verify Renamed | Sign out", str(r))
+              r["status"] == ["Your details were saved."] and r["nav"] == "Cart | 0 | Verify Renamed | Sign out", str(r))
 
         # 10. Addresses: default rules, edit, delete, someone else's address.
         r = step(r"""
@@ -351,7 +351,7 @@ def main():
                 width = int(key.split("@")[1])
                 check(f"page {key} loads without sideways scroll", v["status"] == 200 and v["scroll"] <= width, json.dumps(v))
         check("no console errors on the signed-in and password pages", not r["consoleErrors"], "; ".join(r["consoleErrors"]))
-        check("on a phone the menu button reveals the name and sign out", r["mobileMenu"] == "Verify Renamed | Sign out", r["mobileMenu"])
+        check("on a phone the menu button reveals the cart, the name and sign out", r["mobileMenu"] == "Cart | 0 | Verify Renamed | Sign out", r["mobileMenu"])
         current_password = changed_password
 
         # 12. Lockout: 5 wrong passwords, then the right one.

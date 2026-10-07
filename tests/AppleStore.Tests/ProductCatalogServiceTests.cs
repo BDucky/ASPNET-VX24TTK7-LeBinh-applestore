@@ -30,7 +30,7 @@ public class ProductCatalogServiceTests
             UpdatedAt = DateTime.UtcNow,
         };
 
-    private static ProductVariant NewVariant(Product product, string sku, decimal? price, int stock, bool status = true) =>
+    internal static ProductVariant NewVariant(Product product, string sku, decimal? price, int stock, bool status = true) =>
         new()
         {
             Product = product,
@@ -44,7 +44,7 @@ public class ProductCatalogServiceTests
 
     // Tags a variant with an option ("config", "color", "region"), reusing
     // the option type and value rows when they already exist.
-    private static void Tag(AppleStore.Infrastructure.Data.AppDbContext db, ProductVariant variant, string code, string value)
+    internal static void Tag(AppleStore.Infrastructure.Data.AppDbContext db, ProductVariant variant, string code, string value)
     {
         var type = db.ChangeTracker.Entries<OptionType>().Select(e => e.Entity).FirstOrDefault(t => t.Code == code)
             ?? new OptionType { Code = code };
@@ -53,13 +53,17 @@ public class ProductCatalogServiceTests
         db.Add(new VariantOption { Variant = variant, OptionType = type, OptionValue = optionValue });
     }
 
-    private static ProductVariant AddVariant(SqliteInMemoryFixture f, Product product, string sku, decimal? price, int stock, string? config = null, string? color = null, string? region = null, bool status = true)
+    private static ProductVariant AddVariant(SqliteInMemoryFixture f, Product product, string sku, decimal? price, int stock, string? config = null, string? color = null, string? region = null, bool status = true) =>
+        AddVariant(f.Context, product, sku, price, stock, config, color, region, status);
+
+    // Also used by the cart tests.
+    internal static ProductVariant AddVariant(AppleStore.Infrastructure.Data.AppDbContext db, Product product, string sku, decimal? price, int stock, string? config = null, string? color = null, string? region = null, bool status = true)
     {
         var v = NewVariant(product, sku, price, stock, status);
-        f.Context.Add(v);
-        if (config is not null) Tag(f.Context, v, "config", config);
-        if (color is not null) Tag(f.Context, v, "color", color);
-        if (region is not null) Tag(f.Context, v, "region", region);
+        db.Add(v);
+        if (config is not null) Tag(db, v, "config", config);
+        if (color is not null) Tag(db, v, "color", color);
+        if (region is not null) Tag(db, v, "region", region);
         return v;
     }
 

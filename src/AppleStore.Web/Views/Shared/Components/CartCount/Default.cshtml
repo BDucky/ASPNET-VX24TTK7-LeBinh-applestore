@@ -1,0 +1,8 @@
+@model int?
+<a class="site-nav-account-link site-nav-cart" asp-area="" asp-controller="Cart" asp-action="Index" aria-label="Cart@(Model is null ? "" : $", {Model} items")">
+    Cart
+    @if (Model is not null)
+    {
+        <span class="site-nav-cart-count" data-cart-count>@Model</span>
+    }
+</a>

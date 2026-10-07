@@ -6,6 +6,7 @@ PASS/FAIL line per check. Each script keeps only its own checks.
 """
 import json
 import re
+import sqlite3
 import os
 import subprocess
 import sys
@@ -24,6 +25,18 @@ def otp_for(log_path, email):
     text = Path(log_path).read_text()
     codes = re.findall(re.escape(email) + r"[^\n]*\n[^\n]*?Your code is (\d{6})", text, re.IGNORECASE)
     return codes[-1] if codes else None
+
+
+def migrate(db_path):
+    """A fresh database through the real migrations (catalog included)."""
+    subprocess.run(["dotnet", "ef", "database", "update", "--no-build", "--project", "src/AppleStore.Infrastructure",
+                    "--startup-project", "src/AppleStore.Web", "--connection", f"Data Source={db_path}"],
+                   cwd=ROOT, check=True, capture_output=True)
+
+
+def scalar(db_path, sql, *args):
+    with sqlite3.connect(db_path) as db:
+        return db.execute(sql, args).fetchone()[0]
 
 
 # Shared browser helpers, prepended to every step.
