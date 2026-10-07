@@ -4,6 +4,50 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-07: cart, use cases 11-14 (`feat/cart`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 184 of 184 (46 new: 26 `CartServiceTests`, 20 in `CartFlowTests` and `CartFailureTests`) |
+| `python3 setup/verify-cart/verify.py` | **23 of 23** |
+| `python3 setup/verify-account/verify.py` | 69 of 69 (nav now starts with the cart link) |
+| `python3 setup/verify-admin/verify.py` | 31 of 31 (same) |
+| `dotnet ef database update` on the dev database (backed up first) | `UniqueCartPerUserAndLinePerVariant` applied, both indexes present |
+
+`CartServiceTests` run on a real SQLite schema. Races are staged with a
+`SaveChangesInterceptor` that lets a second context write just before the
+service's own save, so the unique indexes reject it as they would in
+production.
+
+**Attack sequences and mutation checks:**
+
+| Sequence | Result |
+|---|---|
+| Another request adds the same line, or creates the cart, first | one cart, one line holding both quantities |
+| Another request takes the last unit first | refused with "0 more", line unchanged |
+| Retry removed | 3 tests fail |
+| Stock condition removed from the `UPDATE` | 2 tests fail |
+| Owner condition removed from change and remove | 2 tests fail |
+| `[ValidateAntiForgeryToken]` removed from Add | 1 test fails |
+| Return address not checked as local | 1 test fails |
+| Write lock held on the live database while adding | message on the same product page, logged; the next click works |
+
+**Found during this pass:**
+1. `ProductVariants.SKU` is not unique (retired AirTag variants share SKUs
+   with active ones), so the form posts the variant id and `VariantChoice`
+   carries it.
+2. Two web tests first failed on test data: a configuration named "256GB"
+   (real ones include the product name) and comparing raw HTML where Razor
+   encodes "Đ". Both were test fixes, not app fixes.
+3. Adding the cart link to the nav changed the exact nav text that the
+   account and admin checks compare; their expectations were updated.
+
+**Not checked:** two requests truly in parallel on the live server (SQLite
+serializes writes; the race path is covered by the staged unit tests);
+checkout, which is task 6.
+
 ## 2026-10-07: Admin area and seeded admin (`feat/admin-area`)
 
 | Command | Result |
