@@ -61,7 +61,7 @@ puts a demoable buying flow and the admin area first.
 | 2 | Register, OTP, sign in, sign out, lockout | 1-3 | `feat/identity-login` | Identity with a custom `UserStore`, cookie, `[Authorize]`, anti-forgery | done, verified 31/31, PR #12 |
 | 3 | Forgot password, change password, profile and addresses | 4-6 | `feat/account-password-profile` | `UserManager.ChangePasswordAsync`, `ResetPasswordAsync`, security stamp sign-out | done, verified 67/67, PR #13 |
 | 3b | Send codes by real email (SMTP) | 2 | `feat/smtp-email` | options pattern with startup validation, user-secrets, MailKit | done, verified 69/69; real Gmail send confirmed by the owner (PR #14) |
-| 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager`, options pattern | done, verified 31/31 |
+| 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager`, options pattern | done, verified 31/31, PR #16 |
 | 5 | Cart | 11-14 | `feat/cart` | session or DB cart, view components for the nav count | not started |
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, transactions in EF Core | not started |
 | 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern for gateway config, callbacks | not started |

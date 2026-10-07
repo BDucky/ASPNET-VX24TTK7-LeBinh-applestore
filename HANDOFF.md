@@ -15,7 +15,7 @@ dashboard with four counts, Admin link in the nav for admins only, and
 `AdminSeeder` creating the first admin from `SeedAdmin` settings at
 startup. 138 tests; live check `setup/verify-admin/verify.py` 31 of 31;
 `setup/verify-account/verify.py` still 69 of 69 after its harness moved to
-`setup/verifylib.py`.
+`setup/verifylib.py`. PR #16.
 
 **Decisions:**
 
