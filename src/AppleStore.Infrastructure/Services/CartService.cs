@@ -136,10 +136,11 @@ public class CartService : ICartService
 
         return new CartView(rows.Select(r =>
         {
-            var configuration = options.Get(r.VariantId, "config") ?? r.ProductName;
+            var configuration = options.ConfigurationName(r.VariantId, r.ProductName);
             return new CartLine(
                 r.Id,
                 r.VariantId,
+                r.ProductId,
                 r.ProductName,
                 r.ProductSlug,
                 configuration,

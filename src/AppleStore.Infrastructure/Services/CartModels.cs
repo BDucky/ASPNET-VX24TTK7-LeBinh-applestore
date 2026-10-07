@@ -30,6 +30,7 @@ public enum CartLineProblem
 public sealed record CartLine(
     int ItemId,
     int VariantId,
+    int ProductId,
     string ProductName,
     string ProductSlug,
     string ConfigurationName,
