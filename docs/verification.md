@@ -4,6 +4,49 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-05: real email over SMTP (`feat/smtp-email`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 112 of 112 (10 new: 8 `EmailTests`, 2 in `AccountSettingsFlowTests`) |
+| `python3 setup/verify-account/verify.py` | **69 of 69** |
+
+`EmailTests` use real collaborators: the sender choice is resolved from a
+real `ServiceCollection` and configuration, and the failure test opens a
+real socket to a closed local port (refused at once, well under the 30
+seconds the test allows). The two new live checks start the app with SMTP
+pointed at that closed port: Register shows "We could not send the email.
+Please try again in a moment.", keeps the typed email, and the server log
+has the failure.
+
+**Found during this pass:** the GREEN commit went in before
+`dotnet format` was checked (the command chain did not stop on the format
+error); a separate style commit fixed the one initializer. Also: once
+user-secrets hold SMTP settings, a Development run would send real mail and
+the live check could no longer read codes from the log; the script now sets
+`Smtp__Host` to empty.
+
+### Real send to a real inbox (same day)
+
+The owner stored the Gmail settings in user-secrets (sending account
+kbsaigonese@gmail.com, App Password typed by the owner). The app ran in
+Development against a temp copy of the database and the Register form was
+submitted in Chromium.
+
+| Run | Result |
+|---|---|
+| 1. revocation check on (default) | refused in the TLS handshake: "An incomplete certificate revocation check occurred"; the page showed "We could not send the email..." and the log had the error |
+| 2. same, outside the session sandbox | same error, so it is .NET on macOS, not this session's network |
+| 3. `Smtp__CheckCertificateRevocation=false` for that run | sent to kbsaigonese@gmail.com in 5.4 s, page moved to the code step, no error logged |
+| 4. same settings, to lebinh030199@gmail.com | sent in 3.4 s; **the owner confirmed the email arrived** |
+
+Runs 1 and 2 also showed the failure path working for real: a visible
+message, the typed email kept, the failure in the log. The code from the
+email was not typed back into the app in this pass; that step is covered by
+the live check script with log-only mail.
+
 ## 2026-10-05: use cases 4-6, forgot and change password, profile, addresses (`feat/account-password-profile`)
 
 | Command | Result |

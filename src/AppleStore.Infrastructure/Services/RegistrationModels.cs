@@ -9,6 +9,7 @@ public enum RegistrationError
     AttemptNotFound,
     InvalidOtp,
     PasswordTooWeak,
+    EmailSendFailed,
 }
 
 public record RegistrationStartResult(bool Success, string? AttemptId, RegistrationError? Error);

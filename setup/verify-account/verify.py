@@ -48,8 +48,11 @@ def check(name, ok, detail=""):
     print(f"{'PASS' if ok else 'FAIL'}  {name}" + (f"  ({detail})" if detail else ""))
 
 
-def start_app(env_name, db_path, log_path):
-    env = dict(os.environ, ASPNETCORE_ENVIRONMENT=env_name, ConnectionStrings__Default=f"Data Source={db_path}")
+def start_app(env_name, db_path, log_path, smtp=None):
+    # Smtp__Host empty keeps mail in the log even when user-secrets hold real
+    # SMTP settings, so the script can read each code and never mails anyone.
+    env = dict(os.environ, ASPNETCORE_ENVIRONMENT=env_name, ConnectionStrings__Default=f"Data Source={db_path}", Smtp__Host="")
+    env.update(smtp or {})
     log = open(log_path, "w")
     proc = subprocess.Popen(
         ["dotnet", "run", "--no-build", "--no-launch-profile", "--urls", APP],
@@ -452,7 +455,32 @@ def main():
     finally:
         stop_app(proc)
 
-    # 13. Server error (no tables): the page says so and offers a way back.
+    # 13. Mail server unreachable: register says so and stays on the form.
+    unreachable = {"Smtp__Host": "127.0.0.1", "Smtp__Port": "1", "Smtp__UserName": "u",
+                   "Smtp__Password": "p", "Smtp__FromAddress": "store@example.com"}
+    shutil.copy(WEB / "AppleStore.db", TMP / "app-smtp.db")
+    proc = start_app("Development", TMP / "app-smtp.db", TMP / "app-smtp.log", unreachable)
+    try:
+        r = step(r"""
+  const out = {};
+  await page.goto(APP + '/Account/Register');
+  await fill(page, { Email: 'smtp__STAMP__@example.com', FullName: 'Smtp Check', Phone: '', Password: 'Password1', ConfirmPassword: 'Password1' });
+  await submit(page);
+  out.url = page.url().replace(APP, '');
+  out.msg = await errors(page);
+  out.kept = await page.inputValue('.account-form #Email');
+  await page.screenshot({ path: 'smtp-failed.png' });
+  return JSON.stringify(out);
+""".replace("__STAMP__", STAMP))
+        check("an unreachable mail server shows a message and keeps the form",
+              r["url"] == "/Account/Register" and r["msg"] == ["We could not send the email. Please try again in a moment."]
+              and r["kept"] == f"smtp{STAMP}@example.com", str(r))
+        logged = "Sending" in (TMP / "app-smtp.log").read_text()
+        check("the failed send is in the server log", logged)
+    finally:
+        stop_app(proc)
+
+    # 14. Server error (no tables): the page says so and offers a way back.
     proc = start_app("Production", TMP / "empty.db", TMP / "app-prod.log")
     try:
         r = step(r"""

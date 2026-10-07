@@ -54,11 +54,20 @@ public class RegistrationService : IRegistrationService
         var pending = new PendingRegistration(request.Email, request.Phone, request.FullName, passwordHash, code, expiresAtUtc);
         _cache.Set(CacheKey(attemptId), pending, expiresAtUtc);
 
-        await _emailSender.SendAsync(
-            request.Email,
-            "Your Apple Store verification code",
-            $"Your code is {code}. It expires in {OtpService.Validity.TotalMinutes:0} minutes.",
-            ct);
+        try
+        {
+            await _emailSender.SendAsync(
+                request.Email,
+                "Your Apple Store verification code",
+                $"Your code is {code}. It expires in {OtpService.Validity.TotalMinutes:0} minutes.",
+                ct);
+        }
+        catch (EmailSendException)
+        {
+            // No code reached the visitor, so the attempt is useless; drop it.
+            _cache.Remove(CacheKey(attemptId));
+            return new RegistrationStartResult(false, null, RegistrationError.EmailSendFailed);
+        }
 
         return new RegistrationStartResult(true, attemptId, null);
     }

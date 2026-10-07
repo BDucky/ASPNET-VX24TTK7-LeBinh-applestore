@@ -7,6 +7,7 @@ public enum PasswordResetError
     CodeExpired,
     LockedOut,
     PasswordTooWeak,
+    EmailSendFailed,
 }
 
 public record PasswordResetStartResult(bool Success, PasswordResetError? Error);

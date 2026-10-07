@@ -196,6 +196,35 @@ public class AccountSettingsFlowTests : WebFlowTestBase
         Assert.DoesNotContain("New line", await Client.GetStringAsync("/Account/Addresses"));
     }
 
+    [Fact]
+    public async Task Register_says_so_when_the_email_cannot_be_sent()
+    {
+        Factory.Email.Fail = true;
+
+        var response = await PostFormAsync("/Account/Register", new()
+        {
+            ["Email"] = "new@example.com",
+            ["FullName"] = "New",
+            ["Password"] = "Password1",
+            ["ConfirmPassword"] = "Password1",
+        });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("We could not send the email. Please try again in a moment.", ErrorMessage(await response.Content.ReadAsStringAsync()));
+    }
+
+    [Fact]
+    public async Task Forgot_password_says_so_when_the_email_cannot_be_sent()
+    {
+        await CreateUserAsync(Email, "Password1");
+        Factory.Email.Fail = true;
+
+        var response = await PostFormAsync("/Account/ForgotPassword", new() { ["Email"] = Email });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("We could not send the email. Please try again in a moment.", ErrorMessage(await response.Content.ReadAsStringAsync()));
+    }
+
     private static Dictionary<string, string> AddressForm(string line) => new()
     {
         ["Label"] = "Home",

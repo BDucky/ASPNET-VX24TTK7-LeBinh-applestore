@@ -50,6 +50,33 @@ dotnet ef database update --project src/AppleStore.Infrastructure --startup-proj
 dotnet run --project src/AppleStore.Web
 ```
 
+Without further setup, emails (registration and password-reset codes) are
+written to the console log, not sent. To send them for real through Gmail,
+create an App Password for the sending Gmail account (Google Account,
+Security, 2-Step Verification, App passwords), then store the settings in
+user-secrets on your own machine:
+
+```bash
+dotnet user-secrets set "Smtp:Host" "smtp.gmail.com" --project src/AppleStore.Web
+dotnet user-secrets set "Smtp:Port" "587" --project src/AppleStore.Web
+dotnet user-secrets set "Smtp:UserName" "<sending gmail address>" --project src/AppleStore.Web
+dotnet user-secrets set "Smtp:FromAddress" "<sending gmail address>" --project src/AppleStore.Web
+dotnet user-secrets set "Smtp:Password" "<16-character app password>" --project src/AppleStore.Web
+```
+
+On macOS the TLS handshake with smtp.gmail.com can fail with "An incomplete
+certificate revocation check occurred" (it did on the development machine).
+If it does, turn that one check off for your machine; the certificate and
+host name are still verified:
+
+```bash
+dotnet user-secrets set "Smtp:CheckCertificateRevocation" "false" --project src/AppleStore.Web
+```
+
+User-secrets live outside the repository and are read only in Development.
+`dotnet user-secrets clear --project src/AppleStore.Web` goes back to
+log-only mail.
+
 ## Documentation
 
 See `docs/requirements.md` for the source requirements, `docs/data-model.md` for the

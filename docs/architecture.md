@@ -111,3 +111,20 @@ other signed-in sessions end at their next stamp check, which Identity runs
 every 30 minutes by default. `Infrastructure` references the ASP.NET Core
 shared framework for Identity's token providers and data protection. `Domain`
 still has no ASP.NET reference: `User` only gained plain columns.
+
+## Email
+
+`IEmailSender` is the only thing the services call. `AddAppleStoreEmail`
+(`Infrastructure/Services/EmailServiceCollectionExtensions.cs`) picks the
+implementation once, at startup:
+
+| `Smtp:Host` | Sender | Behavior |
+|---|---|---|
+| empty or missing | `DevEmailSender` | writes each email to the log; tests and `setup/verify-account/verify.py` run this way |
+| set | `SmtpEmailSender` | MailKit over SMTP; port 465 uses TLS from the start, any other port must upgrade with STARTTLS; the "Smtp" section is bound with the options pattern and validated at startup, so a half-filled section stops the app at launch |
+
+A failed send (server unreachable, wrong password) is logged and becomes
+`EmailSendException`; registration and password reset turn it into "We could
+not send the email. Please try again in a moment." on the same form, and
+leave no usable attempt or code behind. The password goes in user-secrets
+(see the root README), never in `appsettings.json`.
