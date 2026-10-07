@@ -29,6 +29,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Shipment> Shipments => Set<Shipment>();
     public DbSet<ReviewMedia> ReviewMedia => Set<ReviewMedia>();
+    public DbSet<Voucher> Vouchers => Set<Voucher>();
+    public DbSet<VoucherProduct> VoucherProducts => Set<VoucherProduct>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
