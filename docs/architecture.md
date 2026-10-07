@@ -163,6 +163,31 @@ and freezes no price: prices are read live, and checkout (task 6) checks
 again. A line whose variant left sale, lost its price or its stock stays
 visible with the reason and leaves the subtotal.
 
+## Checkout and vouchers
+
+Added 2026-10-07, use cases 15-16. `CheckoutService` prices the cart through
+`CartService` (one rule for what can be bought), applies a voucher by
+BM_VOUCHER_01 and places the order. `CheckoutController` (`/Checkout`) has one
+form: "Apply" prices again and writes nothing, "Place order" validates the
+`DeliveryFields` (shared with saved addresses) and places it. `/Orders/{id}`
+shows the shopper's own order.
+
+Placing is one EF Core transaction in which every write is conditional:
+
+| Write | Condition | On a miss |
+|---|---|---|
+| `ProductVariants.StockQty -= q` | stock still at least q, still on sale | roll back, "no longer has enough stock" |
+| `Vouchers.UsedCount += 1` | still active, a use still left | roll back, "fully used" |
+| delete each cart line | same id, same quantity, same user | roll back, "your cart changed" |
+| insert `Orders`, `OrderItems` (prices frozen), `Payments` (COD, pending) | | |
+
+Before any write the total is compared with the one the page showed
+(`ExpectedTotal`); a different total is shown again instead of being placed.
+A second submit finds the cart empty. Voucher rules: both ends of the window
+count, a percent discount rounds to whole dong half away from zero, no
+discount exceeds the lines it applies to, shipping is free. The clock is
+`TimeProvider`, so tests fix the time.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`

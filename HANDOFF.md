@@ -5,6 +5,21 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-07 (evening): checkout and vouchers, task 6
+
+**What landed.** Branch `feat/checkout`: `Vouchers` and `VoucherProducts`
+tables with three demo vouchers (WELCOME10, GIAM500K, AIRPODS15),
+`CheckoutService`, `/Checkout` and `/Orders/{id}`, a Checkout button in the
+cart. 227 tests; `setup/verify-checkout/verify.py` 25 of 25.
+
+**Decisions:** vouchers in a table (owner). Shipping free, COD only until
+task 7, no per-user voucher limit, order email with task 8 (Claude's,
+accepted with the plan). Step-by-step commits allowed for this task.
+
+**Where to pick up:** task 7 (VNPay and MoMo, simulated unless sandbox
+credentials appear). `Payments` already gets a COD row per order; task 7
+adds the method choice on the checkout page.
+
 ## 2026-10-07 (afternoon): cart, task 5
 
 **What landed.** Branch `feat/cart`: `CartService` (add, change, remove,

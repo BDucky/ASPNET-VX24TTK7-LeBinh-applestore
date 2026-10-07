@@ -63,7 +63,7 @@ puts a demoable buying flow and the admin area first.
 | 3b | Send codes by real email (SMTP) | 2 | `feat/smtp-email` | options pattern with startup validation, user-secrets, MailKit | done, verified 69/69; real Gmail send confirmed by the owner (PR #14) |
 | 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager`, options pattern | done, verified 31/31, PR #16 |
 | 5 | Cart | 11-14 | `feat/cart` | `[Authorize]`, anti-forgery, DB cart with unique indexes (EF migration), view component for the nav count | done, verified 23/23, PR #17 |
-| 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, transactions in EF Core | not started |
+| 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, EF Core transaction with conditional writes, `TimeProvider`, voucher table by migration | done, verified 25/25 |
 | 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern for gateway config, callbacks | not started |
 | 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24 | `feat/orders` | role-based pages, status flow | not started |
 | 9 | Admin product and voucher CRUD | 25-27, 29-31 | `feat/admin-products` | scaffolded CRUD on MVC, file upload | not started |
@@ -75,7 +75,6 @@ puts a demoable buying flow and the admin area first.
 
 | Decision | Needed by task | Notes |
 |---|---|---|
-| Vouchers: own table or configuration | 6 | the report's schema has no voucher table, only `Order.VoucherCode` |
 | VNPay and MoMo sandbox credentials | 7 | without them both are simulated |
 | Report language and who writes which chapter | 11 | sample report is Vietnamese |
 
@@ -86,6 +85,9 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Vouchers | 2026-10-07 | own table (`Vouchers`, `VoucherProducts`), owner's choice; three demo vouchers seeded until the admin pages (task 9) |
+| Checkout assumptions | 2026-10-07 | shipping free (the store advertises it), COD only until task 7, no per-user voucher limit, order email with task 8 (Claude's, accepted) |
+| Commits in task 6 | 2026-10-07 | owner allowed step-by-step commits for the checkout task |
 | Cart needs an account | 2026-10-07 | a visitor is asked to sign in before adding, then returns to the same product choice (owner's choice; no guest cart to merge) |
 | Commits in task 5 | 2026-10-07 | owner allowed committing step by step for the cart task only; ask again for later tasks |
 | Admin account | 2026-10-07 | created at startup from `SeedAdmin` settings in user-secrets (environment variables outside Development); never promotes an existing customer |
@@ -117,6 +119,10 @@ puts a demoable buying flow and the admin area first.
   which admin pages employees get.
 - If the admin account is deleted or demoted while the `SeedAdmin`
   settings are still set, the next start creates it again.
+- A placed order is never cancelled yet, so its stock and voucher use are
+  never given back (task 8 adds cancelling).
+- Checkout catches a database failure while placing; one while pricing
+  (opening `/Checkout`) falls to the global error page, which has a way back.
 - The cart count badge shows 0 for an empty cart rather than hiding.
 - `AccountController` and `AddressesController` do not catch database
   failures themselves (the global error page does); the cart does.

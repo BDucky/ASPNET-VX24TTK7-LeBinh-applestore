@@ -18,5 +18,6 @@ silently leaving setup incomplete.
 | `verify-account/verify.py` | register, OTP, sign in, sign out, lockout, live in a browser |
 | `verify-admin/verify.py` | seeded admin, Admin area access by role, dashboard counts, live in a browser |
 | `verify-cart/verify.py` | sign-in link, add, change, remove, stock limits, a locked database, live in a browser |
+| `verify-checkout/verify.py` | checkout, demo vouchers, placing, double submit, changed price, a locked database, live in a browser |
 
-All three import `verifylib.py` (start the app, drive the browser, tally results).
+All of them import `verifylib.py` (start the app, drive the browser, tally results).

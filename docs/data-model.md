@@ -103,6 +103,14 @@ Option type codes in use (seeded 2026-09-25): `config` (the configuration card a
 ### ProductImages
 `Id (PK)`, `ProductId (FK -> Products)`, `VariantId (FK -> ProductVariants, nullable)`, `ImageUrl (nvarchar 255)`, `SortOrder (int, >= 0)`
 
+### Vouchers (added 2026-10-07, not in the report)
+`Id (PK)`, `Code (varchar 40, unique, stored upper case)`, `DiscountType (int: Percent=0, Fixed=1)`, `DiscountValue (decimal(12,2))`, `MinOrderAmount (decimal(12,2), nullable)`, `StartsAt`, `EndsAt`, `UsageLimit (int, nullable)`, `UsedCount (int)`, `IsActive (bit)`, `CreatedAt`, `UpdatedAt`
+
+The report keeps only `Orders.VoucherCode`; BM_VOUCHER_01 describes percent or fixed discounts, all or some products, a minimum order, a usage count and a time window, so the owner chose a table. `Orders.VoucherCode` still holds the code as text, so an order keeps its code even if the voucher row changes later.
+
+### VoucherProducts (added 2026-10-07)
+Composite PK `(VoucherId, ProductId)`, both cascading. A voucher with rows here applies only to those products.
+
 ### CartItems
 `Id (PK)`, `CartId (FK -> Carts)`, `ProductId (FK -> Products)`, `VariantId (FK -> ProductVariants)`, `Quantity (int, >= 1)`
 
