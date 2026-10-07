@@ -65,6 +65,60 @@ Treat them like config in the global "SKIP TDD" list. TDD applies once a task ad
 service, controller action with a decision in it, validator, or calculation
 (voucher math, stock updates, revenue totals).
 
+## Test Like a Senior Reviewer: Project Bindings
+
+Adapted on 2026-10-07 from the rules the owner keeps for the corjl webapp
+(`CLAUDE.local.md` there), at the owner's request. The global rule "Review
+Like a Senior Reviewer" in `~/.claude/CLAUDE.md` still applies in full; this
+section adds the steps that make it concrete here.
+
+1. **Triage by risk, not size.** Pick one lane before planning:
+   - Fast: copy, CSS, config, docs. Do it, then a live check.
+   - TDD: anything with a decision (service, controller action that
+     branches, validator, seeder, money or stock math). Full RED, GREEN,
+     REFACTOR.
+   - Live-only: layout and visuals. Verify with the browser script, and move
+     any logic inside it into the TDD lane.
+   - Spike first: root cause unknown. Throwaway repro first, then RED the
+     confirmed behavior. Never lock a guess into a test.
+   A change that touches money, authorization, startup, or shared code is
+   TDD regardless of how small it is.
+2. **Blast-radius sweep, in the PLAN and again before delivering.** List
+   every place that renders or triggers the behavior (views, partials,
+   controllers, startup, tests' host) and every condition that gates it
+   (role, lockout, configuration source, environment, a database that is
+   not migrated yet). Write it as a table: site, gating condition, verified
+   or assumed. Two sites carrying the same rule is a finding (see "Extend,
+   Do Not Copy").
+3. **Find the contracts before writing tests.** Name the owner of each
+   decision the change relies on (`UserManager`, `UserStore`, the cookie
+   handler, EF Core's unique index) and let it run for real in the test.
+   Fake only the edge (email, payment gateway), and make the fake enforce
+   the owner's real rule.
+4. **The PLAN holds:** approach, target behavior, blast radius, assumptions
+   (with whose call each is), edge cases, error paths, blockers, test plan.
+   Approval is on the approach, not only the behavior.
+5. **Three paths per behavior:** happy, unhappy (bad input, missing
+   configuration, failing dependency), and the golden path the user takes
+   end to end in the real app.
+6. **Attack sequences first.** Before writing tests, write the sequences
+   that could end in wrong data, a page with no way back, or a silent
+   mismatch (run twice, run concurrently, run before the database exists,
+   configuration present in one environment and not another). Each one
+   becomes a test or a written reason why it cannot happen.
+7. **Minimal seam.** Make the test pass through the existing seam. Do not
+   build new machinery only to make something testable.
+8. **Audit before delivering:**
+   - L4: re-run the blast-radius sweep. Did a site or condition appear that
+     the tests do not cover?
+   - L5: write down what was not tested, and say it in the reply.
+   - L6: look for the same bug elsewhere and fix the class, not the
+     instance. Any bug that escaped becomes a permanent RED test.
+9. **Green is not done.** Deliver only after `dotnet build --no-incremental`,
+   `dotnet test`, `dotnet format --verify-no-changes`, and the live browser
+   script under `setup/verify-*/` with its failure paths, all with results
+   shown.
+
 ## Extend, Do Not Copy: C# Bindings
 
 The hard rule lives in the global `~/.claude/CLAUDE.md`. In this codebase:
