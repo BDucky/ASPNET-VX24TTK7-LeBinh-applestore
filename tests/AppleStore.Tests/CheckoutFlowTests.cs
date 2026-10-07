@@ -40,6 +40,9 @@ public class CheckoutFlowTests : WebFlowTestBase
     private static string Total(string html) =>
         Regex.Match(WebUtility.HtmlDecode(html), "data-checkout-total[^>]*>\\s*([^<]+?)\\s*<").Groups[1].Value;
 
+    // A user without a saved address has to type one before placing.
+    private static Dictionary<string, string> WithAddress => new() { ["AddressLine"] = "5 Test Street" };
+
     private Dictionary<string, string> Form(string html, string intent, Dictionary<string, string>? overrides = null)
     {
         var fields = new Dictionary<string, string>
@@ -260,12 +263,17 @@ public class CheckoutFlowTests : WebFlowTestBase
             await scope.ServiceProvider.GetRequiredService<AppDbContext>().ProductVariants
                 .Where(v => v.Id == blue).ExecuteUpdateAsync(s => s.SetProperty(v => v.Price, 25_990_000m));
 
-        var response = await PostFormAsync("/Checkout", Form(page, "place"), formPage: "/Checkout");
+        var response = await PostFormAsync("/Checkout", Form(page, "place", WithAddress), formPage: "/Checkout");
 
         var html = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
         Assert.Contains("The total changed since you opened this page. Check it and place the order again.", html);
         Assert.Equal("25.990.000 VNĐ", Total(html));
         Assert.Equal(0, await OrderCountAsync());
+
+        // Having seen the new total, placing again goes through.
+        var again = await PostFormAsync("/Checkout", Form(html, "place", WithAddress), formPage: "/Checkout");
+        Assert.Matches("^/Orders/\\d+$", Location(again));
+        Assert.Equal(1, await OrderCountAsync());
     }
 
     [Fact]
@@ -276,8 +284,8 @@ public class CheckoutFlowTests : WebFlowTestBase
         await AddToCartAsync(blue);
         var page = await PageAsync("/Checkout");
 
-        await PostFormAsync("/Checkout", Form(page, "place"), formPage: "/Checkout");
-        var second = await PostFormAsync("/Checkout", Form(page, "place"), formPage: "/Cart");
+        await PostFormAsync("/Checkout", Form(page, "place", WithAddress), formPage: "/Checkout");
+        var second = await PostFormAsync("/Checkout", Form(page, "place", WithAddress), formPage: "/Cart");
 
         Assert.Equal("/Cart", Location(second));
         Assert.Equal(1, await OrderCountAsync());
@@ -303,7 +311,7 @@ public class CheckoutFlowTests : WebFlowTestBase
         var (blue, _, _) = Seed();
         await SignInAsync("first@example.com");
         await AddToCartAsync(blue);
-        var placed = await PostFormAsync("/Checkout", Form(await PageAsync("/Checkout"), "place"), formPage: "/Checkout");
+        var placed = await PostFormAsync("/Checkout", Form(await PageAsync("/Checkout"), "place", WithAddress), formPage: "/Checkout");
         await PostFormAsync("/Account/Logout", new(), formPage: "/");
         await SignInAsync();
 

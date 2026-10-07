@@ -1820,3 +1820,129 @@ a.btn-store-primary {
       "actions actions";
   }
 }
+
+/* ---------- Checkout and order ---------- */
+
+.cart-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 12px;
+}
+
+.checkout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
+  gap: 24px 32px;
+  margin-top: 8px;
+}
+
+.checkout-heading {
+  font-size: 1.05rem;
+  margin: 18px 0 2px;
+}
+
+.checkout-details textarea,
+.checkout-voucher input {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+}
+
+.checkout-voucher {
+  display: flex;
+  gap: 8px;
+}
+
+.checkout-voucher input {
+  flex: 1;
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+.checkout-summary {
+  align-self: start;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkout-summary .btn-store-primary {
+  justify-content: center;
+}
+
+.checkout-lines {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.checkout-lines li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+}
+
+.checkout-line-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.checkout-line-meta {
+  grid-column: 1;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.checkout-line-total {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  white-space: nowrap;
+}
+
+.checkout-totals {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  margin: 8px 0 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.checkout-totals dt {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.checkout-totals dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.checkout-totals .checkout-total-label {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.checkout-totals .checkout-total {
+  font-family: var(--display-font);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .checkout {
+    grid-template-columns: 1fr;
+  }
+}
