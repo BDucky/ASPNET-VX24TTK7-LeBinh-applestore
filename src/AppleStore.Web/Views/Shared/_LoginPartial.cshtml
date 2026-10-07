@@ -1,12 +1,17 @@
+@using AppleStore.Domain.Enums
 @using AppleStore.Infrastructure.Identity
 @using System.Security.Claims
 @* Right side of the nav: sign-in link, or the signed-in user's name with
    their account page and a sign-out form (POST, so a link cannot sign
-   anyone out). *@
+   anyone out). An admin also gets a link to the Admin area. *@
 @if (User.Identity?.IsAuthenticated == true)
 {
     var name = User.FindFirstValue(AppUserClaimsPrincipalFactory.FullNameClaim) ?? User.Identity.Name;
     <div class="site-nav-account">
+        @if (User.IsInRole(nameof(UserRole.Admin)))
+        {
+            <a class="site-nav-account-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a>
+        }
         <a class="site-nav-account-link" asp-area="" asp-controller="Account" asp-action="Index">@name</a>
         <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
             <button type="submit" class="site-nav-account-out">Sign out</button>

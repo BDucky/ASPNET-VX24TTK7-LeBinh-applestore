@@ -2,7 +2,6 @@ using System.Net;
 using System.Text.RegularExpressions;
 using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppleStore.Tests;
@@ -51,6 +50,16 @@ public class AdminAreaTests : WebFlowTestBase
         await CreateUserAsync("c1@example.com", Password);
         await CreateUserAsync("c2@example.com", Password);
         await CreateUserAsync("staff@example.com", Password, role: UserRole.Employee);
+        using (var scope = Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var iphone = ProductCatalogServiceTests.NewCategory("iPhone", "iphone");
+            db.Products.AddRange(
+                ProductCatalogServiceTests.NewProduct(iphone, "iPhone 17", "iphone-17", 20_000_000m),
+                ProductCatalogServiceTests.NewProduct(iphone, "iPhone 16", "iphone-16", 18_000_000m),
+                ProductCatalogServiceTests.NewProduct(iphone, "iPhone 15", "iphone-15", 15_000_000m, status: false));
+            await db.SaveChangesAsync();
+        }
         await LoginAsync("admin@example.com", Password);
 
         var response = await Client.GetAsync("/Admin");
@@ -58,14 +67,10 @@ public class AdminAreaTests : WebFlowTestBase
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var html = await response.Content.ReadAsStringAsync();
         Assert.Contains("Dashboard", html);
-
-        using var scope = Factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Assert.Equal(await db.Products.CountAsync(), Stat(html, "products"));
-        Assert.Equal(await db.Products.CountAsync(p => p.Status), Stat(html, "products-on-sale"));
+        Assert.Equal(3, Stat(html, "products"));
+        Assert.Equal(2, Stat(html, "products-on-sale"));
         Assert.Equal(2, Stat(html, "customers"));
         Assert.Equal(0, Stat(html, "orders"));
-        Assert.True(Stat(html, "products") > 0, "the seeded catalog should be counted");
     }
 
     [Fact]

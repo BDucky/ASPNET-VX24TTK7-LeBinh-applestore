@@ -57,6 +57,12 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+// Area routes first, so /Admin reaches the Admin area's Dashboard.
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
