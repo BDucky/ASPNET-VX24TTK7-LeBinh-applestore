@@ -30,10 +30,16 @@ builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IProductCatalogService, ProductCatalogService>();
+builder.Services.AddOptions<SeedAdminOptions>().Bind(builder.Configuration.GetSection(SeedAdminOptions.Section));
+builder.Services.AddScoped<AdminSeeder>();
 // Real SMTP when the "Smtp" section is configured, otherwise log-only.
 builder.Services.AddAppleStoreEmail(builder.Configuration);
 
 var app = builder.Build();
+
+// The first admin account, from the SeedAdmin settings (see AdminSeeder).
+using (var scope = app.Services.CreateScope())
+    await scope.ServiceProvider.GetRequiredService<AdminSeeder>().SeedAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
