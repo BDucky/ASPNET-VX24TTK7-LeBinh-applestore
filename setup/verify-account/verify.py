@@ -19,76 +19,23 @@ What it does:
      Screenshots go to the temp folder, not the repo.
 """
 import json
-import os
 import re
 import shutil
 import sqlite3
-import subprocess
 import sys
-import tempfile
 import time
-import urllib.error
-import urllib.request
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-WEB = ROOT / "src" / "AppleStore.Web"
-APP = "http://localhost:5286"
-TMP = Path(tempfile.mkdtemp(prefix="verify-account-"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from verifylib import WEB, Harness  # noqa: E402
+
+h = Harness("verify-account", 5286)
+APP, TMP = h.app, h.tmp
+check, start_app, stop_app, step = h.check, h.start_app, h.stop_app, h.step
 STAMP = str(int(time.time()))
 EMAIL = f"verify{STAMP}@example.com"
 PHONE = "09" + STAMP[-8:]
 PASSWORD = "Password1"
-SESSION = "verify-account"
-results = []
-
-
-def check(name, ok, detail=""):
-    results.append((name, bool(ok)))
-    print(f"{'PASS' if ok else 'FAIL'}  {name}" + (f"  ({detail})" if detail else ""))
-
-
-def start_app(env_name, db_path, log_path, smtp=None):
-    # Smtp__Host empty keeps mail in the log even when user-secrets hold real
-    # SMTP settings, so the script can read each code and never mails anyone.
-    env = dict(os.environ, ASPNETCORE_ENVIRONMENT=env_name, ConnectionStrings__Default=f"Data Source={db_path}", Smtp__Host="")
-    env.update(smtp or {})
-    log = open(log_path, "w")
-    proc = subprocess.Popen(
-        ["dotnet", "run", "--no-build", "--no-launch-profile", "--urls", APP],
-        cwd=WEB, env=env, stdout=log, stderr=subprocess.STDOUT)
-    for _ in range(60):
-        try:
-            urllib.request.urlopen(APP + "/Account/Login", timeout=2)
-            return proc
-        except urllib.error.HTTPError:
-            return proc
-        except Exception:
-            time.sleep(1)
-    proc.kill()
-    sys.exit("app did not start, see " + str(log_path))
-
-
-def stop_app(proc):
-    proc.terminate()
-    try:
-        proc.wait(timeout=15)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-
-
-def run(js):
-    path = TMP / "step.js"
-    path.write_text(js)
-    out = subprocess.run(["playwright-cli", "-s=" + SESSION, "--raw", "run-code", "--filename=" + str(path)],
-                         capture_output=True, text=True, cwd=TMP)
-    text = out.stdout.strip()
-    try:
-        value = json.loads(text)
-        # Steps return JSON.stringify(...), which --raw prints as a JSON string.
-        return json.loads(value) if isinstance(value, str) else value
-    except json.JSONDecodeError:
-        sys.exit("browser step failed:\n" + text + out.stderr)
 
 
 def otp_for(log_path, email):
@@ -97,29 +44,10 @@ def otp_for(log_path, email):
     return codes[-1] if codes else None
 
 
-# Shared browser helpers, prepended to every step.
-LIB = r"""
-const APP = '__APP__';
-const text = async (page, sel) => (await page.locator(sel).allTextContents()).map(s => s.trim()).filter(Boolean);
-const errors = page => text(page, '.account-error');
-const fieldErrors = page => text(page, '.account-field-error');
-const submit = async page => { await page.click('.account-form button[type=submit]'); await page.waitForLoadState('load'); };
-const fill = async (page, fields) => { for (const [k, v] of Object.entries(fields)) await page.fill('.account-form #' + k, v); };
-const signOut = async page => {
-  if (await page.locator('.site-nav-account-out').count()) { await page.click('.site-nav-account-out'); await page.waitForLoadState('load'); }
-};
-"""
-
-
-def step(body):
-    return run("async page => {\n" + LIB.replace("__APP__", APP) + body + "\n}")
-
-
 def main():
     shutil.copy(WEB / "AppleStore.db", TMP / "app.db")
     log = TMP / "app.log"
-    subprocess.run(["dotnet", "build", "-v", "q", str(WEB)], check=True, capture_output=True)
-    subprocess.run(["playwright-cli", "-s=" + SESSION, "open"], capture_output=True, cwd=TMP)
+    h.open_browser()
     proc = start_app("Development", TMP / "app.db", log)
     try:
         # 1. Every account page loads, has no console errors, no sideways scroll.
@@ -498,11 +426,9 @@ def main():
         check("a server error shows the error page with a link back", r["heading"] != "" and len(r["links"]) > 0, json.dumps(r))
     finally:
         stop_app(proc)
-        subprocess.run(["playwright-cli", "-s=" + SESSION, "close"], capture_output=True, cwd=TMP)
+        h.close_browser()
 
-    failed = [n for n, ok in results if not ok]
-    print(f"\n{len(results) - len(failed)} of {len(results)} checks passed. Screenshots and logs: {TMP}")
-    sys.exit(1 if failed else 0)
+    h.finish()
 
 
 if __name__ == "__main__":
