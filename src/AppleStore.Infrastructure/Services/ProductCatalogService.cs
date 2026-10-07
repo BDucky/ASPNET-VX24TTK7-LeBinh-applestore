@@ -120,7 +120,7 @@ public class ProductCatalogService : IProductCatalogService
             .Select(g => new ConfigurationGroup(
                 g.Key,
                 CatalogSlug.From(g.Key),
-                g.Select(v => new VariantChoice(v.SKU, Option(v.Id, "color"), Option(v.Id, "region"), v.Price, v.StockQty)).ToList()))
+                g.Select(v => new VariantChoice(v.Id, v.SKU, Option(v.Id, "color"), Option(v.Id, "region"), v.Price, v.StockQty)).ToList()))
             .ToList();
     }
 

@@ -22,7 +22,7 @@ public class CatalogRulesTests
     [Fact]
     public void Select_prefers_an_exact_colour_and_region_match()
     {
-        var config = Config(new("A", "Blue", "VN", 1m, 1), new("B", "Blue", "Mỹ", 2m, 1));
+        var config = Config(new(0, "A", "Blue", "VN", 1m, 1), new(0, "B", "Blue", "Mỹ", 2m, 1));
 
         Assert.Equal("B", config.Select("blue", "Mỹ").SKU);
     }
@@ -30,7 +30,7 @@ public class CatalogRulesTests
     [Fact]
     public void Select_falls_back_to_the_first_choice_in_that_colour()
     {
-        var config = Config(new("A", "Purple", "VN", 1m, 1), new("B", "Blue", "VN", 2m, 1), new("C", "Blue", "Mỹ", 2m, 1));
+        var config = Config(new(0, "A", "Purple", "VN", 1m, 1), new(0, "B", "Blue", "VN", 2m, 1), new(0, "C", "Blue", "Mỹ", 2m, 1));
 
         Assert.Equal("B", config.Select("Blue", "Nowhere").SKU);
     }
@@ -38,7 +38,7 @@ public class CatalogRulesTests
     [Fact]
     public void Select_opens_on_the_first_choice_when_nothing_matches()
     {
-        var config = Config(new("A", "Purple", "VN", 1m, 1), new("B", "Blue", "VN", 2m, 1));
+        var config = Config(new(0, "A", "Purple", "VN", 1m, 1), new(0, "B", "Blue", "VN", 2m, 1));
 
         Assert.Equal("A", config.Select(null, null).SKU);
         Assert.Equal("A", config.Select("Green", null).SKU);

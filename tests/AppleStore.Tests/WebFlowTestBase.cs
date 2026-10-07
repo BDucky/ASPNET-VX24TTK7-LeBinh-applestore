@@ -13,11 +13,17 @@ namespace AppleStore.Tests;
 // anti-forgery token, sign-in, and users created through UserManager.
 public abstract class WebFlowTestBase : IDisposable
 {
-    protected readonly AppleStoreWebFactory Factory = new();
+    protected readonly AppleStoreWebFactory Factory;
     protected readonly HttpClient Client;
 
-    protected WebFlowTestBase()
+    protected WebFlowTestBase() : this(new AppleStoreWebFactory())
     {
+    }
+
+    // For a test class that needs its own app setup (a swapped service, say).
+    protected WebFlowTestBase(AppleStoreWebFactory factory)
+    {
+        Factory = factory;
         Client = NewClient();
     }
 
