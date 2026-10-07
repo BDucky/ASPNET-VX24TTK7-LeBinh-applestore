@@ -76,6 +76,11 @@ same open design question as vouchers in M3.
 
 ## M7: Admin CRUD and reporting
 
+Done so far (2026-10-07): the Admin area itself, `/Admin` behind the Admin
+role, a dashboard with product, customer and order counts, and the first
+admin account seeded from configuration (`docs/architecture.md`, "Admin
+area and the first admin").
+
 Use cases 25-27, 29-31, 33-36 (product/voucher CRUD, business and revenue reports,
 export). No new entities beyond what M1-M6 already cover; this is read-heavy
 aggregation queries and Excel/PDF export.

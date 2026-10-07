@@ -1,0 +1,31 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Admin dashboard";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-admin">
+        <div class="hero-eyebrow">Admin</div>
+        <h1 class="account-title">Dashboard</h1>
+        <partial name="_AdminNav" />
+
+        <dl class="admin-stats">
+            <div class="admin-stat">
+                <dt>Products</dt>
+                <dd data-stat="products">@Model.Products.ToString("N0")</dd>
+            </div>
+            <div class="admin-stat">
+                <dt>On sale</dt>
+                <dd data-stat="products-on-sale">@Model.ProductsOnSale.ToString("N0")</dd>
+            </div>
+            <div class="admin-stat">
+                <dt>Customers</dt>
+                <dd data-stat="customers">@Model.Customers.ToString("N0")</dd>
+            </div>
+            <div class="admin-stat">
+                <dt>Orders</dt>
+                <dd data-stat="orders">@Model.Orders.ToString("N0")</dd>
+            </div>
+        </dl>
+    </div>
+</section>

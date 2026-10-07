@@ -77,6 +77,24 @@ User-secrets live outside the repository and are read only in Development.
 `dotnet user-secrets clear --project src/AppleStore.Web` goes back to
 log-only mail.
 
+### The first admin account
+
+The Admin area (`/Admin`) needs an account with the Admin role. Nobody can
+register one; it is created at startup from the `SeedAdmin` settings when
+the database has no admin yet. Set them once in user-secrets (the password
+must be at least 8 characters):
+
+```bash
+dotnet user-secrets set "SeedAdmin:Email" "<admin email>" --project src/AppleStore.Web
+dotnet user-secrets set "SeedAdmin:Password" "<admin password>" --project src/AppleStore.Web
+dotnet user-secrets set "SeedAdmin:FullName" "<name shown in the nav>" --project src/AppleStore.Web
+```
+
+Start the app; the log says "Admin account ... created". Later starts leave
+that account alone, even if the settings change; change its password from
+the account page. Outside Development, use the environment variables
+`SEEDADMIN__EMAIL`, `SEEDADMIN__PASSWORD` and `SEEDADMIN__FULLNAME`.
+
 ## Documentation
 
 See `docs/requirements.md` for the source requirements, `docs/data-model.md` for the

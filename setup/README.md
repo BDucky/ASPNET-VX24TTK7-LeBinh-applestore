@@ -16,3 +16,6 @@ silently leaving setup incomplete.
 |---|---|
 | `rauvang-sync/verify.py` | catalog, model, and price data against rauvang.com |
 | `verify-account/verify.py` | register, OTP, sign in, sign out, lockout, live in a browser |
+| `verify-admin/verify.py` | seeded admin, Admin area access by role, dashboard counts, live in a browser |
+
+Both import `verifylib.py` (start the app, drive the browser, tally results).

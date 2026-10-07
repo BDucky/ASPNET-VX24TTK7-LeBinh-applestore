@@ -61,7 +61,7 @@ puts a demoable buying flow and the admin area first.
 | 2 | Register, OTP, sign in, sign out, lockout | 1-3 | `feat/identity-login` | Identity with a custom `UserStore`, cookie, `[Authorize]`, anti-forgery | done, verified 31/31, PR #12 |
 | 3 | Forgot password, change password, profile and addresses | 4-6 | `feat/account-password-profile` | `UserManager.ChangePasswordAsync`, `ResetPasswordAsync`, security stamp sign-out | done, verified 67/67, PR #13 |
 | 3b | Send codes by real email (SMTP) | 2 | `feat/smtp-email` | options pattern with startup validation, user-secrets, MailKit | done, verified 69/69; real Gmail send confirmed by the owner (PR #14) |
-| 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager` | not started |
+| 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager`, options pattern | done, verified 31/31, PR #16 |
 | 5 | Cart | 11-14 | `feat/cart` | session or DB cart, view components for the nav count | not started |
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, transactions in EF Core | not started |
 | 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern for gateway config, callbacks | not started |
@@ -69,13 +69,12 @@ puts a demoable buying flow and the admin area first.
 | 9 | Admin product and voucher CRUD | 25-27, 29-31 | `feat/admin-products` | scaffolded CRUD on MVC, file upload | not started |
 | 10 | Revenue report | 33-36 | `feat/admin-reports` | LINQ aggregation, export | not started |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
-| 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | due by 2026-10-13 |
+| 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)
 
 | Decision | Needed by task | Notes |
 |---|---|---|
-| Admin account: how its first password is set (user secrets, environment variable, or printed once at seed) | 4 | never a password committed to the repo |
 | Vouchers: own table or configuration | 6 | the report's schema has no voucher table, only `Order.VoucherCode` |
 | VNPay and MoMo sandbox credentials | 7 | without them both are simulated |
 | Report language and who writes which chapter | 11 | sample report is Vietnamese |
@@ -87,6 +86,8 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Admin account | 2026-10-07 | created at startup from `SeedAdmin` settings in user-secrets (environment variables outside Development); never promotes an existing customer |
+| Senior review test rules | 2026-10-07 | adapted from the corjl webapp into `CLAUDE.md` at the owner's request (PR #15) |
 | Real email | 2026-10-05 | Gmail SMTP with an App Password held in user-secrets on the owner's machine; without SMTP settings mail stays in the log |
 
 ## Known gaps carried forward
@@ -105,6 +106,15 @@ puts a demoable buying flow and the admin area first.
 - No limit on how often a reset code can be requested.
 - Real email works only on a machine whose user-secrets hold the SMTP
   settings; a deployed copy would need them as environment variables.
+- Changing a user's role does not change their security stamp, so a
+  demoted admin keeps the Admin role claim until the next stamp check (up
+  to 30 minutes). No page changes roles yet; the task that adds one must
+  call `UpdateSecurityStampAsync`.
+- An employee sent to `/Account/AccessDenied` reads "This page is for staff
+  accounts only", though employees are staff. Reword when task 8 decides
+  which admin pages employees get.
+- If the admin account is deleted or demoted while the `SeedAdmin`
+  settings are still set, the next start creates it again.
 - On macOS, Gmail sending needs `Smtp:CheckCertificateRevocation=false`
   (incomplete revocation check); whether to keep it off on the owner's
   machine is the owner's call.

@@ -13,10 +13,11 @@ public class ProductCatalogServiceTests
         return (sut, fixture);
     }
 
-    private static Category NewCategory(string name, string slug) =>
+    // Also used by AdminAreaTests to put products in the web app's database.
+    internal static Category NewCategory(string name, string slug) =>
         new() { Name = name, Slug = slug };
 
-    private static Product NewProduct(Category category, string name, string slug, decimal basePrice, bool status = true, int sortOrder = 0) =>
+    internal static Product NewProduct(Category category, string name, string slug, decimal basePrice, bool status = true, int sortOrder = 0) =>
         new()
         {
             SortOrder = sortOrder,

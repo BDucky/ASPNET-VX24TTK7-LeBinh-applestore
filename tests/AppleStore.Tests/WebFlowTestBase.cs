@@ -61,7 +61,7 @@ public abstract class WebFlowTestBase : IDisposable
     protected static string ErrorMessage(string html) =>
         WebUtility.HtmlDecode(Regex.Match(html, "class=\"account-error\"[^>]*>\\s*([^<]+?)\\s*<").Groups[1].Value);
 
-    protected async Task<User> CreateUserAsync(string email, string password, string fullName = "Test User", string? phone = null)
+    protected async Task<User> CreateUserAsync(string email, string password, string fullName = "Test User", string? phone = null, UserRole role = UserRole.Customer)
     {
         using var scope = Factory.Services.CreateScope();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -70,7 +70,7 @@ public abstract class WebFlowTestBase : IDisposable
             Email = email,
             FullName = fullName,
             Phone = phone,
-            Role = UserRole.Customer,
+            Role = role,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
