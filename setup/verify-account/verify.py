@@ -19,7 +19,6 @@ What it does:
      Screenshots go to the temp folder, not the repo.
 """
 import json
-import re
 import shutil
 import sqlite3
 import sys
@@ -27,7 +26,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from verifylib import WEB, Harness  # noqa: E402
+from verifylib import WEB, Harness, otp_for  # noqa: E402
 
 h = Harness("verify-account", 5286)
 APP, TMP = h.app, h.tmp
@@ -36,12 +35,6 @@ STAMP = str(int(time.time()))
 EMAIL = f"verify{STAMP}@example.com"
 PHONE = "09" + STAMP[-8:]
 PASSWORD = "Password1"
-
-
-def otp_for(log_path, email):
-    text = Path(log_path).read_text()
-    codes = re.findall(re.escape(email) + r"[^\n]*\n[^\n]*?Your code is (\d{6})", text, re.IGNORECASE)
-    return codes[-1] if codes else None
 
 
 def main():

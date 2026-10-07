@@ -5,6 +5,7 @@ throwaway database, drives Chromium through playwright-cli, and records one
 PASS/FAIL line per check. Each script keeps only its own checks.
 """
 import json
+import re
 import os
 import subprocess
 import sys
@@ -16,6 +17,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / "src" / "AppleStore.Web"
+
+# DevEmailSender writes each code into the app log; the newest one for this
+# address wins.
+def otp_for(log_path, email):
+    text = Path(log_path).read_text()
+    codes = re.findall(re.escape(email) + r"[^\n]*\n[^\n]*?Your code is (\d{6})", text, re.IGNORECASE)
+    return codes[-1] if codes else None
+
 
 # Shared browser helpers, prepended to every step.
 LIB = r"""
