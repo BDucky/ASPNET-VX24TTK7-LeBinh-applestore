@@ -9,6 +9,8 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
     public void Configure(EntityTypeBuilder<CartItem> builder)
     {
         builder.HasKey(i => i.Id);
+        // One line per variant: adding it again raises the quantity (added 2026-10-07, M3).
+        builder.HasIndex(i => new { i.CartId, i.VariantId }).IsUnique();
 
         builder.HasOne(i => i.Cart)
             .WithMany()

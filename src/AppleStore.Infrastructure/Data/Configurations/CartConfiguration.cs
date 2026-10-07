@@ -9,6 +9,8 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
     public void Configure(EntityTypeBuilder<Cart> builder)
     {
         builder.HasKey(c => c.Id);
+        // One cart per user (added 2026-10-07, M3).
+        builder.HasIndex(c => c.UserId).IsUnique();
 
         builder.HasOne(c => c.User)
             .WithMany()
