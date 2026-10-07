@@ -18,14 +18,12 @@ What it does:
      Screenshots go to the temp folder, not the repo.
 """
 import json
-import sqlite3
-import subprocess
 import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from verifylib import ROOT, Harness, otp_for  # noqa: E402
+from verifylib import Harness, migrate, otp_for, scalar  # noqa: E402
 
 h = Harness("verify-admin", 5287)
 APP, TMP = h.app, h.tmp
@@ -36,16 +34,6 @@ ADMIN_PASSWORD = f"Admin-{STAMP}"
 CUSTOMER = f"customer{STAMP}@example.com"
 PASSWORD = "Password1"
 SEED = {"SeedAdmin__Email": ADMIN, "SeedAdmin__Password": ADMIN_PASSWORD, "SeedAdmin__FullName": "Store Admin"}
-
-
-def migrate(db_path):
-    subprocess.run(["dotnet", "ef", "database", "update", "--no-build", "--project", "src/AppleStore.Infrastructure",
-                    "--startup-project", "src/AppleStore.Web", "--connection", f"Data Source={db_path}"],
-                   cwd=ROOT, check=True, capture_output=True)
-
-
-def scalar(db_path, sql):
-    return sqlite3.connect(db_path).execute(sql).fetchone()[0]
 
 
 def sign_in(email, password):
@@ -98,7 +86,7 @@ def main():
               r["stats"] == {"products": str(products), "products-on-sale": str(on_sale), "customers": "0", "orders": "0"},
               f"{r['stats']} vs products={products} on_sale={on_sale}")
         check("admin nav lists the dashboard and the way back", r["adminNav"] == ["Dashboard", "Back to the store"], str(r["adminNav"]))
-        check("the site nav shows Admin, the name and Sign out", r["nav"] == "Admin | Store Admin | Sign out", r["nav"])
+        check("the site nav shows the cart, Admin, the name and Sign out", r["nav"] == "Cart | 0 | Admin | Store Admin | Sign out", r["nav"])
         check("no console errors so far", r["consoleErrors"] == [], str(r["consoleErrors"]))
 
         # 3. Layout at both widths, the nav link on a phone, the way back.
