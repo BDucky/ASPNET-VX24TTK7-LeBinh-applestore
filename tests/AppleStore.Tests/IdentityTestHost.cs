@@ -16,10 +16,13 @@ public sealed class IdentityTestHost : IDisposable
     public UserManager<User> UserManager { get; }
     public IUserClaimsPrincipalFactory<User> ClaimsFactory { get; }
 
-    public IdentityTestHost()
+    // createSchema: false leaves the database empty, like a machine where
+    // "dotnet ef database update" has not been run yet.
+    public IdentityTestHost(bool createSchema = true)
     {
         Fixture = new SqliteInMemoryFixture();
-        Fixture.Context.Database.EnsureCreated();
+        if (createSchema)
+            Fixture.Context.Database.EnsureCreated();
 
         var services = new ServiceCollection();
         services.AddLogging();
