@@ -10,5 +10,7 @@ public sealed class SeedAdminOptions
 
     public string? Email { get; set; }
     public string? Password { get; set; }
-    public string FullName { get; set; } = "Administrator";
+    public const string DefaultFullName = "Administrator";
+
+    public string? FullName { get; set; }
 }

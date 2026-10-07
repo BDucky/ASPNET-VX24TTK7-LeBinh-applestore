@@ -56,7 +56,7 @@ public sealed class AdminSeeder
             var admin = new User
             {
                 Email = email,
-                FullName = _options.FullName,
+                FullName = string.IsNullOrWhiteSpace(_options.FullName) ? SeedAdminOptions.DefaultFullName : _options.FullName.Trim(),
                 Role = UserRole.Admin,
                 CreatedAt = now,
                 UpdatedAt = now,
