@@ -63,7 +63,7 @@ puts a demoable buying flow and the admin area first.
 | 3b | Send codes by real email (SMTP) | 2 | `feat/smtp-email` | options pattern with startup validation, user-secrets, MailKit | done, verified 69/69; real Gmail send confirmed by the owner (PR #14) |
 | 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager`, options pattern | done, verified 31/31, PR #16 |
 | 5 | Cart | 11-14 | `feat/cart` | `[Authorize]`, anti-forgery, DB cart with unique indexes (EF migration), view component for the nav count | done, verified 23/23, PR #17 |
-| 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, EF Core transaction with conditional writes, `TimeProvider`, voucher table by migration | done, verified 25/25 |
+| 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, EF Core transaction with conditional writes, `TimeProvider`, voucher table by migration | done, verified 25/25, PR #18 |
 | 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern for gateway config, callbacks | not started |
 | 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24 | `feat/orders` | role-based pages, status flow | not started |
 | 9 | Admin product and voucher CRUD | 25-27, 29-31 | `feat/admin-products` | scaffolded CRUD on MVC, file upload | not started |
