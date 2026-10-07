@@ -3,11 +3,13 @@
 @using System.Security.Claims
 @* Right side of the nav: sign-in link, or the signed-in user's name with
    their account page and a sign-out form (POST, so a link cannot sign
-   anyone out). An admin also gets a link to the Admin area. *@
+   anyone out). An admin also gets a link to the Admin area. The cart link
+   comes first for everyone; a visitor following it is asked to sign in. *@
 @if (User.Identity?.IsAuthenticated == true)
 {
     var name = User.FindFirstValue(AppUserClaimsPrincipalFactory.FullNameClaim) ?? User.Identity.Name;
     <div class="site-nav-account">
+        <vc:cart-count></vc:cart-count>
         @if (User.IsInRole(nameof(UserRole.Admin)))
         {
             <a class="site-nav-account-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a>
@@ -21,6 +23,7 @@
 else
 {
     <div class="site-nav-account">
+        <vc:cart-count></vc:cart-count>
         <a class="site-nav-account-link" asp-area="" asp-controller="Account" asp-action="Login">Sign in</a>
     </div>
 }

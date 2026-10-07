@@ -30,6 +30,7 @@ builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IProductCatalogService, ProductCatalogService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddOptions<SeedAdminOptions>().Bind(builder.Configuration.GetSection(SeedAdminOptions.Section));
 builder.Services.AddScoped<AdminSeeder>();
 // Real SMTP when the "Smtp" section is configured, otherwise log-only.

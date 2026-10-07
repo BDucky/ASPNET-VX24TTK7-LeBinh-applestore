@@ -15,7 +15,7 @@ namespace AppleStore.Tests;
 public class CartFlowTests : WebFlowTestBase
 {
     private const string Password = "Password1";
-    private const string VariantUrl = "/Products/iphone-17/256gb";
+    private const string VariantUrl = "/Products/iphone-17/iphone-17-256gb";
     private const string Email = "shopper@example.com";
 
     private (int Blue, int Black, int SoldOut) Seed()
@@ -23,9 +23,9 @@ public class CartFlowTests : WebFlowTestBase
         using var scope = Factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var product = NewProduct(NewCategory("iPhone", "iphone"), "iPhone 17", "iphone-17", 20_000_000m);
-        var blue = AddVariant(db, product, "IP17-256-BLUE", 24_990_000m, stock: 3, config: "256GB", color: "Blue", region: "VN/A");
-        var black = AddVariant(db, product, "IP17-256-BLACK", 25_490_000m, stock: 5, config: "256GB", color: "Black", region: "VN/A");
-        var soldOut = AddVariant(db, product, "IP17-256-PINK", 24_990_000m, stock: 0, config: "256GB", color: "Pink", region: "VN/A");
+        var blue = AddVariant(db, product, "IP17-256-BLUE", 24_990_000m, stock: 3, config: "iPhone 17 256GB", color: "Blue", region: "VN/A");
+        var black = AddVariant(db, product, "IP17-256-BLACK", 25_490_000m, stock: 5, config: "iPhone 17 256GB", color: "Black", region: "VN/A");
+        var soldOut = AddVariant(db, product, "IP17-256-PINK", 24_990_000m, stock: 0, config: "iPhone 17 256GB", color: "Pink", region: "VN/A");
         db.SaveChanges();
         return (blue.Id, black.Id, soldOut.Id);
     }
@@ -38,6 +38,9 @@ public class CartFlowTests : WebFlowTestBase
 
     private Task<HttpResponseMessage> AddAsync(int variantId, string quantity = "1", string returnUrl = VariantUrl) =>
         PostFormAsync("/Cart/Add", new() { ["VariantId"] = variantId.ToString(), ["Quantity"] = quantity, ["ReturnUrl"] = returnUrl }, formPage: VariantUrl);
+
+    // Razor encodes the "Đ" of "VNĐ"; pages are compared as the shopper reads them.
+    private async Task<string> PageAsync(string url) => WebUtility.HtmlDecode(await Client.GetStringAsync(url));
 
     private static string Location(HttpResponseMessage response) =>
         response.Headers.Location?.OriginalString ?? "";
@@ -70,7 +73,7 @@ public class CartFlowTests : WebFlowTestBase
         var html = await Client.GetStringAsync(VariantUrl + "?color=Black");
 
         Assert.DoesNotContain("action=\"/Cart/Add\"", html);
-        Assert.Contains("href=\"/Account/Login?returnUrl=%2FProducts%2Fiphone-17%2F256gb%3Fcolor%3DBlack\"", html);
+        Assert.Contains("href=\"/Account/Login?returnUrl=%2FProducts%2Fiphone-17%2Fiphone-17-256gb%3Fcolor%3DBlack\"", html);
     }
 
     [Theory]
@@ -129,7 +132,7 @@ public class CartFlowTests : WebFlowTestBase
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("/Cart", Location(response));
-        var cart = await Client.GetStringAsync("/Cart");
+        var cart = await PageAsync("/Cart");
         Assert.Equal("Added to your cart.", Notice(cart, "status"));
         Assert.Contains("iPhone 17", cart);
         Assert.Contains("Blue", cart);
@@ -233,7 +236,7 @@ public class CartFlowTests : WebFlowTestBase
         var response = await PostFormAsync("/Cart/Update", new() { ["ItemId"] = (await LineIdAsync(blue)).ToString(), ["Quantity"] = "3" }, formPage: "/Cart");
 
         Assert.Equal("/Cart", Location(response));
-        var cart = await Client.GetStringAsync("/Cart");
+        var cart = await PageAsync("/Cart");
         Assert.Contains("100.460.000 VNĐ", cart);
         Assert.Equal([(Email, blue, 3), (Email, black, 1)], await StoredAsync());
     }
@@ -296,7 +299,7 @@ public class CartFlowTests : WebFlowTestBase
             await scope.ServiceProvider.GetRequiredService<AppDbContext>().ProductVariants
                 .Where(v => v.Id == black).ExecuteUpdateAsync(s => s.SetProperty(v => v.Status, false));
 
-        var cart = await Client.GetStringAsync("/Cart");
+        var cart = await PageAsync("/Cart");
 
         Assert.Contains("No longer on sale", cart);
         Assert.Matches("data-cart-subtotal[^>]*>\\s*24\\.990\\.000 VNĐ\\s*<", cart);

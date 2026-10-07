@@ -11,12 +11,16 @@
     var regions = Model.Choices.Select(c => c.Region).OfType<string>().Distinct().ToList();
     var choicesJson = JsonSerializer.Serialize(Model.Choices.Select(c => new
     {
+        id = c.VariantId,
+        buyable = c.Price is not null && c.StockQty > 0,
         sku = c.SKU,
         color = c.Color,
         region = c.Region,
         price = PriceText.Vnd(c.Price),
         stock = c.StockQty,
     }));
+    var here = Context.Request.Path + Context.Request.QueryString;
+    var selectedBuyable = selected.Price is not null && selected.StockQty > 0;
     string ChoiceUrl(string? color, string? region) =>
         Url.Action("Variant", "Products", new { slug = Model.ProductSlug, config = Model.Slug, color, region })!;
 }
@@ -78,6 +82,26 @@
                         <a class="pdp-chip is-small @(isSelected ? "is-selected" : "") @(available ? "" : "is-unavailable")" href="@ChoiceUrl(selected.Color, region)"
                            data-choice-region="@region" aria-current="@(isSelected ? "true" : null)">@region</a>
                     }
+                </div>
+            }
+
+            @* The cart needs an account (decided 2026-10-07): a visitor gets a
+               sign-in link that comes back to this exact choice. effects.js
+               keeps the variant id, the return address and the button in
+               step with the chips. *@
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form class="pdp-buy" asp-controller="Cart" asp-action="Add" method="post">
+                    <input type="hidden" name="VariantId" value="@selected.VariantId" data-choice-variant />
+                    <input type="hidden" name="Quantity" value="1" />
+                    <input type="hidden" name="ReturnUrl" value="@here" data-choice-return />
+                    <button type="submit" class="btn-store-primary" data-choice-buy disabled="@(!selectedBuyable)">Add to cart</button>
+                </form>
+            }
+            else
+            {
+                <div class="pdp-buy">
+                    <a class="btn-store-primary" href="/Account/Login?returnUrl=@Uri.EscapeDataString(here)" data-choice-signin>Sign in to add to cart</a>
                 </div>
             }
 
