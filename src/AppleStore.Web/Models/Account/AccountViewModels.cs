@@ -96,11 +96,10 @@ public class ProfileViewModel
     public string? Phone { get; set; }
 }
 
-public class AddressViewModel
+// Who receives a delivery and where: shared by a saved address and the
+// checkout form, so both validate the same way.
+public class DeliveryFields
 {
-    [StringLength(60), Display(Name = "Label (for example Home, Office)")]
-    public string? Label { get; set; }
-
     [Required, StringLength(120), Display(Name = "Receiver name")]
     public string FullName { get; set; } = string.Empty;
 
@@ -118,6 +117,12 @@ public class AddressViewModel
 
     [StringLength(100), Display(Name = "City or province")]
     public string? City { get; set; }
+}
+
+public class AddressViewModel : DeliveryFields
+{
+    [StringLength(60), Display(Name = "Label (for example Home, Office)")]
+    public string? Label { get; set; }
 
     [Display(Name = "Use as my default address")]
     public bool IsDefault { get; set; }

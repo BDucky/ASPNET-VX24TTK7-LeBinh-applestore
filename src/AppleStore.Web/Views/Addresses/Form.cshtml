@@ -16,29 +16,7 @@
             <input asp-for="Label" />
             <span asp-validation-for="Label" class="account-field-error"></span>
 
-            <label asp-for="FullName"></label>
-            <input asp-for="FullName" autocomplete="name" />
-            <span asp-validation-for="FullName" class="account-field-error"></span>
-
-            <label asp-for="Phone"></label>
-            <input asp-for="Phone" autocomplete="tel" />
-            <span asp-validation-for="Phone" class="account-field-error"></span>
-
-            <label asp-for="AddressLine"></label>
-            <input asp-for="AddressLine" autocomplete="street-address" />
-            <span asp-validation-for="AddressLine" class="account-field-error"></span>
-
-            <label asp-for="Ward"></label>
-            <input asp-for="Ward" />
-            <span asp-validation-for="Ward" class="account-field-error"></span>
-
-            <label asp-for="District"></label>
-            <input asp-for="District" />
-            <span asp-validation-for="District" class="account-field-error"></span>
-
-            <label asp-for="City"></label>
-            <input asp-for="City" autocomplete="address-level1" />
-            <span asp-validation-for="City" class="account-field-error"></span>
+            <partial name="_DeliveryFields" model="Model" />
 
             <label class="account-check">
                 <input asp-for="IsDefault" />
