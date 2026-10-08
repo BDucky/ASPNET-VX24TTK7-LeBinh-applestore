@@ -1,0 +1,53 @@
+@model AppleStore.Web.Models.Orders.TrackPage
+@using AppleStore.Web.Models.Checkout
+@using AppleStore.Web.Models.Orders
+@{
+    ViewData["Title"] = "Track an order";
+    var result = Model.Result;
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card">
+        <div class="hero-eyebrow">Orders</div>
+        <h1 class="account-title">Track an order</h1>
+        <p class="account-lead">Enter the order number from your email and the receiver's phone number.</p>
+
+        <form asp-action="Index" method="post" class="account-form" novalidate>
+            <label asp-for="Form.OrderId" for="OrderId"></label>
+            <input name="OrderId" id="OrderId" value="@Model.Form.OrderId" inputmode="numeric" />
+            <span asp-validation-for="Form.OrderId" data-valmsg-for="OrderId" class="account-field-error">@ViewData.ModelState["OrderId"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+
+            <label asp-for="Form.Phone" for="Phone"></label>
+            <input name="Phone" id="Phone" value="@Model.Form.Phone" autocomplete="tel" />
+            <span class="account-field-error">@ViewData.ModelState["Phone"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+
+            <button type="submit" class="btn-store-primary">Track</button>
+        </form>
+
+        @if (Model.Searched)
+        {
+            <div class="track-result" data-track-result>
+                @if (result is null)
+                {
+                    <p class="account-error">@OrderMessages.NotTracked</p>
+                }
+                else
+                {
+                    <dl class="account-details">
+                        <dt>Order</dt>
+                        <dd>#@result.OrderId, placed @result.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</dd>
+                        <dt>Status</dt>
+                        <dd>@CheckoutMessages.Status(result.Status)</dd>
+                        @if (result.TrackingNo is not null)
+                        {
+                            <dt>Carrier</dt>
+                            <dd>@result.Carrier</dd>
+                            <dt>Tracking number</dt>
+                            <dd><strong>@result.TrackingNo</strong> (@OrderMessages.Shipment(result.ShipmentStatus))</dd>
+                        }
+                    </dl>
+                }
+            </div>
+        }
+    </div>
+</section>

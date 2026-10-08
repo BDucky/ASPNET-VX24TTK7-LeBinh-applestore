@@ -169,9 +169,16 @@ public class CheckoutService : ICheckoutService
         return result;
     }
 
-    public async Task<OrderSummary?> GetOrderAsync(int userId, int orderId, CancellationToken ct = default)
+    public Task<OrderSummary?> GetOrderAsync(int userId, int orderId, CancellationToken ct = default) =>
+        LoadOrderAsync(orderId, userId, ct);
+
+    public Task<OrderSummary?> GetOrderForStaffAsync(int orderId, CancellationToken ct = default) =>
+        LoadOrderAsync(orderId, null, ct);
+
+    // userId set: only that customer's order; null: any order (staff).
+    private async Task<OrderSummary?> LoadOrderAsync(int orderId, int? userId, CancellationToken ct)
     {
-        var order = await _db.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId, ct);
+        var order = await _db.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId && (userId == null || o.UserId == userId), ct);
         if (order is null)
             return null;
 
@@ -182,6 +189,9 @@ public class CheckoutService : ICheckoutService
             .ToListAsync(ct);
         var options = await VariantOptionLookup.LoadAsync(_db, items.Select(i => i.VariantId).ToList(), ct);
         var method = await _db.Payments.Where(p => p.OrderId == order.Id).OrderBy(p => p.Id).Select(p => p.Method).FirstOrDefaultAsync(ct);
+        var email = await _db.Users.Where(u => u.Id == order.UserId).Select(u => u.Email).FirstAsync(ct);
+        var shipment = await _db.Shipments.AsNoTracking().Where(s => s.OrderId == order.Id).OrderByDescending(s => s.Id)
+            .Select(s => new { s.Carrier, s.TrackingNo, s.Status }).FirstOrDefaultAsync(ct);
 
         return new OrderSummary(
             order.Id,
@@ -206,6 +216,10 @@ public class CheckoutService : ICheckoutService
             order.Ward,
             order.District,
             order.City,
-            order.Note);
+            order.Note,
+            email,
+            shipment?.Carrier,
+            shipment?.TrackingNo,
+            shipment?.Status);
     }
 }

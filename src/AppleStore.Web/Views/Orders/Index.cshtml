@@ -1,0 +1,36 @@
+@model IReadOnlyList<AppleStore.Infrastructure.Services.OrderListItem>
+@using AppleStore.Infrastructure.Formatting
+@using AppleStore.Web.Models.Checkout
+@{
+    ViewData["Title"] = "My orders";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Account</div>
+        <h1 class="account-title">My orders</h1>
+
+        @if (Model.Count == 0)
+        {
+            <p class="account-lead">You have no orders yet.</p>
+            <a class="btn-store-primary" asp-controller="Products" asp-action="Index">Browse products</a>
+        }
+        else
+        {
+            <ul class="order-list">
+                @foreach (var order in Model)
+                {
+                    <li>
+                        <a class="order-list-link" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">
+                            <span class="order-list-id">Order #@order.Id</span>
+                            <span class="order-list-meta">@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy") · @order.ItemCount item(s) · @CheckoutMessages.Method(order.PaymentMethod)</span>
+                            <span class="order-list-status">@CheckoutMessages.Status(order.Status)</span>
+                            <span class="order-list-total">@PriceText.Vnd(order.Total)</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+        <p class="account-switch"><a asp-controller="Account" asp-action="Index">Back to my account</a></p>
+    </div>
+</section>

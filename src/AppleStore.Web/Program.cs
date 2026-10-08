@@ -33,6 +33,8 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IProductCatalogService, ProductCatalogService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+builder.Services.AddScoped<IOrderManagementService, OrderManagementService>();
+builder.Services.AddScoped<IOrderNotifier, OrderNotifier>();
 builder.Services.AddSingleton(TimeProvider.System);
 // Online payment: the simulated gateway in Development (appsettings), none otherwise.
 builder.Services.AddAppleStorePayments(builder.Configuration);

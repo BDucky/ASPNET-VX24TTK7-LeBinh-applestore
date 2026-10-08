@@ -1,0 +1,54 @@
+@model AppleStore.Infrastructure.Services.OrderSummary
+@using AppleStore.Infrastructure.Formatting
+@using AppleStore.Web.Models.Checkout
+@using AppleStore.Web.Models.Orders
+@* The body of an order (lines, totals, delivery, shipping, payment), shared
+   by the customer's order page and the staff one. *@
+@{
+    var order = Model;
+    var place = string.Join(", ", new[] { order.AddressLine, order.Ward, order.District, order.City }.Where(s => !string.IsNullOrWhiteSpace(s)));
+}
+        <ul class="checkout-lines">
+            @foreach (var line in order.Lines)
+            {
+                <li>
+                    <span class="checkout-line-name">@line.Name</span>
+                    <span class="checkout-line-meta">@string.Join(" · ", new[] { line.Color, line.Region }.OfType<string>()) × @line.Quantity, @PriceText.Vnd(line.Price) each</span>
+                    <span class="checkout-line-total">@PriceText.Vnd(line.LineTotal)</span>
+                </li>
+            }
+        </ul>
+
+        <dl class="checkout-totals">
+            <dt>Subtotal</dt>
+            <dd>@PriceText.Vnd(order.Subtotal)</dd>
+            @if (order.Discount > 0)
+            {
+                <dt>Voucher @order.VoucherCode</dt>
+                <dd>-@PriceText.Vnd(order.Discount)</dd>
+            }
+            <dt>Shipping</dt>
+            <dd>@(order.ShippingFee == 0 ? "Free" : PriceText.Vnd(order.ShippingFee))</dd>
+            <dt class="checkout-total-label">Total</dt>
+            <dd class="checkout-total">@PriceText.Vnd(order.Total)</dd>
+        </dl>
+
+        <dl class="account-details">
+            <dt>Deliver to</dt>
+            <dd>@order.ReceiverName, @order.Phone</dd>
+            <dt>Address</dt>
+            <dd>@place</dd>
+            @if (order.Note is not null)
+            {
+                <dt>Note</dt>
+                <dd>@order.Note</dd>
+            }
+            @if (order.TrackingNo is not null)
+            {
+                <dt>Shipping</dt>
+                <dd>@order.Carrier, tracking number <strong>@order.TrackingNo</strong> (@OrderMessages.Shipment(order.ShipmentStatus))</dd>
+            }
+            <dt>Payment</dt>
+            <dd>@CheckoutMessages.Method(order.PaymentMethod), @CheckoutMessages.Payment(order.PaymentStatus).ToLowerInvariant()</dd>
+        </dl>
+
