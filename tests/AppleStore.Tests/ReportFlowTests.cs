@@ -22,7 +22,8 @@ public class ReportFlowTests : PaymentFlowBase
 
     private async Task SignInAsAsync(string email, UserRole role)
     {
-        await PostFormAsync("/Account/Logout", new(), formPage: "/");
+        if ((await Client.GetStringAsync("/")).Contains("site-nav-account-out"))
+            await PostFormAsync("/Account/Logout", new(), formPage: "/");
         await CreateUserAsync(email, Password, role: role);
         await LoginAsync(email, Password);
     }

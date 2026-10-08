@@ -40,6 +40,13 @@ public class OrdersController : Controller
         return order is null ? NotFound() : View(OrderPage.For(order, byStaff: true));
     }
 
+    [HttpGet("{id:int}/Invoice")]
+    public async Task<IActionResult> Invoice(int id, CancellationToken ct)
+    {
+        var order = await _checkout.GetOrderForStaffAsync(id, ct);
+        return order is null ? NotFound() : View("Invoice", order);
+    }
+
     [HttpPost("{id:int}/Confirm"), ValidateAntiForgeryToken]
     public Task<IActionResult> Confirm(int id, CancellationToken ct) =>
         ChangeAsync(id, OrderAction.Confirm, () => _orders.ConfirmAsync(id, ct), ct);

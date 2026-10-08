@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Apple Store</title>
+    @* Plain black on white for paper and "Save as PDF"; no shop navigation. *@
+    <style>
+        body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; color: #111; background: #fff; margin: 24px; font-size: 14px; }
+        h1 { font-size: 22px; margin: 0 0 6px; }
+        h2 { font-size: 16px; margin: 20px 0 6px; }
+        table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        dl, ul { padding: 0; }
+        .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .admin-stat { border: 1px solid #ccc; padding: 8px; }
+        .admin-stat dt { color: #555; }
+        .admin-stat dd { margin: 0; font-weight: 700; font-size: 16px; }
+        .checkout-lines { list-style: none; }
+        .checkout-lines li { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 4px 0; }
+        .checkout-totals, .account-details { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
+        .checkout-totals dd, .account-details dd { margin: 0; }
+        .account-hint { color: #555; }
+        .print-actions { margin-bottom: 16px; }
+        @@media print { .print-actions { display: none; } body { margin: 0; } }
+    </style>
+</head>
+<body>
+    <div class="print-actions">
+        <button type="button" onclick="window.print()">Print or save as PDF</button>
+    </div>
+    @RenderBody()
+</body>
+</html>

@@ -105,3 +105,5 @@ public sealed record ProductPage(int? Id, ProductForm Form, string? Slug, IReadO
 public sealed record VoucherPage(int? Id, VoucherForm Form, int UsedCount, IReadOnlyList<(int Id, string Name)> Products, string? Error);
 
 public sealed record UsersPage(IReadOnlyList<UserAdminRow> Users, string? Search, int CurrentUserId);
+
+public sealed record ReportPage(DateOnly From, DateOnly To, SalesReport? Report, string? Error);

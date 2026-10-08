@@ -1,0 +1,16 @@
+@model AppleStore.Web.Models.Admin.ReportPage
+@{
+    Layout = "/Views/Shared/_PrintLayout.cshtml";
+    ViewData["Title"] = "Sales report";
+}
+
+<h1>Sales report</h1>
+<p>Apple Store, @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"). Printed @DateTime.UtcNow.AddHours(7).ToString("dd/MM/yyyy HH:mm") (Vietnam time).</p>
+@if (Model.Error is not null)
+{
+    <p role="alert">@Model.Error</p>
+}
+else if (Model.Report is not null)
+{
+    <partial name="_SalesReportTables" model="Model.Report" />
+}
