@@ -142,6 +142,12 @@ public class OrderFlowTests : PaymentFlowBase
     }
 
     [Fact]
+    public async Task Every_page_links_to_tracking()
+    {
+        Assert.Contains("href=\"/Track\"", await Client.GetStringAsync("/"));
+    }
+
+    [Fact]
     public async Task Tracking_with_the_wrong_phone_finds_nothing()
     {
         var order = await PlaceCashOrderAsync();
