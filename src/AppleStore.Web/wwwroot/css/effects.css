@@ -2242,3 +2242,10 @@ a.btn-store-primary {
   color: var(--text-muted);
   font-weight: 500;
 }
+
+/* Amounts in the stat cards stay on one line at every width. */
+.admin-stat dd[data-report-revenue],
+.admin-stats .admin-stat dd {
+  font-size: clamp(1.15rem, 2vw, 1.9rem);
+  white-space: nowrap;
+}
