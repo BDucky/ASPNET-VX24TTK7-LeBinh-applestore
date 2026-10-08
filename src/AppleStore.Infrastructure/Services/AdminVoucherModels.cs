@@ -22,6 +22,9 @@ public enum VoucherAdminOutcome
     LimitBelowUsed,
     UnknownProduct,
     Changed,
+    // Orders hold the code as text; renaming a used voucher would make a
+    // cancelled order give its use back to the wrong voucher.
+    CodeLocked,
 }
 
 public sealed record VoucherAdminResult(VoucherAdminOutcome Outcome, int? Id = null);
