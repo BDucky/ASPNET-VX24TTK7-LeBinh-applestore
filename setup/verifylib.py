@@ -52,6 +52,9 @@ const errors = page => text(page, '.account-error');
 const fieldErrors = page => text(page, '.account-field-error');
 const submit = async page => { await page.click('.account-form button[type=submit]'); await page.waitForLoadState('load'); };
 const fill = async (page, fields) => { for (const [k, v] of Object.entries(fields)) await page.fill('.account-form #' + k, v); };
+// Clicks something that submits or navigates, and waits for the new page itself
+// (waiting for 'load' alone can return before the navigation starts).
+const press = async (page, selector) => { await Promise.all([page.waitForNavigation(), page.click(selector)]); };
 const signOut = async page => {
   if (await page.locator('.site-nav-account-out').count()) { await page.click('.site-nav-account-out'); await page.waitForLoadState('load'); }
 };
