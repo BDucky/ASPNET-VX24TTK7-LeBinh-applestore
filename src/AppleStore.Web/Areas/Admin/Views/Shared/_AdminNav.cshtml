@@ -1,10 +1,19 @@
-@* Links between admin pages. Later tasks add products, orders, vouchers
-   and reports here as each page exists. *@
+@using AppleStore.Domain.Enums
+@* Links between staff pages. The dashboard is for admins; orders for every
+   staff role (agreed 2026-10-08). *@
 @{
     var current = ViewContext.RouteData.Values["controller"] as string;
+    var links = new (string Controller, string Label, bool Shown)[]
+    {
+        ("Dashboard", "Dashboard", User.IsInRole(nameof(UserRole.Admin))),
+        ("Orders", "Orders", true),
+    };
 }
 <nav class="admin-nav" aria-label="Admin">
-    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
-       class="@(current == "Dashboard" ? "is-active" : "")" aria-current="@(current == "Dashboard" ? "page" : null)">Dashboard</a>
+    @foreach (var link in links.Where(l => l.Shown))
+    {
+        <a asp-area="Admin" asp-controller="@link.Controller" asp-action="Index"
+           class="@(current == link.Controller ? "is-active" : "")" aria-current="@(current == link.Controller ? "page" : null)">@link.Label</a>
+    }
     <a asp-area="" asp-controller="Home" asp-action="Index">Back to the store</a>
 </nav>

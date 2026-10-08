@@ -366,5 +366,7 @@ public class CheckoutFailureTests : WebFlowTestBase
             throw new DbUpdateException("database is locked");
 
         public Task<OrderSummary?> GetOrderAsync(int userId, int orderId, CancellationToken ct = default) => Task.FromResult<OrderSummary?>(null);
+
+        public Task<OrderSummary?> GetOrderForStaffAsync(int orderId, CancellationToken ct = default) => Task.FromResult<OrderSummary?>(null);
     }
 }

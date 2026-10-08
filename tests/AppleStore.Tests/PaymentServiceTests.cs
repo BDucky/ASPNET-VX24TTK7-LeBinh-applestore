@@ -300,6 +300,35 @@ public sealed class PaymentServiceTests : IDisposable
         Assert.Equal(OrderPaymentStatus.Paid, State(order).Order);
     }
 
+    // ---------- Cancelled orders ----------
+
+    [Fact]
+    public async Task A_cancelled_order_cannot_be_paid()
+    {
+        var order = await PlaceAsync(PaymentMethod.VnPay);
+        await new OrderManagementService(_db, new FixedTime(Now)).CancelAsync(order, _alice);
+
+        Assert.Equal(PayStartOutcome.Cancelled, (await _sut.StartAsync(_alice, order)).Outcome);
+    }
+
+    // The shopper opened the gateway, then cancelled in another tab, then paid.
+    [Fact]
+    public async Task Money_taken_after_the_order_was_cancelled_is_recorded_for_a_refund()
+    {
+        var order = await PlaceAsync(PaymentMethod.VnPay);
+        var payment = await PaymentIdAsync(order);
+        await new OrderManagementService(_db, new FixedTime(Now)).CancelAsync(order, _alice);
+
+        var result = await _sut.HandleAsync(Result(payment, PaymentResultCode.Success, txn: "SIM-LATE"));
+
+        Assert.Equal(new CallbackResult(CallbackOutcome.PaidAfterCancel, order), result);
+        var (paid, payments) = State(order);
+        Assert.Equal(OrderPaymentStatus.Unpaid, paid);
+        Assert.Equal([(PaymentMethod.VnPay, PaymentStatus.Success, (string?)"SIM-LATE", Total)], payments);
+        await using var db = _shop.Context();
+        Assert.Equal(OrderStatus.Cancelled, (await db.Orders.SingleAsync(o => o.Id == order)).Status);
+    }
+
     private async Task<int> LastPaymentIdAsync(int orderId)
     {
         await using var db = _shop.Context();

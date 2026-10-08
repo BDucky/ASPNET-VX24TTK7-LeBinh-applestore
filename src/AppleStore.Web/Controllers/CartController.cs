@@ -82,7 +82,7 @@ public class CartController : Controller
         {
             return await call();
         }
-        catch (Exception ex) when (ex is DbUpdateException or DbException)
+        catch (Exception ex) when (ex.IsDatabaseFailure())
         {
             _logger.LogError(ex, "Cart {Action} failed for user {UserId}, id {Id}", action, UserId, id);
             TempData[CartMessages.ErrorKey] = CartMessages.Failed;

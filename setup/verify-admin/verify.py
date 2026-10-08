@@ -85,7 +85,7 @@ def main():
         check("dashboard counts match the database",
               r["stats"] == {"products": str(products), "products-on-sale": str(on_sale), "customers": "0", "orders": "0"},
               f"{r['stats']} vs products={products} on_sale={on_sale}")
-        check("admin nav lists the dashboard and the way back", r["adminNav"] == ["Dashboard", "Back to the store"], str(r["adminNav"]))
+        check("admin nav lists the dashboard, orders and the way back", r["adminNav"] == ["Dashboard", "Orders", "Back to the store"], str(r["adminNav"]))
         check("the site nav shows the cart, Admin, the name and Sign out", r["nav"] == "Cart | 0 | Admin | Store Admin | Sign out", r["nav"])
         check("no console errors so far", r["consoleErrors"] == [], str(r["consoleErrors"]))
 

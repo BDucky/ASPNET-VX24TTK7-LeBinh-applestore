@@ -4,6 +4,39 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-08: orders after checkout, tracking, staff pages (`feat/orders`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 335 of 335 (62 new: 36 `OrderManagementServiceTests`, 2 cancelled-order payment tests, 4 `OrderNotifierTests`, 20 order web tests) |
+| `python3 setup/verify-orders/verify.py` | **19 of 19** |
+| earlier checks: admin, account, cart, checkout, payment | 31, 69, 23, 25, 16 (the admin check now expects the Orders link) |
+
+**Staged race:** staff confirm an order just before a customer's cancel
+writes (`SqlRace` runs the confirm before the cancel's `UPDATE`). The
+cancel finds the status moved and gives nothing back. Without the
+compare-and-swap the test fails.
+
+**Mutation checks** (each caught): no compare-and-swap; online order
+confirmed unpaid; voucher use count allowed below zero; cash not recorded on
+completion; tracking phone compared as typed; open attempts left payable
+after a cancel; employees shut out of the order pages; the customer's cancel
+button always shown; no order email; no shipped email.
+
+**Found during this pass:**
+1. A cancelled order was still offered "Pay now", and a late gateway success
+   marked it paid. Now refused at start, and money arriving after a cancel is
+   recorded with the order left cancelled and a refund due (RED then GREEN).
+2. The "database refused this" check was copied in four controllers; it is
+   one helper now.
+3. `/Track` was reachable only from the shipping email; the footer links it.
+
+**Not checked:** an employee made through a page (there is none; the live
+check sets the role in its throwaway database); real email delivery for the
+order emails (the live check reads them from the Development log).
+
 ## 2026-10-08: online payment through the simulated gateway (`feat/payment`)
 
 | Command | Result |

@@ -20,6 +20,7 @@ public enum PayStartOutcome
     NotOnline,
     AlreadyPaid,
     Unavailable,
+    Cancelled,
 }
 
 public sealed record PayStart(PayStartOutcome Outcome, string? RedirectUrl = null);
@@ -33,6 +34,8 @@ public enum CallbackOutcome
     // Money was taken twice for one order: recorded, and the shopper is told
     // a refund is due.
     PaidTwice,
+    // Paid at the gateway after the order was cancelled: recorded, refund due.
+    PaidAfterCancel,
     Rejected,
 }
 

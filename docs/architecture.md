@@ -210,6 +210,29 @@ taken), a failure never undoes a success, a repeated answer changes nothing,
 and a second success on a paid order is recorded as paid twice and logged
 for a refund. A real gateway would replace only `IPaymentGateway`.
 
+## Orders after checkout
+
+Added 2026-10-08, use cases 18-19, 22-24 and 37.
+
+| Piece | Role |
+|---|---|
+| `OrderTransitions` | the one table of what a customer and staff may do in each state; read by the service and by the pages that draw buttons |
+| `OrderManagementService` | confirm, ship, complete, cancel, the lists, and the public lookup |
+| `OrderNotifier` | the "received" and "on its way" emails; a failed send is logged, never thrown |
+| `OrdersController` | `/Orders` and `/Orders/{id}` for the customer, with cancel |
+| `TrackController` | `/Track`: order number and receiver phone (digits only) give status and tracking, never address or price |
+| `Areas/Admin/OrdersController` | `/Admin/Orders` for Admin and Employee |
+| `_OrderSummary` partial | the body of an order, shared by the customer and staff pages |
+| `StaffLinks` | the nav link per staff role (Admin: dashboard, Employee: orders) |
+
+Every change is a compare-and-swap on the status that was read, in one
+transaction with what goes with it: a `Shipments` row on shipping; the
+shipment delivered and, for cash on delivery, the cash recorded as paid on
+completing; the stock and voucher use given back and open payment attempts
+closed on cancelling. Two people pressing buttons at once cannot apply one
+change twice. A cancelled order cannot be paid; money that arrives for one
+anyway is recorded, the order stays cancelled, and a refund is due.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`

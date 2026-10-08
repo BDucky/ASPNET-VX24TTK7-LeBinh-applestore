@@ -1,0 +1,51 @@
+@model AppleStore.Web.Models.Orders.OrderPage
+@using AppleStore.Infrastructure.Services
+@using AppleStore.Web.Models.Checkout
+@{
+    var order = Model.Order;
+    ViewData["Title"] = $"Order #{order.Id} (staff)";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Order #@order.Id</h1>
+        <partial name="_AdminNav" />
+        <p class="account-lead">Placed @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") by @order.CustomerEmail. @CheckoutMessages.Status(order.Status).</p>
+
+        @* Only the buttons OrderTransitions allows staff in this state. *@
+        <section class="order-actions" data-order-actions aria-label="Actions">
+            @if (Model.WaitsForPayment)
+            {
+                <p class="account-hint">Waiting for payment before it can be confirmed.</p>
+            }
+            @foreach (var action in Model.Actions)
+            {
+                switch (action)
+                {
+                    case OrderAction.Ship:
+                        <form asp-action="Ship" asp-route-id="@order.Id" method="post" class="order-ship">
+                            <label for="Carrier">Carrier</label>
+                            <input id="Carrier" name="Carrier" placeholder="GHN, GHTK, Viettel Post" />
+                            <label for="TrackingNo">Tracking number</label>
+                            <input id="TrackingNo" name="TrackingNo" />
+                            <button type="submit" class="btn-store-primary" name="action" value="Ship">Ship</button>
+                        </form>
+                        break;
+                    case OrderAction.Cancel:
+                        <form asp-action="Cancel" asp-route-id="@order.Id" method="post">
+                            <button type="submit" class="btn-store-ghost" name="action" value="Cancel">Cancel order</button>
+                        </form>
+                        break;
+                    default:
+                        <form asp-action="@action.ToString()" asp-route-id="@order.Id" method="post">
+                            <button type="submit" class="btn-store-primary" name="action" value="@action">@(action == OrderAction.Confirm ? "Confirm order" : "Mark delivered")</button>
+                        </form>
+                        break;
+                }
+            }
+        </section>
+
+        <partial name="_OrderSummary" model="order" />
+    </div>
+</section>

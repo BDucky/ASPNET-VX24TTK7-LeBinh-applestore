@@ -1,0 +1,46 @@
+@model AppleStore.Web.Models.Orders.StaffOrderList
+@using AppleStore.Domain.Enums
+@using AppleStore.Infrastructure.Formatting
+@using AppleStore.Web.Models.Checkout
+@{
+    ViewData["Title"] = "Orders";
+    var filters = new OrderStatus?[] { null }.Concat(Enum.GetValues<OrderStatus>().Select(s => (OrderStatus?)s));
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Orders</h1>
+        <partial name="_AdminNav" />
+
+        <nav class="order-filters" aria-label="Filter by status">
+            @foreach (var filter in filters)
+            {
+                var label = filter is null ? "All" : CheckoutMessages.Status(filter.Value);
+                <a asp-action="Index" asp-route-status="@filter" class="@(filter == Model.Status ? "is-active" : "")"
+                   aria-current="@(filter == Model.Status ? "page" : null)">@label</a>
+            }
+        </nav>
+
+        @if (Model.Orders.Count == 0)
+        {
+            <p class="account-lead">No orders here.</p>
+        }
+        else
+        {
+            <ul class="order-list">
+                @foreach (var order in Model.Orders)
+                {
+                    <li>
+                        <a class="order-list-link" asp-action="Details" asp-route-id="@order.Id">
+                            <span class="order-list-id">Order #@order.Id · @order.ReceiverName</span>
+                            <span class="order-list-meta">@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · @order.ItemCount item(s) · @CheckoutMessages.Method(order.PaymentMethod), @CheckoutMessages.Payment(order.PaymentStatus).ToLowerInvariant()</span>
+                            <span class="order-list-status">@CheckoutMessages.Status(order.Status)</span>
+                            <span class="order-list-total">@PriceText.Vnd(order.Total)</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</section>

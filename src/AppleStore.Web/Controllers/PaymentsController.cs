@@ -40,7 +40,7 @@ public class PaymentsController : Controller
         {
             start = await payments.StartAsync(userId, orderId, ct);
         }
-        catch (Exception ex) when (ex is DbUpdateException or DbException)
+        catch (Exception ex) when (ex.IsDatabaseFailure())
         {
             logger.LogError(ex, "Starting a payment failed for order {OrderId}", orderId);
             controller.TempData[CartMessages.ErrorKey] = CheckoutMessages.Answer(CallbackOutcome.Rejected).Text;
@@ -67,7 +67,7 @@ public class PaymentsController : Controller
         {
             result = await _payments.HandleAsync(fields, ct);
         }
-        catch (Exception ex) when (ex is DbUpdateException or DbException)
+        catch (Exception ex) when (ex.IsDatabaseFailure())
         {
             _logger.LogError(ex, "Recording a payment answer failed");
             result = new CallbackResult(CallbackOutcome.Rejected);

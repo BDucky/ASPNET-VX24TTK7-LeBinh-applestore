@@ -1,18 +1,18 @@
-@using AppleStore.Domain.Enums
+@using AppleStore.Web.Models.Orders
 @using AppleStore.Infrastructure.Identity
 @using System.Security.Claims
 @* Right side of the nav: sign-in link, or the signed-in user's name with
    their account page and a sign-out form (POST, so a link cannot sign
-   anyone out). An admin also gets a link to the Admin area. The cart link
+   anyone out). Staff also get a link to their pages (StaffLinks). The cart link
    comes first for everyone; a visitor following it is asked to sign in. *@
 @if (User.Identity?.IsAuthenticated == true)
 {
     var name = User.FindFirstValue(AppUserClaimsPrincipalFactory.FullNameClaim) ?? User.Identity.Name;
     <div class="site-nav-account">
         <vc:cart-count></vc:cart-count>
-        @if (User.IsInRole(nameof(UserRole.Admin)))
+        @if (StaffLinks.For(User) is { } staff)
         {
-            <a class="site-nav-account-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a>
+            <a class="site-nav-account-link" href="@staff.Href">@staff.Label</a>
         }
         <a class="site-nav-account-link" asp-area="" asp-controller="Account" asp-action="Index">@name</a>
         <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">

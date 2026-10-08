@@ -85,4 +85,8 @@ public sealed record OrderSummary(
     string? Ward,
     string? District,
     string? City,
-    string? Note);
+    string? Note,
+    string CustomerEmail,
+    string? Carrier,
+    string? TrackingNo,
+    ShipmentStatus? ShipmentStatus);

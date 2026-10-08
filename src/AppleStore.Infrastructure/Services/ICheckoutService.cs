@@ -13,4 +13,7 @@ public interface ICheckoutService
         PaymentMethod method = PaymentMethod.Cod, CancellationToken ct = default);
 
     Task<OrderSummary?> GetOrderAsync(int userId, int orderId, CancellationToken ct = default);
+
+    // Any order, for staff pages.
+    Task<OrderSummary?> GetOrderForStaffAsync(int orderId, CancellationToken ct = default);
 }

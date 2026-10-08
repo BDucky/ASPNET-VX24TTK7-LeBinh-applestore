@@ -23,11 +23,14 @@ public class CheckoutController : Controller
     private readonly ICheckoutService _checkout;
     private readonly IPaymentService _payments;
     private readonly IProfileService _profile;
+    private readonly IOrderNotifier _notifier;
     private readonly UserManager<User> _users;
     private readonly ILogger<CheckoutController> _logger;
 
-    public CheckoutController(ICheckoutService checkout, IPaymentService payments, IProfileService profile, UserManager<User> users, ILogger<CheckoutController> logger)
+    public CheckoutController(ICheckoutService checkout, IPaymentService payments, IProfileService profile, IOrderNotifier notifier,
+        UserManager<User> users, ILogger<CheckoutController> logger)
     {
+        _notifier = notifier;
         _checkout = checkout;
         _payments = payments;
         _profile = profile;
@@ -73,7 +76,7 @@ public class CheckoutController : Controller
             var delivery = new DeliveryInput(form.FullName, form.Phone, form.AddressLine, form.Ward, form.District, form.City, form.Note);
             result = await _checkout.PlaceOrderAsync(UserId, delivery, form.VoucherCode, form.ExpectedTotal, form.PaymentMethod, ct);
         }
-        catch (Exception ex) when (ex is DbUpdateException or DbException)
+        catch (Exception ex) when (ex.IsDatabaseFailure())
         {
             _logger.LogError(ex, "Placing an order failed for user {UserId}", UserId);
             TempData[CartMessages.ErrorKey] = CheckoutMessages.Failed;
@@ -84,6 +87,8 @@ public class CheckoutController : Controller
         {
             case PlaceOrderOutcome.Placed:
                 TempData[CartMessages.StatusKey] = CheckoutMessages.Placed;
+                await _notifier.OrderPlacedAsync(result.OrderId!.Value,
+                    Url.Action("Details", "Orders", new { id = result.OrderId }, Request.Scheme)!, ct);
                 // Online: straight on to the gateway; the order page offers
                 // "Pay now" if that does not work out.
                 if (form.PaymentMethod != PaymentMethod.Cod)

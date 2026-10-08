@@ -1986,3 +1986,110 @@ a.btn-store-primary {
   flex-wrap: wrap;
   gap: 10px;
 }
+
+/* ---------- Orders ---------- */
+
+.order-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: grid;
+  gap: 10px;
+}
+
+.order-list-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 16px;
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.order-list-link:hover {
+  border-color: var(--accent);
+}
+
+.order-list-id {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.order-list-meta {
+  grid-column: 1;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.order-list-status {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.order-list-total {
+  grid-column: 2;
+  grid-row: 2;
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.order-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.order-filters a {
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+
+.order-filters a.is-active {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.order-actions form {
+  margin: 0;
+}
+
+.order-ship {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-ship input {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  min-width: 0;
+}
+
+.track-result {
+  margin-top: 20px;
+}
