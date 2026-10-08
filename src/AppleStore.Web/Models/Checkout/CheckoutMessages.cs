@@ -1,7 +1,7 @@
 using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Payments;
 using AppleStore.Infrastructure.Services;
-using AppleStore.Web.Formatting;
+using AppleStore.Infrastructure.Formatting;
 
 namespace AppleStore.Web.Models.Checkout;
 

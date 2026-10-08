@@ -1,5 +1,5 @@
 using AppleStore.Infrastructure.Services;
-using AppleStore.Web.Formatting;
+using AppleStore.Infrastructure.Formatting;
 
 namespace AppleStore.Tests;
 

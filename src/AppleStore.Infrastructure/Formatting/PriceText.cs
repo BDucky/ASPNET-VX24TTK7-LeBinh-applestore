@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace AppleStore.Web.Formatting;
+namespace AppleStore.Infrastructure.Formatting;
 
 // Prices print the way rauvang.com prints them on its cards: whole dong,
 // dots between thousands, "VNĐ" after. A missing price is never shown as 0.
