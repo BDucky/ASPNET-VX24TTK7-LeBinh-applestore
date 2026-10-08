@@ -78,7 +78,13 @@ public class RegistrationService : IRegistrationService
             return new RegistrationConfirmResult(false, null, RegistrationError.AttemptNotFound);
 
         if (!_otp.IsValid(otpCode, pending.OtpCode, pending.ExpiresAtUtc, DateTime.UtcNow))
-            return new RegistrationConfirmResult(false, null, RegistrationError.InvalidOtp);
+        {
+            // Counted atomically, so guesses sent in parallel are all counted.
+            if (Interlocked.Increment(ref pending.WrongCodes.Count) < MaxWrongCodes)
+                return new RegistrationConfirmResult(false, null, RegistrationError.InvalidOtp);
+            _cache.Remove(CacheKey(attemptId));
+            return new RegistrationConfirmResult(false, null, RegistrationError.TooManyAttempts);
+        }
 
         var user = new User
         {
@@ -113,11 +119,22 @@ public class RegistrationService : IRegistrationService
 
     private static string CacheKey(string attemptId) => $"registration-attempt:{attemptId}";
 
+    // Same number as the sign-in lockout (agreed 2026-10-05).
+    private const int MaxWrongCodes = 5;
+
+    private sealed class Counter
+    {
+        public int Count;
+    }
+
     private sealed record PendingRegistration(
         string Email,
         string? Phone,
         string FullName,
         string PasswordHash,
         string OtpCode,
-        DateTime ExpiresAtUtc);
+        DateTime ExpiresAtUtc)
+    {
+        public Counter WrongCodes { get; } = new();
+    }
 }
