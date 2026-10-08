@@ -68,7 +68,7 @@ puts a demoable buying flow and the admin area first.
 | 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24, 37 | `feat/orders` | `[Authorize(Roles = "Admin,Employee")]`, one rules table, compare-and-swap updates, partial views, email | done, verified 19/19, PR #20 |
 | 9 | Admin product and voucher CRUD, account roles | 25-27, 29-31 | `feat/admin-products` | Areas, model binding, optimistic concurrency (row version), security stamp, unique index | done, verified 15/15, PR #21 |
 | 10 | Revenue report, export, invoices | 33-36 | `feat/admin-reports` | LINQ aggregation, `File` result (ClosedXML .xlsx), print layout | done, verified 14/14, PR #23 |
-| 10b | Product reviews | 32 | `feat/reviews` | view component, `[Authorize]`, unique index, EF migration | done, verified 9/9 |
+| 10b | Product reviews | 32 | `feat/reviews` | view component, `[Authorize]`, unique index, EF migration | done, verified 9/9, PR #24 |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
