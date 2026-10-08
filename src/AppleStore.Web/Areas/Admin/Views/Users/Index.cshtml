@@ -1,0 +1,42 @@
+@model AppleStore.Web.Models.Admin.UsersPage
+@using AppleStore.Domain.Enums
+@{
+    ViewData["Title"] = "Accounts";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Admin</div>
+        <h1 class="account-title">Accounts</h1>
+        <partial name="_AdminNav" />
+        <p class="account-hint">Changing a role signs that person out of their open sessions. You cannot change your own role.</p>
+
+        <form method="get" class="admin-search">
+            <label class="visually-hidden" for="search">Search accounts</label>
+            <input id="search" name="search" value="@Model.Search" placeholder="Search by email or name" />
+            <button type="submit" class="btn-store-ghost">Search</button>
+        </form>
+
+        <ul class="admin-variants">
+            @foreach (var u in Model.Users)
+            {
+                <li>
+                    <div class="admin-variant-name">
+                        <strong>@u.Email</strong>
+                        <span class="account-hint">@u.FullName · since @u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")@(u.Id == Model.CurrentUserId ? " · you" : "")</span>
+                    </div>
+                    <form method="post" asp-antiforgery="true" action="/Admin/Users/@u.Id/Role" class="admin-variant-form">
+                        <label class="visually-hidden" for="role-@u.Id">Role</label>
+                        <select id="role-@u.Id" name="Role" disabled="@(u.Id == Model.CurrentUserId)">
+                            @foreach (var role in Enum.GetValues<UserRole>())
+                            {
+                                <option value="@role" selected="@(role == u.Role)">@role</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn-store-ghost" disabled="@(u.Id == Model.CurrentUserId)">Save</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    </div>
+</section>

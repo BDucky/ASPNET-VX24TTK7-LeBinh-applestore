@@ -1,12 +1,16 @@
 @using AppleStore.Domain.Enums
-@* Links between staff pages. The dashboard is for admins; orders for every
-   staff role (agreed 2026-10-08). *@
+@* Links between staff pages. Orders are for every staff role; the rest for
+   admins (agreed 2026-10-08). *@
 @{
     var current = ViewContext.RouteData.Values["controller"] as string;
+    var isAdmin = User.IsInRole(nameof(UserRole.Admin));
     var links = new (string Controller, string Label, bool Shown)[]
     {
-        ("Dashboard", "Dashboard", User.IsInRole(nameof(UserRole.Admin))),
+        ("Dashboard", "Dashboard", isAdmin),
         ("Orders", "Orders", true),
+        ("Products", "Products", isAdmin),
+        ("Vouchers", "Vouchers", isAdmin),
+        ("Users", "Accounts", isAdmin),
     };
 }
 <nav class="admin-nav" aria-label="Admin">

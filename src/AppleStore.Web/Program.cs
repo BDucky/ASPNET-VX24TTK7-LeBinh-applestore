@@ -19,6 +19,10 @@ builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddIdentityCookies();
 builder.Services.AddAppleStoreIdentityCore()
     .AddSignInManager();
+// The security stamp is checked on every request, so a role change or a new
+// password ends the person's other sessions at once rather than within 30
+// minutes (Identity's default). Costs one user lookup per signed-in request.
+builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.Zero);
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -35,6 +39,10 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<IOrderManagementService, OrderManagementService>();
 builder.Services.AddScoped<IOrderNotifier, OrderNotifier>();
+builder.Services.AddScoped<IAdminCatalogService, AdminCatalogService>();
+builder.Services.AddScoped<IAdminVoucherService, AdminVoucherService>();
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();
+builder.Services.AddSingleton<IImageLibrary, AppleStore.Web.Services.WebImageLibrary>();
 builder.Services.AddSingleton(TimeProvider.System);
 // Online payment: the simulated gateway in Development (appsettings), none otherwise.
 builder.Services.AddAppleStorePayments(builder.Configuration);

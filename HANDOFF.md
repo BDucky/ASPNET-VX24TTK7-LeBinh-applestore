@@ -5,6 +5,22 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-08 (evening): admin catalog, vouchers, roles, photos, task 9
+
+**What landed.** Branch `feat/admin-products`: `/Admin/Products`,
+`/Admin/Vouchers`, `/Admin/Users`, `RowVersion`, `WebImageLibrary`, the
+security stamp checked on every request, unique product slugs, photos for
+Mac mini, iPhone Duo and Apple Watch 12, and the anti-forgery fix with
+`FormTokenTests`. 398 tests; `verify-admin-catalog` 15 of 15, the six
+earlier checks pass.
+
+**Decisions:** owner: delete = off sale; products + variants + photo; no
+uploads, Claude finds photos; an account roles page. Claude: stamp checked
+every request.
+
+**Where to pick up:** task 10 (revenue report). Open with the owner: the
+previous-model photos for five products.
+
 ## 2026-10-08 (later): orders after checkout, task 8
 
 **What landed.** Branch `feat/orders`: `OrderTransitions`,

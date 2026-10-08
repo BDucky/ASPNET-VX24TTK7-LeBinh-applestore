@@ -1,0 +1,72 @@
+@model AppleStore.Web.Models.Admin.VoucherPage
+@using AppleStore.Domain.Enums
+@{
+    var isNew = Model.Id is null;
+    var form = Model.Form;
+    ViewData["Title"] = isNew ? "Add a voucher" : $"Voucher {form.Code}";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Admin</div>
+        <h1 class="account-title">@(isNew ? "Add a voucher" : form.Code)</h1>
+        <partial name="_AdminNav" />
+        @if (!isNew)
+        {
+            <p class="account-hint">Used @Model.UsedCount time(s). Checkout counts uses; editing never changes the count.</p>
+        }
+        @if (Model.Error is not null)
+        {
+            <p class="account-error" role="alert">@Model.Error</p>
+        }
+
+        <form method="post" asp-antiforgery="true" action="@(isNew ? "/Admin/Vouchers/New" : $"/Admin/Vouchers/{Model.Id}")" class="account-form admin-form" novalidate>
+            <input type="hidden" name="Version" value="@form.Version" />
+            <label for="Code">Code (stored upper case)</label>
+            <input id="Code" name="Code" value="@form.Code" maxlength="40" />
+
+            <label for="Type">Type</label>
+            <select id="Type" name="Type">
+                <option value="Percent" selected="@(form.Type == VoucherDiscountType.Percent)">Percent off</option>
+                <option value="Fixed" selected="@(form.Type == VoucherDiscountType.Fixed)">Fixed amount off (VND)</option>
+            </select>
+
+            <label for="Value">Discount</label>
+            <input id="Value" name="Value" value="@form.Value.ToString("0.##")" inputmode="decimal" />
+
+            <label for="MinOrderAmount">Minimum order (VND), empty for none</label>
+            <input id="MinOrderAmount" name="MinOrderAmount" value="@form.MinOrderAmount?.ToString("0.##")" inputmode="numeric" />
+
+            <label for="StartsAt">Starts</label>
+            <input id="StartsAt" name="StartsAt" type="datetime-local" value="@form.StartsAt.ToString("yyyy-MM-ddTHH:mm")" />
+            <label for="EndsAt">Ends</label>
+            <input id="EndsAt" name="EndsAt" type="datetime-local" value="@form.EndsAt.ToString("yyyy-MM-ddTHH:mm")" />
+
+            <label for="UsageLimit">Usage limit, empty for no limit</label>
+            <input id="UsageLimit" name="UsageLimit" value="@form.UsageLimit" inputmode="numeric" />
+
+            <label class="account-check">
+                <input type="checkbox" name="IsActive" value="true" checked="@form.IsActive" />
+                <input type="hidden" name="IsActive" value="false" />
+                <span>Active</span>
+            </label>
+
+            <label for="ProductIds">Only these products (none selected: every product)</label>
+            <select id="ProductIds" name="ProductIds" multiple size="8">
+                @foreach (var (id, name) in Model.Products)
+                {
+                    <option value="@id" selected="@form.ProductIds.Contains(id)">@name</option>
+                }
+            </select>
+
+            <button type="submit" class="btn-store-primary">Save voucher</button>
+        </form>
+
+        @if (!isNew)
+        {
+            <form method="post" asp-antiforgery="true" action="/Admin/Vouchers/@Model.Id/Delete" class="cart-actions">
+                <button type="submit" class="btn-store-ghost">Delete voucher</button>
+            </form>
+        }
+    </div>
+</section>

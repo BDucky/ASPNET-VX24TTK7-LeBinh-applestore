@@ -233,6 +233,27 @@ closed on cancelling. Two people pressing buttons at once cannot apply one
 change twice. A cancelled order cannot be paid; money that arrives for one
 anyway is recorded, the order stays cancelled, and a refund is due.
 
+## Admin catalog
+
+Added 2026-10-08, use cases 25-27 and 29-31, plus account roles.
+
+| Piece | Role |
+|---|---|
+| `AdminCatalogService` | add and edit products and variants, take off sale ("delete"), main photo |
+| `AdminVoucherService` | add, edit, delete vouchers by BM_VOUCHER_01; never writes the use count |
+| `AdminUserService` | list accounts, change a role (new security stamp); never one's own |
+| `IImageLibrary` / `WebImageLibrary` | the shop's own photos in `wwwroot/img/products`; a photo outside it is refused |
+| `RowVersion` | an edit saves only while the row's `UpdatedAt` is what the admin saw; the next value is always later, even within one clock tick |
+
+A variant save also requires the stock the admin saw, because a sale
+changes stock without touching `UpdatedAt`. Product slugs are unique (index)
+and stay when a product is renamed, so links keep working. The security stamp
+is checked on every request (`SecurityStampValidatorOptions.ValidationInterval`
+zero): a role or password change ends the person's other sessions at once,
+for one user lookup per signed-in request. Forms with a hand-written action
+ask for the anti-forgery token explicitly (`asp-antiforgery="true"`);
+`FormTokenTests` checks every post form on 21 pages.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`

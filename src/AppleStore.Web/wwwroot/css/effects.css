@@ -2093,3 +2093,125 @@ a.btn-store-primary {
 .track-result {
   margin-top: 20px;
 }
+
+/* ---------- Admin catalog ---------- */
+
+.admin-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.admin-search input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+  font: inherit;
+}
+
+.admin-form select,
+.admin-form textarea {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+}
+
+.admin-photos {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  margin: 10px 0;
+  min-width: 0;
+}
+
+.admin-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.admin-photos legend {
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0 6px;
+}
+
+.admin-photo {
+  display: flex !important;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  overflow-wrap: anywhere;
+}
+
+.admin-photo img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: var(--bg-card);
+  border-radius: 8px;
+}
+
+.admin-photo-none {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+.admin-variants {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: grid;
+  gap: 10px;
+}
+
+.admin-variants li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.admin-variant-name {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-variant-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+}
+
+.admin-variant-form input:not([type="checkbox"]),
+.admin-variant-form select {
+  width: 120px;
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+}

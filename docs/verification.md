@@ -4,6 +4,37 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-08: admin products, vouchers, accounts and photos (`feat/admin-products`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 398 of 398 (63 new) |
+| `python3 setup/verify-admin-catalog/verify.py` | **15 of 15** |
+| earlier checks: admin, account, cart, checkout, payment, orders | 31, 69, 23, 25, 16, 19 |
+
+**Mutation checks** (each caught): product version ignored; the seen stock
+ignored on a variant save; any photo address accepted; `RowVersion.Next`
+returning the clock (stale edit in one tick); stamp checked every 30
+minutes; vouchers open to employees; a stale product page reported as saved.
+
+**Found during this pass:**
+1. Using `UpdatedAt` as the version let a stale edit through when two saves
+   fell in one clock tick (the voucher test, with a fixed clock). Fixed with
+   `RowVersion.Next` for vouchers, products and variants.
+2. Every admin save was a 400 in a real browser: the form tag helper leaves
+   out the anti-forgery token when the action attribute is hand-written. The
+   web tests had passed because they take the token from any form on the
+   page. `FormTokenTests` now checks each post form on 21 pages; the forms
+   ask for the token explicitly.
+3. Photos: a research pass on Wikimedia Commons found exact-model photos for
+   3 of the 8 products without one (checked by category, description, EXIF
+   date and by eye); 4 have only the previous model, 1 has nothing.
+
+**Not checked:** a real second admin in parallel (staged by changing the row
+under the page instead).
+
 ## 2026-10-08: orders after checkout, tracking, staff pages (`feat/orders`)
 
 | Command | Result |

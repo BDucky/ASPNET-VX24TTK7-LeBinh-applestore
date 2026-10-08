@@ -21,5 +21,6 @@ silently leaving setup incomplete.
 | `verify-checkout/verify.py` | checkout, demo vouchers, placing, double submit, changed price, a locked database, live in a browser |
 | `verify-payment/verify.py` | VNPay and MoMo through the simulated gateway, retries, tampering, the Production guard, live in a browser |
 | `verify-orders/verify.py` | my orders, cancelling, staff confirm/ship/complete, tracking, live in a browser |
+| `verify-admin-catalog/verify.py` | admin products, variants, vouchers and roles end to end, live in a browser |
 
 All of them import `verifylib.py` (start the app, drive the browser, tally results).

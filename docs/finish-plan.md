@@ -66,7 +66,7 @@ puts a demoable buying flow and the admin area first.
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, EF Core transaction with conditional writes, `TimeProvider`, voucher table by migration | done, verified 25/25, PR #18 |
 | 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern with `ValidateOnStart`, signed callbacks (HMAC-SHA512), conditional updates | done, verified 16/16, PR #19 |
 | 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24, 37 | `feat/orders` | `[Authorize(Roles = "Admin,Employee")]`, one rules table, compare-and-swap updates, partial views, email | done, verified 19/19, PR #20 |
-| 9 | Admin product and voucher CRUD | 25-27, 29-31 | `feat/admin-products` | scaffolded CRUD on MVC, file upload | not started |
+| 9 | Admin product and voucher CRUD, account roles | 25-27, 29-31 | `feat/admin-products` | Areas, model binding, optimistic concurrency (row version), security stamp, unique index | done, verified 15/15, PR #21 |
 | 10 | Revenue report | 33-36 | `feat/admin-reports` | LINQ aggregation, export | not started |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
@@ -84,6 +84,8 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Admin catalog | 2026-10-08 | "delete" a product = take it off sale; admins edit products, variants and the main photo; account roles page (owner). No uploads: admins pick from the shop's own licensed photos, and Claude sources photos (owner) |
+| Sessions | 2026-10-08 | security stamp checked on every request, so a role or password change ends other sessions at once (Claude's, to make role changes immediate as promised) |
 | Order rules | 2026-10-08 | customer cancels while pending, staff until shipped; an online order is confirmed only once paid; delivered cash orders are recorded as paid; public tracking by order number and receiver phone (owner chose all four) |
 | Staff access | 2026-10-08 | employees get `/Admin/Orders`, the dashboard stays admin-only; emails on placing and shipping (Claude's, stated before building) |
 | Online payment | 2026-10-08 | no sandbox credentials: VNPay and MoMo are simulated inside the app (`/PaymentSimulator`), only when `Payments:Mode=Simulated` (Development); the app refuses to start with it in Production (owner agreed the approach) |
@@ -107,8 +109,6 @@ puts a demoable buying flow and the admin area first.
   still has the template's "Development mode" paragraph (pre-existing, see
   `docs/verification.md`, 2026-10-05).
 - Instructor collaborator acceptance not yet verifiable.
-- Other sessions end within 30 minutes after a password change, not at
-  once (Identity's default stamp check interval).
 - Deleting an address asks no confirmation.
 - No limit on how often a reset code can be requested.
 - Real email works only on a machine whose user-secrets hold the SMTP
@@ -124,8 +124,10 @@ puts a demoable buying flow and the admin area first.
 - `/Track` has no limit on attempts; guessing needs both the order number
   and the receiver's full phone number. A rate limit would need a number
   from the owner.
-- There is no page to make an account an Employee; the live check sets the
-  role in its throwaway database.
+- Five products on sale still have no photo: no licensed photo of the exact
+  model exists yet (MagSafe Battery, Apple Watch Ultra 4, iPad Air 8 11"
+  and 13", Apple Watch SE 3). Photos of the previous models exist; using
+  them is the owner's call.
 - A second successful payment on a paid order is recorded and logged as
   needing a refund; refunds themselves are manual.
 - Checkout catches a database failure while placing; one while pricing

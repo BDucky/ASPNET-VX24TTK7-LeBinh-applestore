@@ -5,7 +5,7 @@
   "ipad-pro-m4-13": "/img/products/ipad-pro-m4.jpg",
   "ipad-pro-m4-11": "/img/products/ipad-pro-m4.jpg",
   "ipad-gen-11": "/img/products/ipad-a16.jpg",
-  "apple-watch-12": null,
+  "apple-watch-12": "/img/products/apple-watch-series-12-commons.jpg",
   "apple-watch-11": "/img/products/apple-watch-series-11.jpg",
   "iphone-17-pro-max": "/img/products/iphone-17-pro-max.jpg",
   "iphone-16-pro-max": "/img/products/iphone-16-pro-max.jpg",
@@ -23,12 +23,13 @@
   "macbook-air-15-m5": "/img/products/macbook-air-15-m5.jpg",
   "macbook-air-13-m5": "/img/products/macbook-air-15-m5.jpg",
   "day-apple-watch": "/img/products/day-apple-watch.jpg",
-  "mac-mini": null,
+  "mac-mini": "/img/products/mac-mini-m4.jpg",
   "airpods": "/img/products/airpods-2nd-gen.jpg",
   "airpods-max-silver": "/img/products/airpods-max.jpg",
   "airpods-max-2": "/img/products/airpods-max-2.jpg",
   "magsafe-battery-pack": null,
   "homepod-mini": "/img/products/homepod-mini.jpg",
   "airpods-5": "/img/products/airpods-5-real.jpg",
-  "apple-watch-ultra-4": null
+  "apple-watch-ultra-4": null,
+  "iphone-duo": "/img/products/iphone-duo.jpg"
 }
