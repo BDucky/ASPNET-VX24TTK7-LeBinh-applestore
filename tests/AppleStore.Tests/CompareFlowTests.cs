@@ -1,6 +1,9 @@
 using System.Net;
 using AppleStore.Infrastructure.Data;
+using AppleStore.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using static AppleStore.Tests.ProductCatalogServiceTests;
 
 namespace AppleStore.Tests;
@@ -134,6 +137,21 @@ public class CompareFlowTests : WebFlowTestBase
         Assert.Contains("Apple Watch 12", page);
         Assert.DoesNotContain("Mac mini M4", page);
         Assert.DoesNotContain("iPhone 15", page);
+        // The cookie is cut down to what the page shows, and the nav on this
+        // same page already counts that (found in review 2026-10-08).
+        Assert.Contains($"AppleStore.Compare={phone}.{pods}.{watch};", string.Join("\n", response.Headers.GetValues("Set-Cookie")));
+        Assert.Contains("Compare (3)", page);
+    }
+
+    [Fact]
+    public async Task The_nav_never_counts_more_than_the_cap_from_a_tampered_cookie()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "/");
+        request.Headers.Add("Cookie", "AppleStore.Compare=" + string.Join('.', Enumerable.Range(1, 50)));
+
+        var page = await (await Client.SendAsync(request)).Content.ReadAsStringAsync();
+
+        Assert.Contains("Compare (3)", page);
     }
 
     [Fact]
@@ -146,12 +164,15 @@ public class CompareFlowTests : WebFlowTestBase
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Fact]
-    public async Task Add_ignores_a_return_address_on_another_site()
+    [Theory]
+    [InlineData("https://evil.example/")]
+    [InlineData("//evil.example/")]
+    [InlineData("/\\evil.example/")]
+    public async Task Add_ignores_a_return_address_on_another_site(string returnUrl)
     {
         var (phone, _, _, _, _) = SeedShop();
 
-        var response = await AddAsync(phone, "https://evil.example/");
+        var response = await AddAsync(phone, returnUrl);
 
         Assert.Equal("/Compare", response.Headers.Location!.OriginalString);
     }
@@ -163,5 +184,54 @@ public class CompareFlowTests : WebFlowTestBase
 
         Assert.Contains("Nothing to compare yet", page);
         Assert.Contains("href=\"/Products\"", page);
+    }
+}
+
+// The database failing under the compare page: a message and a way on, and
+// the visitor's list is kept, not wiped.
+public class CompareFailureTests : WebFlowTestBase
+{
+    public CompareFailureTests() : base(new AppleStoreWebFactory(configureServices: services =>
+    {
+        services.RemoveAll<ICompareService>();
+        services.AddScoped<ICompareService, FailingCompareService>();
+    }))
+    {
+    }
+
+    private async Task<HttpResponseMessage> WithListAsync(HttpMethod method, string url, HttpContent? content = null)
+    {
+        var request = new HttpRequestMessage(method, url) { Content = content };
+        request.Headers.Add("Cookie", "AppleStore.Compare=1.2");
+        return await Client.SendAsync(request);
+    }
+
+    [Fact]
+    public async Task A_failed_page_says_so_and_keeps_the_list()
+    {
+        var response = await WithListAsync(HttpMethod.Get, "/Compare");
+        var page = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("We could not load your compare list. Please try again.", page);
+        Assert.False(response.Headers.Contains("Set-Cookie") && response.Headers.GetValues("Set-Cookie").Any(c => c.StartsWith("AppleStore.Compare")));
+    }
+
+    [Fact]
+    public async Task A_failed_add_says_so_on_the_page_and_keeps_the_list()
+    {
+        var response = await PostFormAsync("/Compare/Add", new() { ["ProductId"] = "3", ["ReturnUrl"] = "/Products" }, formPage: "/Account/Login");
+
+        Assert.Equal("/Products", response.Headers.Location?.OriginalString);
+        Assert.False(response.Headers.Contains("Set-Cookie") && response.Headers.GetValues("Set-Cookie").Any(c => c.StartsWith("AppleStore.Compare")));
+        Assert.Contains("We could not update your compare list. Please try again.", WebUtility.HtmlDecode(await Client.GetStringAsync("/Products")));
+    }
+
+    private sealed class FailingCompareService : ICompareService
+    {
+        private static DbUpdateException Failure() => new("database is locked");
+
+        public Task<IReadOnlyList<CompareColumn>> BuildAsync(IReadOnlyList<int> productIds, CancellationToken ct = default) => throw Failure();
+        public Task<CompareResult> AddAsync(IReadOnlyList<int> productIds, int productId, CancellationToken ct = default) => throw Failure();
     }
 }
