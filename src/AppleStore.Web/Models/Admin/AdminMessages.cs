@@ -45,6 +45,7 @@ public static class AdminMessages
         VoucherAdminOutcome.InvalidLimit => "The limit is at least 1, or empty for no limit.",
         VoucherAdminOutcome.LimitBelowUsed => "The limit cannot be below the uses already made.",
         VoucherAdminOutcome.UnknownProduct => "Pick products from the list.",
+        VoucherAdminOutcome.CodeLocked => "This voucher has been used, so its code cannot change (orders keep it). Make a new voucher instead.",
         _ => "Someone changed this voucher after you opened it. Check it and save again.",
     };
 }

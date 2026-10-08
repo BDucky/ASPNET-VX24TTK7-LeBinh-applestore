@@ -64,7 +64,9 @@ public class AdminVoucherService : IAdminVoucherService
         var code = Code(input.Code)!;
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
         var saved = await _db.Vouchers
-            .Where(v => v.Id == voucherId && v.UpdatedAt == new DateTime(version) && (input.UsageLimit == null || v.UsedCount <= input.UsageLimit))
+            .Where(v => v.Id == voucherId && v.UpdatedAt == new DateTime(version)
+                && (input.UsageLimit == null || v.UsedCount <= input.UsageLimit)
+                && (v.Code == code || v.UsedCount == 0))
             .ExecuteUpdateAsync(s => s
                 .SetProperty(v => v.Code, code)
                 .SetProperty(v => v.DiscountType, input.Type)
@@ -77,10 +79,11 @@ public class AdminVoucherService : IAdminVoucherService
                 .SetProperty(v => v.UpdatedAt, next), ct);
         if (saved != 1)
         {
-            var current = await _db.Vouchers.AsNoTracking().Where(v => v.Id == voucherId).Select(v => new { v.UsedCount, v.UpdatedAt }).FirstOrDefaultAsync(ct);
+            var current = await _db.Vouchers.AsNoTracking().Where(v => v.Id == voucherId).Select(v => new { v.UsedCount, v.UpdatedAt, v.Code }).FirstOrDefaultAsync(ct);
             return new VoucherAdminResult(
                 current is null ? VoucherAdminOutcome.NotFound
                 : current.UpdatedAt.Ticks != version ? VoucherAdminOutcome.Changed
+                : current.Code != code && current.UsedCount > 0 ? VoucherAdminOutcome.CodeLocked
                 : VoucherAdminOutcome.LimitBelowUsed);
         }
 
