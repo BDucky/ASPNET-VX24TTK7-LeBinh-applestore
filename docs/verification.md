@@ -4,6 +4,25 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-08: sales report, Excel export, invoices (`feat/admin-reports`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 426 of 426 (16 new) |
+| `python3 setup/verify-reports/verify.py` | **14 of 14** |
+| earlier checks | account 69, admin 31, cart 23, checkout 25, payment 16, orders 19, admin-catalog 15 |
+
+The live check downloads the .xlsx through the browser and opens it (three
+sheets) and prints the invoice to a real PDF with Chromium, with the print
+button hidden on paper. **Mutation checks** (each caught): cancelled paid
+orders counted; days in UTC; the last day cut off; the customer invoice read
+without the owner check; reports open to every signed-in account.
+
+**Found during this pass:** the stat cards wrapped long amounts (fixed);
+the live check's sheet reader missed the `x:` namespace prefix (script fix).
+
 ## 2026-10-08: whole-app senior review and its fixes (`fix/review-findings`)
 
 A review pass in the corjl style: VERIFY gate, LIVE gate over every script,

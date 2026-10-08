@@ -88,7 +88,8 @@ same open design question as vouchers in M3.
 ## M7: Admin CRUD and reporting
 
 Done (2026-10-08): admin product, variant, voucher and account pages
-(`docs/architecture.md`, "Admin catalog"). Next: the revenue report.
+(`docs/architecture.md`, "Admin catalog"); the sales report with Excel export,
+print pages and invoices ("Reports").
 
 Done so far (2026-10-07): the Admin area itself, `/Admin` behind the Admin
 role, a dashboard with product, customer and order counts, and the first
