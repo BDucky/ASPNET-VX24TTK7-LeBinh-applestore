@@ -104,7 +104,7 @@ public class AdminCatalogService : IAdminCatalogService
         if (await CheckAsync(input, ct) is { } refused)
             return refused;
 
-        var now = Now;
+        var next = RowVersion.Next(version, Now);
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
         // The slug is left alone so the product's page address and links keep working.
         var saved = await _db.Products
@@ -115,7 +115,7 @@ public class AdminCatalogService : IAdminCatalogService
                 .SetProperty(p => p.CategoryId, input.CategoryId)
                 .SetProperty(p => p.BasePrice, input.BasePrice)
                 .SetProperty(p => p.Status, input.OnSale)
-                .SetProperty(p => p.UpdatedAt, now), ct);
+                .SetProperty(p => p.UpdatedAt, next), ct);
         if (saved != 1)
             return await _db.Products.AnyAsync(p => p.Id == productId, ct)
                 ? new AdminCatalogResult(AdminCatalogOutcome.Changed)
@@ -178,14 +178,14 @@ public class AdminCatalogService : IAdminCatalogService
         if (CheckVariant(change.Price, change.StockQty) is { } refused)
             return refused;
 
-        var now = Now;
+        var next = RowVersion.Next(change.Version, Now);
         var saved = await _db.ProductVariants
             .Where(v => v.Id == variantId && v.UpdatedAt == new DateTime(change.Version) && v.StockQty == change.SeenStock)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(v => v.Price, change.Price)
                 .SetProperty(v => v.StockQty, change.StockQty)
                 .SetProperty(v => v.Status, change.OnSale)
-                .SetProperty(v => v.UpdatedAt, now), ct);
+                .SetProperty(v => v.UpdatedAt, next), ct);
         if (saved == 1)
             return new AdminCatalogResult(AdminCatalogOutcome.Done, variantId);
 

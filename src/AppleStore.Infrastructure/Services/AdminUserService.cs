@@ -2,6 +2,7 @@ using AppleStore.Domain.Entities;
 using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppleStore.Infrastructure.Services;
 
@@ -16,6 +17,32 @@ public class AdminUserService : IAdminUserService
         _users = users;
     }
 
-    public Task<IReadOnlyList<UserAdminRow>> ListAsync(string? search, CancellationToken ct = default) => throw new NotImplementedException();
-    public Task<RoleChangeOutcome> ChangeRoleAsync(int actingAdminId, int userId, UserRole role, CancellationToken ct = default) => throw new NotImplementedException();
+    public async Task<IReadOnlyList<UserAdminRow>> ListAsync(string? search, CancellationToken ct = default)
+    {
+        var users = _db.Users.AsNoTracking();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = "%" + search.Trim() + "%";
+            users = users.Where(u => EF.Functions.Like(u.Email, term) || EF.Functions.Like(u.FullName, term));
+        }
+        return await users.OrderBy(u => u.Email)
+            .Select(u => new UserAdminRow(u.Id, u.Email, u.FullName, u.Role, u.CreatedAt))
+            .ToListAsync(ct);
+    }
+
+    // An admin never changes their own role, so the admin area always keeps
+    // the admin who is using it.
+    public async Task<RoleChangeOutcome> ChangeRoleAsync(int actingAdminId, int userId, UserRole role, CancellationToken ct = default)
+    {
+        if (actingAdminId == userId)
+            return RoleChangeOutcome.OwnAccount;
+        var user = await _users.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return RoleChangeOutcome.NotFound;
+
+        user.Role = role;
+        // The new stamp ends the person's open sessions; their next sign-in carries the new role.
+        await _users.UpdateSecurityStampAsync(user);
+        return RoleChangeOutcome.Done;
+    }
 }

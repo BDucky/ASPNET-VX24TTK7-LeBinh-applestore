@@ -139,6 +139,23 @@ public sealed class AdminCatalogServiceTests : IDisposable
         Assert.Equal("First admin", (await _sut.GetAsync(_phone))!.Name);
     }
 
+    // The shop clock reads the same instant for both saves (FixedTime), as two
+    // saves in one clock tick would: the version must still move.
+    [Fact]
+    public async Task Two_saves_in_the_same_instant_still_catch_the_stale_one()
+    {
+        Run($"UPDATE Products SET UpdatedAt = '{Now.UtcDateTime:yyyy-MM-dd HH:mm:ss}' WHERE Id = {_phone}");
+        Run($"UPDATE ProductVariants SET UpdatedAt = '{Now.UtcDateTime:yyyy-MM-dd HH:mm:ss}' WHERE Id = {_blue}");
+        var seen = (await _sut.GetAsync(_phone))!;
+        var variant = seen.Variants.Single();
+
+        await _sut.UpdateAsync(_phone, Input(name: "First", category: _iphoneCategory), seen.Version);
+        await _sut.UpdateVariantAsync(_blue, new VariantChange(1m, 5, true, variant.StockQty, variant.Version));
+
+        Assert.Equal(AdminCatalogOutcome.Changed, (await _sut.UpdateAsync(_phone, Input(name: "Second", category: _iphoneCategory), seen.Version)).Outcome);
+        Assert.Equal(AdminCatalogOutcome.Changed, (await _sut.UpdateVariantAsync(_blue, new VariantChange(2m, 5, true, variant.StockQty, variant.Version))).Outcome);
+    }
+
     [Fact]
     public async Task Taking_a_product_off_sale_hides_it_from_the_shop_and_back()
     {
