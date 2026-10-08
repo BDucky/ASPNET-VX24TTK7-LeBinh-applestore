@@ -14,6 +14,7 @@ public static class AdminMessages
     public const string VoucherDeleted = "Voucher deleted. Orders that used it keep their code.";
     public const string RoleChanged = "Role changed. Their open sessions were signed out.";
     public const string OwnRole = "You cannot change your own role.";
+    public const string InvalidRole = "Pick a role from the list.";
     public const string SaveFailed = "We could not save that. Please try again.";
     // A number the model binder could not read binds to null or 0; it is never saved.
     public const string UnreadableNumber = "Type numbers only, without dots or commas (for example 24990000).";

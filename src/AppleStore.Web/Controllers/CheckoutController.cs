@@ -65,7 +65,7 @@ public class CheckoutController : Controller
             ModelState.Clear();
             return Render(form, quote, null);
         }
-        if (form.PaymentMethod != PaymentMethod.Cod && !_payments.OnlineAvailable)
+        if (!Enum.IsDefined(form.PaymentMethod) || (form.PaymentMethod != PaymentMethod.Cod && !_payments.OnlineAvailable))
             ModelState.AddModelError(nameof(CheckoutViewModel.PaymentMethod), CheckoutMessages.MethodUnavailable);
         if (!ModelState.IsValid)
             return Render(form, quote, null);
