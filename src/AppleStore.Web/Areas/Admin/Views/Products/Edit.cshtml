@@ -19,7 +19,7 @@
             <p class="account-error" role="alert">@Model.Error</p>
         }
 
-        <form method="post" action="@(isNew ? "/Admin/Products/New" : $"/Admin/Products/{Model.Id}")" class="account-form admin-form" novalidate>
+        <form method="post" asp-antiforgery="true" action="@(isNew ? "/Admin/Products/New" : $"/Admin/Products/{Model.Id}")" class="account-form admin-form" novalidate>
             <input type="hidden" name="Version" value="@form.Version" />
             <label for="Name">Name</label>
             <input id="Name" name="Name" value="@form.Name" maxlength="200" />
@@ -66,7 +66,7 @@
         @if (!isNew)
         {
             <div class="cart-actions">
-                <form method="post" action="/Admin/Products/@Model.Id/@(form.OnSale ? "OffSale" : "OnSale")">
+                <form method="post" asp-antiforgery="true" action="/Admin/Products/@Model.Id/@(form.OnSale ? "OffSale" : "OnSale")">
                     <button type="submit" class="btn-store-ghost">@(form.OnSale ? "Take off sale (delete)" : "Put back on sale")</button>
                 </form>
             </div>
@@ -80,7 +80,7 @@
                             <strong>@v.Sku</strong>
                             <span class="account-hint">@string.Join(" · ", new[] { v.Configuration, v.Color, v.Region }.OfType<string>())</span>
                         </div>
-                        <form method="post" action="/Admin/Products/Variants/@v.Id" class="admin-variant-form">
+                        <form method="post" asp-antiforgery="true" action="/Admin/Products/Variants/@v.Id" class="admin-variant-form">
                             <input type="hidden" name="SeenStock" value="@v.StockQty" />
                             <input type="hidden" name="Version" value="@v.Version" />
                             <label>Price <input name="Price" value="@v.Price" inputmode="numeric" /></label>
@@ -97,7 +97,7 @@
             </ul>
 
             <h2 class="checkout-heading">Add a variant</h2>
-            <form method="post" action="/Admin/Products/@Model.Id/Variants" class="account-form admin-form">
+            <form method="post" asp-antiforgery="true" action="/Admin/Products/@Model.Id/Variants" class="account-form admin-form">
                 <label for="Sku">SKU</label>
                 <input id="Sku" name="Sku" maxlength="80" />
                 <label for="Configuration">Configuration (for example "@form.Name 256GB"), empty if sold as one model</label>

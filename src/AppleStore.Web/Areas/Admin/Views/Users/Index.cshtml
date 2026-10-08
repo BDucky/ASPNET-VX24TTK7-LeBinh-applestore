@@ -25,7 +25,7 @@
                         <strong>@u.Email</strong>
                         <span class="account-hint">@u.FullName · since @u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")@(u.Id == Model.CurrentUserId ? " · you" : "")</span>
                     </div>
-                    <form method="post" action="/Admin/Users/@u.Id/Role" class="admin-variant-form">
+                    <form method="post" asp-antiforgery="true" action="/Admin/Users/@u.Id/Role" class="admin-variant-form">
                         <label class="visually-hidden" for="role-@u.Id">Role</label>
                         <select id="role-@u.Id" name="Role" disabled="@(u.Id == Model.CurrentUserId)">
                             @foreach (var role in Enum.GetValues<UserRole>())

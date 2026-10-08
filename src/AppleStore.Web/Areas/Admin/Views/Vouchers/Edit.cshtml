@@ -20,7 +20,7 @@
             <p class="account-error" role="alert">@Model.Error</p>
         }
 
-        <form method="post" action="@(isNew ? "/Admin/Vouchers/New" : $"/Admin/Vouchers/{Model.Id}")" class="account-form admin-form" novalidate>
+        <form method="post" asp-antiforgery="true" action="@(isNew ? "/Admin/Vouchers/New" : $"/Admin/Vouchers/{Model.Id}")" class="account-form admin-form" novalidate>
             <input type="hidden" name="Version" value="@form.Version" />
             <label for="Code">Code (stored upper case)</label>
             <input id="Code" name="Code" value="@form.Code" maxlength="40" />
@@ -64,7 +64,7 @@
 
         @if (!isNew)
         {
-            <form method="post" action="/Admin/Vouchers/@Model.Id/Delete" class="cart-actions">
+            <form method="post" asp-antiforgery="true" action="/Admin/Vouchers/@Model.Id/Delete" class="cart-actions">
                 <button type="submit" class="btn-store-ghost">Delete voucher</button>
             </form>
         }
