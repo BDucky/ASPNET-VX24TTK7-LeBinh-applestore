@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Compare products";
     var failed = ViewData["CompareLoadFailed"] is true;
-    static string List(IReadOnlyList<string> values) => values.Count == 0 ? "None" : string.Join(", ", values);
 }
 
 @* Use case 10. One column per product, at most three, any category. The
@@ -56,9 +55,9 @@
                         <tr><th scope="row">Category</th>@foreach (var c in Model) { <td>@c.CategoryName</td> }</tr>
                         <tr><th scope="row">Price from</th>@foreach (var c in Model) { <td>@PriceText.Vnd(c.FromPrice)</td> }</tr>
                         <tr><th scope="row">Stock</th>@foreach (var c in Model) { <td>@(c.InStock ? "In stock" : "Out of stock")</td> }</tr>
-                        <tr><th scope="row">Configurations</th>@foreach (var c in Model) { <td>@List(c.Configurations)</td> }</tr>
-                        <tr><th scope="row">Colours</th>@foreach (var c in Model) { <td>@List(c.Colors)</td> }</tr>
-                        <tr><th scope="row">Regions</th>@foreach (var c in Model) { <td>@List(c.Regions)</td> }</tr>
+                        <tr><th scope="row">Configurations</th>@foreach (var c in Model) { <td><partial name="_CompareValues" model="c.Configurations" /></td> }</tr>
+                        <tr><th scope="row">Colours</th>@foreach (var c in Model) { <td><partial name="_CompareValues" model="c.Colors" /></td> }</tr>
+                        <tr><th scope="row">Regions</th>@foreach (var c in Model) { <td><partial name="_CompareValues" model="c.Regions" /></td> }</tr>
                         <tr>
                             <th scope="row">Rating</th>
                             @foreach (var c in Model)

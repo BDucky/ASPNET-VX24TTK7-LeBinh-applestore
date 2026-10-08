@@ -2317,6 +2317,28 @@ a.btn-store-primary {
   white-space: nowrap;
 }
 
+/* One value per line: configuration names are long. */
+.compare-values {
+  display: block;
+}
+
+/* On a phone the row labels stay in view while the products scroll past. */
+@media (max-width: 575.98px) {
+  .compare-table th[scope="col"] {
+    min-width: 150px;
+  }
+
+  .compare-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg-card);
+    min-width: 0;
+    white-space: normal;
+    width: 84px;
+  }
+}
+
 .compare-photo img {
   display: block;
   width: 120px;
