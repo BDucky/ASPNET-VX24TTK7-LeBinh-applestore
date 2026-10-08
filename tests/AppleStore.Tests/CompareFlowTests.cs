@@ -144,6 +144,18 @@ public class CompareFlowTests : WebFlowTestBase
     }
 
     [Fact]
+    public async Task The_page_that_drops_a_hidden_product_counts_what_it_shows()
+    {
+        var (phone, _, _, _, hidden) = SeedShop();
+        var request = new HttpRequestMessage(HttpMethod.Get, "/Compare");
+        request.Headers.Add("Cookie", $"AppleStore.Compare={hidden}.{phone}");
+
+        var page = await (await Client.SendAsync(request)).Content.ReadAsStringAsync();
+
+        Assert.Contains("Compare (1)", page);
+    }
+
+    [Fact]
     public async Task The_nav_never_counts_more_than_the_cap_from_a_tampered_cookie()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "/");

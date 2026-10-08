@@ -1,8 +1,9 @@
 @using AppleStore.Web.Services
 @* The compare link in the nav, only while the list holds something. The
-   count is the cookie's; the compare page drops hidden products from it. *@
+   count is the cookie's (CompareCookie.Count); the compare page drops hidden
+   products from it. *@
 @{
-    var count = CompareCookie.Read(Context.Request).Count;
+    var count = CompareCookie.Count(Context);
 }
 @if (count > 0)
 {

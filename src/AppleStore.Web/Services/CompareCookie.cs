@@ -11,6 +11,11 @@ public static class CompareCookie
 {
     public const string Name = "AppleStore.Compare";
 
+    // What the nav shows: the list this response wrote, if it wrote one
+    // (the request still carries the old cookie), capped like the page.
+    public static int Count(HttpContext context) =>
+        Math.Min((context.Items[Name] as IReadOnlyList<int> ?? Read(context.Request)).Count, Infrastructure.Services.CompareService.MaxItems);
+
     public static IReadOnlyList<int> Read(HttpRequest request) =>
         (request.Cookies[Name] ?? "")
             .Split('.', StringSplitOptions.RemoveEmptyEntries)
@@ -21,6 +26,7 @@ public static class CompareCookie
 
     public static void Write(HttpContext context, IReadOnlyList<int> ids)
     {
+        context.Items[Name] = ids;
         if (ids.Count == 0)
         {
             context.Response.Cookies.Delete(Name);
