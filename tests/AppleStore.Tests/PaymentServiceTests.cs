@@ -111,7 +111,9 @@ public sealed class PaymentServiceTests : IDisposable
     {
         var order = await PlaceAsync(PaymentMethod.VnPay);
 
-        Assert.Equal((OrderPaymentStatus.Unpaid, [(PaymentMethod.VnPay, PaymentStatus.Pending, (string?)null, 0m)]), State(order));
+        var (paid, payments) = State(order);
+        Assert.Equal(OrderPaymentStatus.Unpaid, paid);
+        Assert.Equal([(PaymentMethod.VnPay, PaymentStatus.Pending, (string?)null, 0m)], payments);
     }
 
     [Fact]
@@ -151,7 +153,9 @@ public sealed class PaymentServiceTests : IDisposable
         var result = await _sut.HandleAsync(Result(payment, PaymentResultCode.Success, txn: "SIM-42"));
 
         Assert.Equal(new CallbackResult(CallbackOutcome.Paid, order), result);
-        Assert.Equal((OrderPaymentStatus.Paid, [(PaymentMethod.VnPay, PaymentStatus.Success, (string?)"SIM-42", Total)]), State(order));
+        var (paid, payments) = State(order);
+        Assert.Equal(OrderPaymentStatus.Paid, paid);
+        Assert.Equal([(PaymentMethod.VnPay, PaymentStatus.Success, (string?)"SIM-42", Total)], payments);
         await using var db = _shop.Context();
         var row = await db.Payments.SingleAsync(p => p.Id == payment);
         Assert.Equal(Now.UtcDateTime, row.PaidAt);
@@ -183,6 +187,23 @@ public sealed class PaymentServiceTests : IDisposable
         Assert.Equal(CallbackOutcome.AlreadyPaid, late.Outcome);
         Assert.Equal(OrderPaymentStatus.Paid, State(order).Order);
         Assert.Equal(PaymentStatus.Success, State(order).Payments[0].Status);
+    }
+
+    // The gateway's success is the one that took the money, so it stands even
+    // when a failure for the same attempt landed first.
+    [Fact]
+    public async Task A_success_landing_after_a_failure_of_the_same_attempt_still_pays()
+    {
+        var order = await PlaceAsync(PaymentMethod.VnPay);
+        var payment = await PaymentIdAsync(order);
+        await _sut.HandleAsync(Result(payment, PaymentResultCode.Failed));
+
+        var late = await _sut.HandleAsync(Result(payment, PaymentResultCode.Success, txn: "SIM-LATE"));
+
+        Assert.Equal(new CallbackResult(CallbackOutcome.Paid, order), late);
+        var (paid, payments) = State(order);
+        Assert.Equal(OrderPaymentStatus.Paid, paid);
+        Assert.Equal([(PaymentMethod.VnPay, PaymentStatus.Success, (string?)"SIM-LATE", Total)], payments);
     }
 
     [Fact]
@@ -234,9 +255,9 @@ public sealed class PaymentServiceTests : IDisposable
         Assert.NotEqual(first, second);
         Assert.Equal(CallbackOutcome.Paid, (await _sut.HandleAsync(Result(second, PaymentResultCode.Success, txn: "SIM-2"))).Outcome);
 
-        Assert.Equal((OrderPaymentStatus.Paid,
-            [(PaymentMethod.MoMo, PaymentStatus.Failed, (string?)null, 0m), (PaymentMethod.MoMo, PaymentStatus.Success, (string?)"SIM-2", Total)]),
-            State(order));
+        var (paid, payments) = State(order);
+        Assert.Equal(OrderPaymentStatus.Paid, paid);
+        Assert.Equal([(PaymentMethod.MoMo, PaymentStatus.Failed, (string?)null, 0m), (PaymentMethod.MoMo, PaymentStatus.Success, (string?)"SIM-2", Total)], payments);
     }
 
     [Fact]

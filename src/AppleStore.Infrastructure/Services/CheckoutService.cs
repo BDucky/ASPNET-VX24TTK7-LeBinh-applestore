@@ -156,8 +156,8 @@ public class CheckoutService : ICheckoutService
             Price = l.UnitPrice!.Value,
             Quantity = l.Quantity,
         }));
-        // Cash on delivery until task 7 adds VNPay and MoMo.
-        _db.Payments.Add(new Payment { Order = order, Method = PaymentMethod.Cod, Status = PaymentStatus.Pending, PaidAmount = 0m, CreatedAt = now });
+        // The first attempt; an online one is settled by PaymentService.
+        _db.Payments.Add(new Payment { Order = order, Method = method, Status = PaymentStatus.Pending, PaidAmount = 0m, CreatedAt = now });
         await _db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
         return new PlaceOrderResult(PlaceOrderOutcome.Placed, order.Id);
