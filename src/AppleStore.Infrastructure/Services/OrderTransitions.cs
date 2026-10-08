@@ -9,10 +9,24 @@ namespace AppleStore.Infrastructure.Services;
 // paid.
 public static class OrderTransitions
 {
-    public static IReadOnlyList<OrderStatus> From(OrderAction action, bool byStaff) => throw new NotImplementedException();
+    private static readonly Dictionary<OrderAction, (OrderStatus[] Staff, OrderStatus[] Customer, OrderStatus To)> Rules = new()
+    {
+        [OrderAction.Confirm] = ([OrderStatus.Pending], [], OrderStatus.Confirmed),
+        [OrderAction.Ship] = ([OrderStatus.Confirmed], [], OrderStatus.Shipping),
+        [OrderAction.Complete] = ([OrderStatus.Shipping], [], OrderStatus.Completed),
+        [OrderAction.Cancel] = ([OrderStatus.Pending, OrderStatus.Confirmed], [OrderStatus.Pending], OrderStatus.Cancelled),
+    };
 
-    public static OrderStatus To(OrderAction action) => throw new NotImplementedException();
+    public static IReadOnlyList<OrderStatus> From(OrderAction action, bool byStaff) =>
+        byStaff ? Rules[action].Staff : Rules[action].Customer;
+
+    public static OrderStatus To(OrderAction action) => Rules[action].To;
+
+    public static bool NeedsPayment(OrderAction action, PaymentMethod method, OrderPaymentStatus paymentStatus) =>
+        action == OrderAction.Confirm && method != PaymentMethod.Cod && paymentStatus != OrderPaymentStatus.Paid;
 
     public static IReadOnlyList<OrderAction> Allowed(OrderStatus status, PaymentMethod method, OrderPaymentStatus paymentStatus, bool byStaff) =>
-        throw new NotImplementedException();
+        Enum.GetValues<OrderAction>()
+            .Where(a => From(a, byStaff).Contains(status) && !NeedsPayment(a, method, paymentStatus))
+            .ToList();
 }

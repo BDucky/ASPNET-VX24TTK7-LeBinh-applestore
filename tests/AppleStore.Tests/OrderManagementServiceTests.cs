@@ -15,6 +15,7 @@ public sealed class OrderManagementServiceTests : IDisposable
     private const decimal Price = 10_000_000m;
 
     private readonly ShopTestDb _shop = new();
+    private readonly SqlRace _race = new();
     private readonly AppDbContext _db;
     private readonly OrderManagementService _sut;
     private readonly int _alice;
@@ -24,7 +25,7 @@ public sealed class OrderManagementServiceTests : IDisposable
 
     public OrderManagementServiceTests()
     {
-        _db = _shop.Context();
+        _db = _shop.Context(_race);
         var alice = ShopTestDb.NewUser("alice@example.com");
         var bob = ShopTestDb.NewUser("bob@example.com");
         var phone = AddVariant(_db, NewProduct(NewCategory("iPhone", "iphone"), "iPhone 17", "iphone-17", 1m), "IP17", Price, stock: 10, config: "iPhone 17 256GB");
@@ -231,6 +232,22 @@ public sealed class OrderManagementServiceTests : IDisposable
         Assert.Equal(new OrderChangeResult(OrderChangeOutcome.Done, RefundDue: false), result);
         Assert.Equal((OrderStatus.Cancelled, 10, 0), (State(order).Status, State(order).Stock, State(order).VoucherUses));
         Assert.Equal([PaymentStatus.Failed], Payments(order).Select(p => p.Status));
+    }
+
+    // Both read the order as pending; staff confirm it just before the
+    // customer's cancel writes. The cancel must find the status moved.
+    [Fact]
+    public async Task A_confirm_landing_just_before_a_customers_cancel_wins()
+    {
+        var order = await PlaceAsync(quantity: 3, voucher: "TAKE1M");
+        _race.Arm("UPDATE \"Orders\"", $"UPDATE Orders SET Status = 1 WHERE Id = {order}");
+
+        var result = await _sut.CancelAsync(order, _alice);
+
+        Assert.True(_race.Ran);
+        Assert.Equal(OrderChangeOutcome.NotAllowed, result.Outcome);
+        Assert.Equal((7, 1), (State(order).Stock, State(order).VoucherUses));
+        Assert.Equal([PaymentStatus.Pending], Payments(order).Select(p => p.Status));
     }
 
     [Fact]
