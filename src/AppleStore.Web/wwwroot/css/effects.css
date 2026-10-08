@@ -2249,3 +2249,50 @@ a.btn-store-primary {
   font-size: clamp(1.15rem, 2vw, 1.9rem);
   white-space: nowrap;
 }
+
+/* ---------- Reviews ---------- */
+
+.pdp-reviews {
+  max-width: 880px;
+  margin: 32px auto 0;
+}
+
+.pdp-review-stars {
+  color: #f5b301;
+  letter-spacing: 1px;
+}
+
+.pdp-review-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.pdp-review-list li {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  overflow-wrap: anywhere;
+}
+
+.pdp-review-list p {
+  margin: 6px 0 0;
+}
+
+.pdp-review-reply {
+  color: var(--text-muted);
+  border-left: 2px solid var(--accent);
+  padding-left: 10px;
+}
+
+.pdp-review-form select,
+.pdp-review-form textarea {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+  font: inherit;
+}

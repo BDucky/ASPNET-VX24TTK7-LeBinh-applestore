@@ -68,6 +68,7 @@ puts a demoable buying flow and the admin area first.
 | 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24, 37 | `feat/orders` | `[Authorize(Roles = "Admin,Employee")]`, one rules table, compare-and-swap updates, partial views, email | done, verified 19/19, PR #20 |
 | 9 | Admin product and voucher CRUD, account roles | 25-27, 29-31 | `feat/admin-products` | Areas, model binding, optimistic concurrency (row version), security stamp, unique index | done, verified 15/15, PR #21 |
 | 10 | Revenue report, export, invoices | 33-36 | `feat/admin-reports` | LINQ aggregation, `File` result (ClosedXML .xlsx), print layout | done, verified 14/14, PR #23 |
+| 10b | Product reviews | 32 | `feat/reviews` | view component, `[Authorize]`, unique index, EF migration | done, verified 9/9, PR #24 |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
@@ -84,6 +85,7 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Reviews | 2026-10-08 | verified purchase = a delivered order with the product (report: "after a verified purchase"); one review per customer per product, editable; staff reply and hide ("remove"); no photos yet (Claude's, stated before building) |
 | Revenue | 2026-10-08 | paid, not cancelled orders, by Vietnam day; export .xlsx (ClosedXML) and print or PDF from the browser (owner). Reports for Admin and Employee, default range this month, every product listed (Claude's) |
 | Admin catalog | 2026-10-08 | "delete" a product = take it off sale; admins edit products, variants and the main photo; account roles page (owner). No uploads: admins pick from the shop's own licensed photos, and Claude sources photos (owner) |
 | Sessions | 2026-10-08 | security stamp checked on every request, so a role or password change ends other sessions at once (Claude's, to make role changes immediate as promised) |

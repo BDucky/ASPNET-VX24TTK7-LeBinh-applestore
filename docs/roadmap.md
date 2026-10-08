@@ -102,6 +102,9 @@ aggregation queries and Excel/PDF export.
 
 ## M8: Reviews
 
+Done (2026-10-08): verified-purchase reviews with staff replies and hiding
+(`docs/architecture.md`, "Reviews"). Photos in reviews not done.
+
 Use cases 32, 37 (submit review, order confirmation email). Entities: `Review`,
 `ReviewMedia`. Placed last because it depends on a completed order existing
 (`PurchaseVerified` requires a real purchase to check against), and order

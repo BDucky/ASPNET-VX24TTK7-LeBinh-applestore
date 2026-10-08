@@ -132,4 +132,5 @@
             <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.ProductSlug" class="btn-store-dark">All @Model.ProductName options &raquo;</a>
         </div>
     </div>
+    <vc:product-reviews product-id="@Model.ProductId"></vc:product-reviews>
 </section>
