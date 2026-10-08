@@ -9,6 +9,8 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
     public void Configure(EntityTypeBuilder<Review> builder)
     {
         builder.HasKey(r => r.Id);
+        // One review per customer per product; writing again edits it.
+        builder.HasIndex(r => new { r.ProductId, r.UserId }).IsUnique();
 
         builder.HasOne(r => r.Product)
             .WithMany()
