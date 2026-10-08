@@ -65,7 +65,7 @@ puts a demoable buying flow and the admin area first.
 | 5 | Cart | 11-14 | `feat/cart` | `[Authorize]`, anti-forgery, DB cart with unique indexes (EF migration), view component for the nav count | done, verified 23/23, PR #17 |
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, EF Core transaction with conditional writes, `TimeProvider`, voucher table by migration | done, verified 25/25, PR #18 |
 | 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern with `ValidateOnStart`, signed callbacks (HMAC-SHA512), conditional updates | done, verified 16/16, PR #19 |
-| 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24, 37 | `feat/orders` | `[Authorize(Roles = "Admin,Employee")]`, one rules table, compare-and-swap updates, partial views, email | done, verified 19/19 |
+| 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24, 37 | `feat/orders` | `[Authorize(Roles = "Admin,Employee")]`, one rules table, compare-and-swap updates, partial views, email | done, verified 19/19, PR #20 |
 | 9 | Admin product and voucher CRUD | 25-27, 29-31 | `feat/admin-products` | scaffolded CRUD on MVC, file upload | not started |
 | 10 | Revenue report | 33-36 | `feat/admin-reports` | LINQ aggregation, export | not started |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
