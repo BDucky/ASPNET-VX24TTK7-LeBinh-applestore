@@ -201,7 +201,7 @@ public class AdminCatalogFlowTests : WebFlowTestBase
         form["BasePrice"] = "14.990.000";
 
         var product = await PostFormAsync("/Admin/Products/New", form, formPage: "/Admin/Products/New");
-        var voucher = await PostFormAsync("/Admin/Vouchers/New", VoucherForm("DOTS", "1.000"), formPage: "/Admin/Vouchers/New");
+        var voucher = await PostFormAsync("/Admin/Vouchers/New", VoucherForm("DOTS", "1.000.000"), formPage: "/Admin/Vouchers/New");
 
         Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await product.Content.ReadAsStringAsync()));
         Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await voucher.Content.ReadAsStringAsync()));

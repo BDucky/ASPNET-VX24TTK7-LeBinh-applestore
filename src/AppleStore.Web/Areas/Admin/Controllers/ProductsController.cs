@@ -44,6 +44,8 @@ public class ProductsController : Controller
     [HttpPost("New"), ValidateAntiForgeryToken]
     public async Task<IActionResult> New(ProductForm form, CancellationToken ct)
     {
+        if (!ModelState.IsValid)
+            return View("Edit", await PageAsync(null, form, null, [], AdminMessages.UnreadableNumber, ct));
         var result = await RunAsync(() => _catalog.CreateAsync(form.ToInput(), ct), "create a product");
         if (result is null)
             return View("Edit", await PageAsync(null, form, null, [], AdminMessages.SaveFailed, ct));
@@ -77,6 +79,11 @@ public class ProductsController : Controller
     [HttpPost("{id:int}"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, ProductForm form, CancellationToken ct)
     {
+        if (!ModelState.IsValid)
+        {
+            var current = await _catalog.GetAsync(id, ct);
+            return current is null ? NotFound() : View(await PageAsync(id, form, current.Slug, current.Variants, AdminMessages.UnreadableNumber, ct));
+        }
         var result = await RunAsync(() => _catalog.UpdateAsync(id, form.ToInput(), form.Version, ct), "save a product");
         if (result?.Outcome == AdminCatalogOutcome.NotFound)
             return NotFound();
@@ -109,6 +116,8 @@ public class ProductsController : Controller
     [HttpPost("{id:int}/Variants"), ValidateAntiForgeryToken]
     public async Task<IActionResult> AddVariant(int id, VariantAddForm form, CancellationToken ct)
     {
+        if (!ModelState.IsValid)
+            return Unreadable(id);
         var input = new VariantInput(form.Sku, form.Configuration, form.Color, form.Region, form.Price, form.StockQty, form.OnSale);
         var result = await RunAsync(() => _catalog.AddVariantAsync(id, input, ct), "add a variant");
         if (result?.Outcome == AdminCatalogOutcome.NotFound)
@@ -122,9 +131,17 @@ public class ProductsController : Controller
         var productId = await _db.ProductVariants.Where(v => v.Id == variantId).Select(v => (int?)v.ProductId).FirstOrDefaultAsync(ct);
         if (productId is null)
             return NotFound();
+        if (!ModelState.IsValid)
+            return Unreadable(productId.Value);
         var change = new VariantChange(form.Price, form.StockQty, form.OnSale, form.SeenStock, form.Version);
         var result = await RunAsync(() => _catalog.UpdateVariantAsync(variantId, change, ct), "save a variant");
         return Back(productId.Value, result, AdminMessages.VariantSaved);
+    }
+
+    private RedirectToActionResult Unreadable(int productId)
+    {
+        TempData[CartMessages.ErrorKey] = AdminMessages.UnreadableNumber;
+        return RedirectToAction(nameof(Edit), new { id = productId });
     }
 
     private RedirectToActionResult Back(int productId, AdminCatalogResult? result, string done)
