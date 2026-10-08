@@ -268,8 +268,9 @@ public class PaymentStartupTests
 {
     [Theory]
     [InlineData("Production", "Simulated")]
+    [InlineData("Staging", "Simulated")]
     [InlineData("Development", "Sandbox")]
-    public void The_app_refuses_to_start_with_the_simulator_in_production_or_an_unknown_mode(string environment, string mode)
+    public void The_app_refuses_to_start_with_the_simulator_outside_development_or_an_unknown_mode(string environment, string mode)
     {
         using var factory = new AppleStoreWebFactory(new Dictionary<string, string?> { ["Payments:Mode"] = mode }, environment: environment);
 
