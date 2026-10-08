@@ -11,6 +11,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Name).HasMaxLength(200).IsRequired();
         builder.Property(p => p.Slug).HasMaxLength(220).IsRequired();
+        // Product pages are found by slug; added 2026-10-08 with the admin product pages.
+        builder.HasIndex(p => p.Slug).IsUnique();
         builder.Property(p => p.BasePrice).HasPrecision(12, 2);
 
         builder.HasOne(p => p.Category)
