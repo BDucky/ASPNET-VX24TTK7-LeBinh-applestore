@@ -19,5 +19,6 @@ silently leaving setup incomplete.
 | `verify-admin/verify.py` | seeded admin, Admin area access by role, dashboard counts, live in a browser |
 | `verify-cart/verify.py` | sign-in link, add, change, remove, stock limits, a locked database, live in a browser |
 | `verify-checkout/verify.py` | checkout, demo vouchers, placing, double submit, changed price, a locked database, live in a browser |
+| `verify-payment/verify.py` | VNPay and MoMo through the simulated gateway, retries, tampering, the Production guard, live in a browser |
 
 All of them import `verifylib.py` (start the app, drive the browser, tally results).

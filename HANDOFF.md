@@ -5,6 +5,22 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-08: online payment, task 7
+
+**What landed.** Branch `feat/payment`: `PaymentSignature`, `IPaymentGateway`
+with `SimulatedPaymentGateway`, `PaymentService`, `/PaymentSimulator`,
+`/Payments/Pay/{id}` and `/Payments/Return`, payment method choice at
+checkout, "Pay now" on the order page. 273 tests; `verify-payment` 16 of 16.
+
+**Decisions:** no sandbox credentials, so the gateway is simulated inside the
+app (owner agreed the approach). `Payments:Mode=Simulated` lives in
+`appsettings.Development.json` only; Production refuses it at startup. The
+owner asked to keep going through the plan with split commits and the
+progress report kept current.
+
+**Where to pick up:** task 8 (orders for staff, tracking for customers),
+which also brings cancelling (stock and voucher use given back).
+
 ## 2026-10-07 (evening): checkout and vouchers, task 6
 
 **What landed.** Branch `feat/checkout`: `Vouchers` and `VoucherProducts`

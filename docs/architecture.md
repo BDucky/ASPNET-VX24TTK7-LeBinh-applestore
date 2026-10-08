@@ -188,6 +188,28 @@ count, a percent discount rounds to whole dong half away from zero, no
 discount exceeds the lines it applies to, shipping is free. The clock is
 `TimeProvider`, so tests fix the time.
 
+## Payment
+
+Added 2026-10-08, use case 17. Cash on delivery needs nothing more than the
+order. VNPay and MoMo go through `IPaymentGateway`; without sandbox
+credentials the only one is `SimulatedPaymentGateway`, a page inside the app
+(`/PaymentSimulator`) that signs its answers with a key made at startup.
+
+| Piece | Role |
+|---|---|
+| `PaymentOptions` (`Payments:Mode`) | empty: cash only; `Simulated`: the in-app gateway. Options pattern with `ValidateOnStart`: an unknown mode, or the simulator in Production, stops the app |
+| `PaymentSignature` | HMAC-SHA512 over the fields sorted by name, compared in constant time (VNPay's scheme) |
+| `PaymentService` | starts a payment on the open attempt (a new `Payments` row after a failure) and settles the gateway's answer |
+| `PaymentsController` | "Pay now" (`POST /Payments/Pay/{orderId}`, owner only) and `/Payments/Return` |
+| `PaymentSimulatorController` | the stand-in gateway page; tells the shop's server first, as VNPay's IPN would, then sends the shopper back with the same answer |
+
+An answer is trusted only when its signature verifies, the payment is an
+online one, and the amount is the order total. Every change is conditional on
+the state it replaces: a success wins over an earlier failure (the money was
+taken), a failure never undoes a success, a repeated answer changes nothing,
+and a second success on a paid order is recorded as paid twice and logged
+for a refund. A real gateway would replace only `IPaymentGateway`.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`
