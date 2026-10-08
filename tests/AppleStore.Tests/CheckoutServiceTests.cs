@@ -390,10 +390,6 @@ public sealed class CheckoutServiceTests : IDisposable
         Assert.Null(await _sut.GetOrderAsync(_alice, 999_999));
     }
 
-    private sealed class FixedTime(DateTimeOffset now) : TimeProvider
-    {
-        public override DateTimeOffset GetUtcNow() => now;
-    }
 
     // Runs another request's SQL once, just before the first command whose
     // text contains the marker, on the same connection and transaction.

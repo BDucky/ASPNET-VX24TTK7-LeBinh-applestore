@@ -82,7 +82,8 @@ public class CheckoutService : ICheckoutService
         return (Math.Min(discount, eligible), VoucherProblem.None, null, voucher.Id);
     }
 
-    public async Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal, CancellationToken ct = default)
+    public async Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal,
+        PaymentMethod method = PaymentMethod.Cod, CancellationToken ct = default)
     {
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
         var (quote, voucherId) = await PriceAsync(userId, voucherCode, ct);

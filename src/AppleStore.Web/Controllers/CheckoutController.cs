@@ -65,7 +65,7 @@ public class CheckoutController : Controller
         try
         {
             var delivery = new DeliveryInput(form.FullName, form.Phone, form.AddressLine, form.Ward, form.District, form.City, form.Note);
-            result = await _checkout.PlaceOrderAsync(UserId, delivery, form.VoucherCode, form.ExpectedTotal, ct);
+            result = await _checkout.PlaceOrderAsync(UserId, delivery, form.VoucherCode, form.ExpectedTotal, ct: ct);
         }
         catch (Exception ex) when (ex is DbUpdateException or DbException)
         {
