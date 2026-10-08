@@ -81,6 +81,22 @@ public sealed class OrderNotifierTests : IDisposable
         Assert.Contains(_log.Entries, e => e.Level == LogLevel.Warning && e.Message.Contains($"#{_order}"));
     }
 
+    // The order is already saved when the notifier runs; a database that
+    // fails its read must not turn that into an error page.
+    [Fact]
+    public async Task A_database_that_fails_the_read_is_logged_not_thrown()
+    {
+        using var broken = new SqliteInMemoryFixture();
+        var log = new ListLogger<OrderNotifier>();
+        var notifier = new OrderNotifier(broken.Context, _mail, log);
+
+        await notifier.OrderPlacedAsync(_order, "x");
+        await notifier.OrderShippedAsync(_order, "x");
+
+        Assert.Empty(_mail.Sent);
+        Assert.Equal(2, log.Entries.Count(e => e.Level == LogLevel.Warning && e.Message.Contains($"#{_order}")));
+    }
+
     [Fact]
     public async Task An_unknown_order_sends_nothing()
     {
