@@ -94,6 +94,43 @@ public class RegistrationServiceTests
         Assert.Empty(fixture.Fixture.Context.Users);
     }
 
+    // A different code than the one sent, never the real one by chance.
+    private static string Wrong(string code) => (code[0] == '9' ? "0" : ((char)(code[0] + 1)).ToString()) + code[1..];
+
+    // Without a cap the 6-digit code could be guessed in its 5 minutes and an
+    // account made under someone else's email (found in review 2026-10-08).
+    // Five, the same number as the sign-in lockout agreed on 2026-10-05.
+    [Fact]
+    public async Task ConfirmAsync_drops_the_attempt_after_five_wrong_codes()
+    {
+        var (sut, fixture, email) = CreateSut();
+        using var _ = fixture;
+        var start = await sut.StartAsync(new RegisterRequest("new@example.com", "Password123!", "New User", null));
+        var code = ExtractCode(email.Sent[0].Body);
+
+        var errors = new List<RegistrationError?>();
+        for (var i = 0; i < 5; i++)
+            errors.Add((await sut.ConfirmAsync(start.AttemptId!, Wrong(code))).Error);
+        var right = await sut.ConfirmAsync(start.AttemptId!, code);
+
+        Assert.Equal([RegistrationError.InvalidOtp, RegistrationError.InvalidOtp, RegistrationError.InvalidOtp, RegistrationError.InvalidOtp, RegistrationError.TooManyAttempts], errors);
+        Assert.Equal(RegistrationError.AttemptNotFound, right.Error);
+        Assert.Empty(fixture.Fixture.Context.Users);
+    }
+
+    [Fact]
+    public async Task ConfirmAsync_still_accepts_the_right_code_after_four_wrong_ones()
+    {
+        var (sut, fixture, email) = CreateSut();
+        using var _ = fixture;
+        var start = await sut.StartAsync(new RegisterRequest("new@example.com", "Password123!", "New User", null));
+        var code = ExtractCode(email.Sent[0].Body);
+        for (var i = 0; i < 4; i++)
+            await sut.ConfirmAsync(start.AttemptId!, Wrong(code));
+
+        Assert.True((await sut.ConfirmAsync(start.AttemptId!, code)).Success);
+    }
+
     [Fact]
     public async Task ConfirmAsync_returns_attempt_not_found_when_unknown()
     {
