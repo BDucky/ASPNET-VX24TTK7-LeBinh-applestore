@@ -1,0 +1,122 @@
+@model AppleStore.Web.Models.Admin.ProductPage
+@{
+    var isNew = Model.Id is null;
+    ViewData["Title"] = isNew ? "Add a product" : $"Edit {Model.Form.Name}";
+    var form = Model.Form;
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Admin</div>
+        <h1 class="account-title">@(isNew ? "Add a product" : form.Name)</h1>
+        <partial name="_AdminNav" />
+        @if (Model.Slug is not null)
+        {
+            <p class="account-hint">Page: <a href="/Products/@Model.Slug" target="_blank" rel="noopener">/Products/@Model.Slug</a> (the address stays when the name changes)</p>
+        }
+        @if (Model.Error is not null)
+        {
+            <p class="account-error" role="alert">@Model.Error</p>
+        }
+
+        <form method="post" action="@(isNew ? "/Admin/Products/New" : $"/Admin/Products/{Model.Id}")" class="account-form admin-form" novalidate>
+            <input type="hidden" name="Version" value="@form.Version" />
+            <label for="Name">Name</label>
+            <input id="Name" name="Name" value="@form.Name" maxlength="200" />
+
+            <label for="CategoryId">Category</label>
+            <select id="CategoryId" name="CategoryId">
+                @foreach (var (id, name) in Model.Categories)
+                {
+                    <option value="@id" selected="@(id == form.CategoryId)">@name</option>
+                }
+            </select>
+
+            <label for="BasePrice">Base price (VND), empty for "Contact for price"</label>
+            <input id="BasePrice" name="BasePrice" value="@form.BasePrice" inputmode="numeric" />
+
+            <label for="Description">Description</label>
+            <textarea id="Description" name="Description" rows="3">@form.Description</textarea>
+
+            <label class="account-check">
+                <input type="checkbox" name="OnSale" value="true" checked="@form.OnSale" />
+                <input type="hidden" name="OnSale" value="false" />
+                <span>On sale</span>
+            </label>
+
+            <fieldset class="admin-photos">
+                <legend>Photo (the shop's own photos, credited on the Credits page)</legend>
+                <label class="admin-photo">
+                    <input type="radio" name="ImageUrl" value="" checked="@(form.ImageUrl is null)" />
+                    <span class="admin-photo-none">No photo</span>
+                </label>
+                @foreach (var image in Model.Images)
+                {
+                    <label class="admin-photo">
+                        <input type="radio" name="ImageUrl" value="@image" checked="@(image == form.ImageUrl)" />
+                        <img src="@image" alt="" loading="lazy" />
+                        <span>@System.IO.Path.GetFileNameWithoutExtension(image)</span>
+                    </label>
+                }
+            </fieldset>
+
+            <button type="submit" class="btn-store-primary">Save product</button>
+        </form>
+
+        @if (!isNew)
+        {
+            <div class="cart-actions">
+                <form method="post" action="/Admin/Products/@Model.Id/@(form.OnSale ? "OffSale" : "OnSale")">
+                    <button type="submit" class="btn-store-ghost">@(form.OnSale ? "Take off sale (delete)" : "Put back on sale")</button>
+                </form>
+            </div>
+
+            <h2 class="checkout-heading">Variants</h2>
+            <ul class="admin-variants">
+                @foreach (var v in Model.Variants)
+                {
+                    <li>
+                        <div class="admin-variant-name">
+                            <strong>@v.Sku</strong>
+                            <span class="account-hint">@string.Join(" · ", new[] { v.Configuration, v.Color, v.Region }.OfType<string>())</span>
+                        </div>
+                        <form method="post" action="/Admin/Products/Variants/@v.Id" class="admin-variant-form">
+                            <input type="hidden" name="SeenStock" value="@v.StockQty" />
+                            <input type="hidden" name="Version" value="@v.Version" />
+                            <label>Price <input name="Price" value="@v.Price" inputmode="numeric" /></label>
+                            <label>Stock <input name="StockQty" value="@v.StockQty" inputmode="numeric" /></label>
+                            <label class="account-check">
+                                <input type="checkbox" name="OnSale" value="true" checked="@v.OnSale" />
+                                <input type="hidden" name="OnSale" value="false" />
+                                <span>On sale</span>
+                            </label>
+                            <button type="submit" class="btn-store-ghost">Save</button>
+                        </form>
+                    </li>
+                }
+            </ul>
+
+            <h2 class="checkout-heading">Add a variant</h2>
+            <form method="post" action="/Admin/Products/@Model.Id/Variants" class="account-form admin-form">
+                <label for="Sku">SKU</label>
+                <input id="Sku" name="Sku" maxlength="80" />
+                <label for="Configuration">Configuration (for example "@form.Name 256GB"), empty if sold as one model</label>
+                <input id="Configuration" name="Configuration" />
+                <label for="Color">Colour</label>
+                <input id="Color" name="Color" />
+                <label for="Region">Region</label>
+                <input id="Region" name="Region" />
+                <label for="Price">Price (VND)</label>
+                <input id="Price" name="Price" inputmode="numeric" />
+                <label for="StockQty">Stock</label>
+                <input id="StockQty" name="StockQty" value="0" inputmode="numeric" />
+                <label class="account-check">
+                    <input type="checkbox" name="OnSale" value="true" checked />
+                    <input type="hidden" name="OnSale" value="false" />
+                    <span>On sale</span>
+                </label>
+                <button type="submit" class="btn-store-primary">Add variant</button>
+            </form>
+        }
+    </div>
+</section>

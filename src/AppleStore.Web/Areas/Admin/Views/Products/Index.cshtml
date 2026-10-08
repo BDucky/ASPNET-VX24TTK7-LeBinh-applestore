@@ -1,0 +1,32 @@
+@model IReadOnlyList<AppleStore.Infrastructure.Services.ProductAdminRow>
+@{
+    ViewData["Title"] = "Products";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Admin</div>
+        <h1 class="account-title">Products</h1>
+        <partial name="_AdminNav" />
+
+        <form method="get" class="admin-search">
+            <label class="visually-hidden" for="search">Search products</label>
+            <input id="search" name="search" value="@ViewData["Search"]" placeholder="Search by name" />
+            <button type="submit" class="btn-store-ghost">Search</button>
+            <a class="btn-store-primary" asp-action="New">Add a product</a>
+        </form>
+
+        <ul class="order-list">
+            @foreach (var p in Model)
+            {
+                <li>
+                    <a class="order-list-link admin-product-row" asp-action="Edit" asp-route-id="@p.Id">
+                        <span class="order-list-id">@p.Name</span>
+                        <span class="order-list-meta">@p.Category · @p.Variants variant(s) · @p.Stock in stock · @(p.ImageUrl is null ? "no photo" : "photo")</span>
+                        <span class="order-list-status">@(p.OnSale ? "On sale" : "Off sale")</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</section>

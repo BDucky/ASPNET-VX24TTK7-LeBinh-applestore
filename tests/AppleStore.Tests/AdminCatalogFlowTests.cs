@@ -98,6 +98,7 @@ public class AdminCatalogFlowTests : WebFlowTestBase
     [Fact]
     public async Task A_photo_from_outside_the_library_is_refused_on_the_form()
     {
+        Seed();
         await SignInAsync();
 
         var response = await PostFormAsync("/Admin/Products/New", ProductForm("Mac mini M5", await CategoryIdAsync("iphone"), "https://evil.example/x.jpg"), formPage: "/Admin/Products/New");
