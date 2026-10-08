@@ -132,12 +132,22 @@ public class AdminCatalogService : IAdminCatalogService
         return new AdminCatalogResult(AdminCatalogOutcome.Done, productId);
     }
 
+    // Moves the version like every other product save, so an edit page opened
+    // before the change cannot overwrite it. Retries while another save lands
+    // between the read and the write; it ends once the version read is current.
     public async Task<AdminCatalogResult> SetOnSaleAsync(int productId, bool onSale, CancellationToken ct = default)
     {
-        var now = Now;
-        var changed = await _db.Products.Where(p => p.Id == productId)
-            .ExecuteUpdateAsync(s => s.SetProperty(p => p.Status, onSale).SetProperty(p => p.UpdatedAt, now), ct);
-        return new AdminCatalogResult(changed == 1 ? AdminCatalogOutcome.Done : AdminCatalogOutcome.NotFound, productId);
+        while (true)
+        {
+            var current = await _db.Products.Where(p => p.Id == productId).Select(p => (DateTime?)p.UpdatedAt).FirstOrDefaultAsync(ct);
+            if (current is not { } seen)
+                return new AdminCatalogResult(AdminCatalogOutcome.NotFound);
+            var next = RowVersion.Next(seen.Ticks, Now);
+            var changed = await _db.Products.Where(p => p.Id == productId && p.UpdatedAt == seen)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.Status, onSale).SetProperty(p => p.UpdatedAt, next), ct);
+            if (changed == 1)
+                return new AdminCatalogResult(AdminCatalogOutcome.Done, productId);
+        }
     }
 
     public async Task<AdminCatalogResult> AddVariantAsync(int productId, VariantInput input, CancellationToken ct = default)
