@@ -68,6 +68,10 @@ method codes, and needs sandbox credentials for VNPay/MoMo before it can start.
 
 ## M5: Order management, tracking, shipments
 
+Done (2026-10-08): "My orders", cancelling, public tracking, staff order pages
+with confirm, ship (carrier and tracking number), complete, cancel, and order
+emails (`docs/architecture.md`, "Orders after checkout").
+
 Use cases 18, 19, 22-24 (employee order processing, tracking assignment, status
 updates, customer order lookup and tracking). Entity: `Shipment`. The `OrderStatus`
 gap that blocked this milestone was resolved on 2026-10-05 (fifth value

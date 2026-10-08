@@ -65,7 +65,7 @@ puts a demoable buying flow and the admin area first.
 | 5 | Cart | 11-14 | `feat/cart` | `[Authorize]`, anti-forgery, DB cart with unique indexes (EF migration), view component for the nav count | done, verified 23/23, PR #17 |
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, EF Core transaction with conditional writes, `TimeProvider`, voucher table by migration | done, verified 25/25, PR #18 |
 | 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern with `ValidateOnStart`, signed callbacks (HMAC-SHA512), conditional updates | done, verified 16/16, PR #19 |
-| 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24 | `feat/orders` | role-based pages, status flow | not started |
+| 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24, 37 | `feat/orders` | `[Authorize(Roles = "Admin,Employee")]`, one rules table, compare-and-swap updates, partial views, email | done, verified 19/19 |
 | 9 | Admin product and voucher CRUD | 25-27, 29-31 | `feat/admin-products` | scaffolded CRUD on MVC, file upload | not started |
 | 10 | Revenue report | 33-36 | `feat/admin-reports` | LINQ aggregation, export | not started |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
@@ -84,6 +84,8 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Order rules | 2026-10-08 | customer cancels while pending, staff until shipped; an online order is confirmed only once paid; delivered cash orders are recorded as paid; public tracking by order number and receiver phone (owner chose all four) |
+| Staff access | 2026-10-08 | employees get `/Admin/Orders`, the dashboard stays admin-only; emails on placing and shipping (Claude's, stated before building) |
 | Online payment | 2026-10-08 | no sandbox credentials: VNPay and MoMo are simulated inside the app (`/PaymentSimulator`), only when `Payments:Mode=Simulated` (Development); the app refuses to start with it in Production (owner agreed the approach) |
 | Commits | 2026-10-08 | owner: keep going through the plan, split commits, update progress as work lands |
 | Vouchers | 2026-10-07 | own table (`Vouchers`, `VoucherProducts`), owner's choice; three demo vouchers seeded until the admin pages (task 9) |
@@ -115,17 +117,17 @@ puts a demoable buying flow and the admin area first.
   demoted admin keeps the Admin role claim until the next stamp check (up
   to 30 minutes). No page changes roles yet; the task that adds one must
   call `UpdateSecurityStampAsync`.
-- An employee sent to `/Account/AccessDenied` reads "This page is for staff
-  accounts only", though employees are staff. Reword when task 8 decides
-  which admin pages employees get.
 - If the admin account is deleted or demoted while the `SeedAdmin`
   settings are still set, the next start creates it again.
-- An online order left unpaid keeps its stock until it is cancelled
-  (cancelling arrives with task 8); there is no time limit on paying.
+- An online order left unpaid keeps its stock until someone cancels it;
+  there is no time limit on paying.
+- `/Track` has no limit on attempts; guessing needs both the order number
+  and the receiver's full phone number. A rate limit would need a number
+  from the owner.
+- There is no page to make an account an Employee; the live check sets the
+  role in its throwaway database.
 - A second successful payment on a paid order is recorded and logged as
   needing a refund; refunds themselves are manual.
-- A placed order is never cancelled yet, so its stock and voucher use are
-  never given back (task 8 adds cancelling).
 - Checkout catches a database failure while placing; one while pricing
   (opening `/Checkout`) falls to the global error page, which has a way back.
 - The cart count badge shows 0 for an empty cart rather than hiding.

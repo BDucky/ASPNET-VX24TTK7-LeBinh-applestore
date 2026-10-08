@@ -5,6 +5,22 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-08 (later): orders after checkout, task 8
+
+**What landed.** Branch `feat/orders`: `OrderTransitions`,
+`OrderManagementService`, `OrderNotifier`, "My orders" and cancel, `/Track`,
+`/Admin/Orders` for Admin and Employee, order emails, and the fix that a
+cancelled order is never paid. 335 tests; `verify-orders` 19 of 19 and all
+five earlier checks still pass.
+
+**Decisions:** the owner chose the four order rules (customer cancel while
+pending, online confirmed only once paid, delivered cash counted as paid,
+public tracking). Claude's, stated first: employees get the order pages only,
+emails on placing and shipping.
+
+**Where to pick up:** task 9 (admin product and voucher pages). There is no
+page to give an account the Employee role yet; it could come with task 9.
+
 ## 2026-10-08: online payment, task 7
 
 **What landed.** Branch `feat/payment`: `PaymentSignature`, `IPaymentGateway`
