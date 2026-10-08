@@ -58,6 +58,9 @@ question for this milestone, not something the scaffold should have guessed at.
 
 ## M4: Payment integration
 
+Done (2026-10-08): cash on delivery, and VNPay and MoMo through a simulated
+gateway inside the app (`docs/architecture.md`, "Payment").
+
 Part of use case 17, split out because it is its own integration surface: COD (no
 external call), VNPay, and MoMo. Entity: `Payment`. This milestone should resolve
 the `PaymentMethod` ordinal assignment's real-world mapping to each gateway's own

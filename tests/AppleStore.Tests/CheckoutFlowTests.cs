@@ -361,7 +361,8 @@ public class CheckoutFailureTests : WebFlowTestBase
         public Task<CheckoutQuote> QuoteAsync(int userId, string? voucherCode, CancellationToken ct = default) =>
             Task.FromResult(new CheckoutQuote(Cart, 100m, 0m, 0m, 100m, null, VoucherProblem.None, CheckoutProblem.None));
 
-        public Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal, CancellationToken ct = default) =>
+        public Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal,
+            PaymentMethod method = PaymentMethod.Cod, CancellationToken ct = default) =>
             throw new DbUpdateException("database is locked");
 
         public Task<OrderSummary?> GetOrderAsync(int userId, int orderId, CancellationToken ct = default) => Task.FromResult<OrderSummary?>(null);

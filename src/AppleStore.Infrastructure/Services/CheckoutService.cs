@@ -82,7 +82,8 @@ public class CheckoutService : ICheckoutService
         return (Math.Min(discount, eligible), VoucherProblem.None, null, voucher.Id);
     }
 
-    public async Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal, CancellationToken ct = default)
+    public async Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal,
+        PaymentMethod method = PaymentMethod.Cod, CancellationToken ct = default)
     {
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
         var (quote, voucherId) = await PriceAsync(userId, voucherCode, ct);
@@ -155,8 +156,8 @@ public class CheckoutService : ICheckoutService
             Price = l.UnitPrice!.Value,
             Quantity = l.Quantity,
         }));
-        // Cash on delivery until task 7 adds VNPay and MoMo.
-        _db.Payments.Add(new Payment { Order = order, Method = PaymentMethod.Cod, Status = PaymentStatus.Pending, PaidAmount = 0m, CreatedAt = now });
+        // The first attempt; an online one is settled by PaymentService.
+        _db.Payments.Add(new Payment { Order = order, Method = method, Status = PaymentStatus.Pending, PaidAmount = 0m, CreatedAt = now });
         await _db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
         return new PlaceOrderResult(PlaceOrderOutcome.Placed, order.Id);

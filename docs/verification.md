@@ -4,6 +4,39 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-08: online payment through the simulated gateway (`feat/payment`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 273 of 273 (46 new: 12 `PaymentSignatureTests`, 19 `PaymentServiceTests`, 15 payment web tests) |
+| `python3 setup/verify-payment/verify.py` | **16 of 16** |
+| `python3 setup/verify-checkout/verify.py` | 25 of 25 |
+
+**Mutation checks** (each caught): signature field signed with the rest;
+attempts read tracked; amount not checked; success only from pending;
+order marked paid without its condition; a failure overwriting a success;
+a cash-on-delivery payment accepted; the owner check removed; Production
+allowed with the simulator; the simulator not re-checking its form; the
+simulator ignoring the mode.
+
+**Found during this pass:**
+1. A failed attempt was reused by "Pay now": the attempt was read as a
+   tracked entity, which kept its status from before an `ExecuteUpdate`.
+   Now read untracked; the retry test caught it.
+2. The first version decided the gateway while registering services in
+   `Program.cs`, where the test host's settings do not reach, so the
+   "Production refuses" test could not fail. Moved to the options pattern
+   with `ValidateOnStart`, which runs after every configuration source.
+3. The shopper's return after the gateway's own call read "already paid";
+   it now reads "Payment received".
+4. One web test (another user's order) passed in RED only because the route
+   did not exist; after GREEN a mutation of the owner check proves it.
+
+**Not checked:** a real VNPay or MoMo sandbox (none available); an unpaid
+online order holding stock (no expiry yet).
+
 ## 2026-10-07: checkout and vouchers, use cases 15-16 (`feat/checkout`)
 
 | Command | Result |

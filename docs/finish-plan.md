@@ -64,7 +64,7 @@ puts a demoable buying flow and the admin area first.
 | 4 | Admin area skeleton and seeded admin account | 25 (part) | `feat/admin-area` | Areas, `[Authorize(Roles = "Admin")]`, seeding through `UserManager`, options pattern | done, verified 31/31, PR #16 |
 | 5 | Cart | 11-14 | `feat/cart` | `[Authorize]`, anti-forgery, DB cart with unique indexes (EF migration), view component for the nav count | done, verified 23/23, PR #17 |
 | 6 | Checkout and voucher | 15-16 | `feat/checkout` | model validation, EF Core transaction with conditional writes, `TimeProvider`, voucher table by migration | done, verified 25/25, PR #18 |
-| 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern for gateway config, callbacks | not started |
+| 7 | Payment: COD, VNPay and MoMo simulated | 17 | `feat/payment` | options pattern with `ValidateOnStart`, signed callbacks (HMAC-SHA512), conditional updates | done, verified 16/16, PR #19 |
 | 8 | Order management (staff) and order tracking (customer) | 18-19, 22-24 | `feat/orders` | role-based pages, status flow | not started |
 | 9 | Admin product and voucher CRUD | 25-27, 29-31 | `feat/admin-products` | scaffolded CRUD on MVC, file upload | not started |
 | 10 | Revenue report | 33-36 | `feat/admin-reports` | LINQ aggregation, export | not started |
@@ -75,7 +75,6 @@ puts a demoable buying flow and the admin area first.
 
 | Decision | Needed by task | Notes |
 |---|---|---|
-| VNPay and MoMo sandbox credentials | 7 | without them both are simulated |
 | Report language and who writes which chapter | 11 | sample report is Vietnamese |
 
 ## Decided
@@ -85,6 +84,8 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Online payment | 2026-10-08 | no sandbox credentials: VNPay and MoMo are simulated inside the app (`/PaymentSimulator`), only when `Payments:Mode=Simulated` (Development); the app refuses to start with it in Production (owner agreed the approach) |
+| Commits | 2026-10-08 | owner: keep going through the plan, split commits, update progress as work lands |
 | Vouchers | 2026-10-07 | own table (`Vouchers`, `VoucherProducts`), owner's choice; three demo vouchers seeded until the admin pages (task 9) |
 | Checkout assumptions | 2026-10-07 | shipping free (the store advertises it), COD only until task 7, no per-user voucher limit, order email with task 8 (Claude's, accepted) |
 | Commits in task 6 | 2026-10-07 | owner allowed step-by-step commits for the checkout task |
@@ -119,6 +120,10 @@ puts a demoable buying flow and the admin area first.
   which admin pages employees get.
 - If the admin account is deleted or demoted while the `SeedAdmin`
   settings are still set, the next start creates it again.
+- An online order left unpaid keeps its stock until it is cancelled
+  (cancelling arrives with task 8); there is no time limit on paying.
+- A second successful payment on a paid order is recorded and logged as
+  needing a refund; refunds themselves are manual.
 - A placed order is never cancelled yet, so its stock and voucher use are
   never given back (task 8 adds cancelling).
 - Checkout catches a database failure while placing; one while pricing

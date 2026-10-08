@@ -1,5 +1,6 @@
 using AppleStore.Infrastructure.Data;
 using AppleStore.Infrastructure.Identity;
+using AppleStore.Infrastructure.Payments;
 using AppleStore.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,8 @@ builder.Services.AddScoped<IProductCatalogService, ProductCatalogService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddSingleton(TimeProvider.System);
+// Online payment: the simulated gateway in Development (appsettings), none otherwise.
+builder.Services.AddAppleStorePayments(builder.Configuration);
 builder.Services.AddOptions<SeedAdminOptions>().Bind(builder.Configuration.GetSection(SeedAdminOptions.Section));
 builder.Services.AddScoped<AdminSeeder>();
 // Real SMTP when the "Smtp" section is configured, otherwise log-only.

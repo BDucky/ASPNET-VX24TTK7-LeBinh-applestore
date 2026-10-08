@@ -16,6 +16,11 @@ namespace AppleStore.Tests;
 //
 // The schema exists before the app starts, as it does after
 // "dotnet ef database update", because startup reads it (AdminSeeder).
+// Settings passed here reach the app through IOptions and IConfiguration at
+// run time, but not code in Program.cs that reads configuration while
+// registering services (found 2026-10-08): decide such things with the
+// options pattern, as AddAppleStorePayments does.
+//
 // The SeedAdmin settings are blanked so the owner's user-secrets or
 // environment variables never seed an admin into a test; a test that wants
 // one passes its own settings.
@@ -31,11 +36,14 @@ public sealed class AppleStoreWebFactory : WebApplicationFactory<Program>
     public FakeEmailSender Email { get; } = new();
 
     private readonly Action<IServiceCollection>? _configureServices;
+    private readonly string _environment;
 
     // configureServices runs after the defaults, so a test can swap one service (a failing one, say).
-    public AppleStoreWebFactory(IReadOnlyDictionary<string, string?>? settings = null, Action<IServiceCollection>? configureServices = null)
+    public AppleStoreWebFactory(IReadOnlyDictionary<string, string?>? settings = null, Action<IServiceCollection>? configureServices = null,
+        string environment = "Development")
     {
         _configureServices = configureServices;
+        _environment = environment;
         _connection.Open();
         using (var db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).Options))
             db.Database.EnsureCreated();
@@ -45,7 +53,7 @@ public sealed class AppleStoreWebFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment(_environment);
         builder.ConfigureAppConfiguration(config => config.AddInMemoryCollection(_settings));
         builder.ConfigureServices(services =>
         {
