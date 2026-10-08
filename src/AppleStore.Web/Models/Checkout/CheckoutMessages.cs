@@ -61,6 +61,7 @@ public static class CheckoutMessages
         CallbackOutcome.Failed => ("The payment did not go through, and nothing was charged. You can try again.", false),
         CallbackOutcome.Cancelled => ("The payment was cancelled. You can try again.", false),
         CallbackOutcome.PaidTwice => ("This order was already paid, so this second payment will be refunded. Contact us if it does not arrive.", false),
+        CallbackOutcome.PaidAfterCancel => ("This order was cancelled, so this payment will be refunded. Contact us if it does not arrive.", false),
         _ => ("We could not confirm this payment. If money was taken, contact us with your order number.", false),
     };
 
@@ -69,6 +70,7 @@ public static class CheckoutMessages
         PayStartOutcome.AlreadyPaid => "This order is already paid.",
         PayStartOutcome.NotOnline => "This order is paid on delivery.",
         PayStartOutcome.Unavailable => "Online payment is not available right now. Please try again later.",
+        PayStartOutcome.Cancelled => "This order was cancelled, so it cannot be paid.",
         _ => null,
     };
 

@@ -35,10 +35,12 @@ public class PaymentService : IPaymentService
     {
         var order = await _db.Orders
             .Where(o => o.Id == orderId && o.UserId == userId)
-            .Select(o => new { o.Id, o.TotalAmount, o.PaymentStatus })
+            .Select(o => new { o.Id, o.TotalAmount, o.PaymentStatus, o.Status })
             .FirstOrDefaultAsync(ct);
         if (order is null)
             return new PayStart(PayStartOutcome.NotFound);
+        if (order.Status == OrderStatus.Cancelled)
+            return new PayStart(PayStartOutcome.Cancelled);
 
         // Not tracked: the answers update rows with ExecuteUpdate, which a
         // tracked copy would not see.
@@ -98,8 +100,9 @@ public class PaymentService : IPaymentService
             if (marked == 0)
                 return new CallbackResult(CallbackOutcome.AlreadyPaid, payment.OrderId);
 
+            // A cancelled order stays cancelled and unpaid; its money goes back.
             var paid = await _db.Orders
-                .Where(o => o.Id == payment.OrderId && o.PaymentStatus == OrderPaymentStatus.Unpaid)
+                .Where(o => o.Id == payment.OrderId && o.PaymentStatus == OrderPaymentStatus.Unpaid && o.Status != OrderStatus.Cancelled)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(o => o.PaymentStatus, OrderPaymentStatus.Paid)
                     .SetProperty(o => o.UpdatedAt, _time.GetUtcNow().UtcDateTime), ct);
@@ -107,8 +110,10 @@ public class PaymentService : IPaymentService
             if (paid == 1)
                 return new CallbackResult(CallbackOutcome.Paid, payment.OrderId);
 
-            _logger.LogWarning("Order {OrderId} was paid twice; payment {PaymentId} needs a refund", payment.OrderId, paymentId);
-            return new CallbackResult(CallbackOutcome.PaidTwice, payment.OrderId);
+            var cancelled = await _db.Orders.AnyAsync(o => o.Id == payment.OrderId && o.Status == OrderStatus.Cancelled, ct);
+            _logger.LogWarning("Order {OrderId} {Why}; payment {PaymentId} needs a refund",
+                payment.OrderId, cancelled ? "was cancelled before it was paid" : "was paid twice", paymentId);
+            return new CallbackResult(cancelled ? CallbackOutcome.PaidAfterCancel : CallbackOutcome.PaidTwice, payment.OrderId);
         }
 
         // A failure only settles an open attempt; it never undoes a success.
