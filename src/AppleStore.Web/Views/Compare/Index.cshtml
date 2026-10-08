@@ -1,0 +1,77 @@
+@model IReadOnlyList<AppleStore.Infrastructure.Services.CompareColumn>
+@using AppleStore.Infrastructure.Formatting
+@{
+    ViewData["Title"] = "Compare products";
+    var failed = ViewData["CompareLoadFailed"] is true;
+    static string List(IReadOnlyList<string> values) => values.Count == 0 ? "None" : string.Join(", ", values);
+}
+
+@* Use case 10. One column per product, at most three, any category. The
+   rows are what every product has today; the attribute tables are empty. *@
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Compare</div>
+        <h1 class="account-title">Compare products</h1>
+
+        @if (failed)
+        {
+            <p class="cart-error" role="alert">We could not load your compare list. Please try again.</p>
+            <a class="btn-store-primary" asp-action="Index">Try again</a>
+        }
+        else if (Model.Count == 0)
+        {
+            <p class="account-lead">Nothing to compare yet. Open a product and choose "Add to compare".</p>
+            <a class="btn-store-primary" href="/Products">Browse products</a>
+        }
+        else
+        {
+            <div class="compare-scroll">
+                <table class="report-table compare-table" data-compare-table>
+                    <thead>
+                        <tr>
+                            <th scope="col"><span class="visually-hidden">Detail</span></th>
+                            @foreach (var c in Model)
+                            {
+                                <th scope="col" data-compare-product="@c.ProductId">
+                                    <a class="compare-photo" asp-controller="Products" asp-action="Details" asp-route-slug="@c.Slug">
+                                        @if (c.ImageUrl is not null)
+                                        {
+                                            <img src="@Url.Content(c.ImageUrl)" alt="@c.Name" />
+                                        }
+                                        else
+                                        {
+                                            <partial name="_NoPhoto" model="(string?)null" />
+                                        }
+                                    </a>
+                                    <a class="compare-name" asp-controller="Products" asp-action="Details" asp-route-slug="@c.Slug">@c.Name</a>
+                                    <form asp-action="Remove" method="post">
+                                        <input type="hidden" name="productId" value="@c.ProductId" />
+                                        <button type="submit" class="cart-remove">Remove</button>
+                                    </form>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">Category</th>@foreach (var c in Model) { <td>@c.CategoryName</td> }</tr>
+                        <tr><th scope="row">Price from</th>@foreach (var c in Model) { <td>@PriceText.Vnd(c.FromPrice)</td> }</tr>
+                        <tr><th scope="row">Stock</th>@foreach (var c in Model) { <td>@(c.InStock ? "In stock" : "Out of stock")</td> }</tr>
+                        <tr><th scope="row">Configurations</th>@foreach (var c in Model) { <td>@List(c.Configurations)</td> }</tr>
+                        <tr><th scope="row">Colours</th>@foreach (var c in Model) { <td>@List(c.Colors)</td> }</tr>
+                        <tr><th scope="row">Regions</th>@foreach (var c in Model) { <td>@List(c.Regions)</td> }</tr>
+                        <tr>
+                            <th scope="row">Rating</th>
+                            @foreach (var c in Model)
+                            {
+                                <td>@(c.AverageRating is { } avg ? $"{avg:0.0} / 5 ({c.ReviewCount} review{(c.ReviewCount == 1 ? "" : "s")})" : "No reviews yet")</td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <form asp-action="Clear" method="post" class="compare-clear">
+                <button type="submit" class="btn-store-ghost">Clear all</button>
+            </form>
+        }
+    </div>
+</section>

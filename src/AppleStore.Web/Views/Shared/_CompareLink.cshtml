@@ -1,0 +1,10 @@
+@using AppleStore.Web.Services
+@* The compare link in the nav, only while the list holds something. The
+   count is the cookie's; the compare page drops hidden products from it. *@
+@{
+    var count = CompareCookie.Read(Context.Request).Count;
+}
+@if (count > 0)
+{
+    <a class="site-nav-account-link" asp-area="" asp-controller="Compare" asp-action="Index" data-compare-count>Compare (@count)</a>
+}

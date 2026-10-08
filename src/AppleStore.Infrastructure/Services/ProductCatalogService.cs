@@ -72,7 +72,7 @@ public class ProductCatalogService : IProductCatalogService
         if (product is null)
             return null;
 
-        var configurations = (await LoadConfigurationsAsync(product, ct))
+        var configurations = (await LoadConfigurationsAsync(_db, product, ct))
             .Select(g => new ConfigurationSummary(
                 g.Name,
                 g.Slug,
@@ -80,7 +80,7 @@ public class ProductCatalogService : IProductCatalogService
                 g.Choices.Any(c => c.StockQty > 0)))
             .ToList();
 
-        return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, product.Category.Slug, configurations, await ImageUrlsAsync(product.Id, ct));
+        return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, product.Category.Slug, configurations, await ImageUrlsAsync(_db, product.Id, ct));
     }
 
     public async Task<ConfigurationDetail?> GetConfigurationAsync(string productSlug, string configurationSlug, CancellationToken ct = default)
@@ -92,27 +92,28 @@ public class ProductCatalogService : IProductCatalogService
         if (product is null)
             return null;
 
-        var configuration = (await LoadConfigurationsAsync(product, ct)).FirstOrDefault(g => g.Slug == configurationSlug);
+        var configuration = (await LoadConfigurationsAsync(_db, product, ct)).FirstOrDefault(g => g.Slug == configurationSlug);
         if (configuration is null)
             return null;
 
-        var imageUrl = (await ImageUrlsAsync(product.Id, ct)).FirstOrDefault();
+        var imageUrl = (await ImageUrlsAsync(_db, product.Id, ct)).FirstOrDefault();
         return new ConfigurationDetail(product.Id, product.Name, product.Slug, product.Category.Name, product.Category.Slug, imageUrl, configuration.Name, configuration.Slug, configuration.Choices);
     }
 
-    private sealed record ConfigurationGroup(string Name, string Slug, IReadOnlyList<VariantChoice> Choices);
+    internal sealed record ConfigurationGroup(string Name, string Slug, IReadOnlyList<VariantChoice> Choices);
 
     // Groups a product's active variants by their "config" option, in catalog
     // order (the order the variants were seeded, which follows the reference
     // store's listing). A variant with no "config" option belongs to one
     // configuration named after the product, for items sold as a single model.
-    private async Task<IReadOnlyList<ConfigurationGroup>> LoadConfigurationsAsync(Domain.Entities.Product product, CancellationToken ct)
+    // Also used by CompareService, so both pages group variants the same way.
+    internal static async Task<IReadOnlyList<ConfigurationGroup>> LoadConfigurationsAsync(AppDbContext db, Domain.Entities.Product product, CancellationToken ct)
     {
-        var variants = await _db.ProductVariants
+        var variants = await db.ProductVariants
             .Where(v => v.ProductId == product.Id && v.Status)
             .OrderBy(v => v.Id)
             .ToListAsync(ct);
-        var options = await VariantOptionLookup.LoadAsync(_db, variants.Select(v => v.Id).ToList(), ct);
+        var options = await VariantOptionLookup.LoadAsync(db, variants.Select(v => v.Id).ToList(), ct);
         string? Option(int variantId, string code) => options.Get(variantId, code);
 
         return variants
@@ -124,8 +125,8 @@ public class ProductCatalogService : IProductCatalogService
             .ToList();
     }
 
-    private Task<List<string>> ImageUrlsAsync(int productId, CancellationToken ct) =>
-        _db.ProductImages
+    internal static Task<List<string>> ImageUrlsAsync(AppDbContext db, int productId, CancellationToken ct) =>
+        db.ProductImages
             .Where(i => i.ProductId == productId)
             .OrderBy(i => i.SortOrder)
             .Select(i => i.ImageUrl)
