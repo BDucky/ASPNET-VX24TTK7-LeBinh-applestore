@@ -2125,15 +2125,19 @@ a.btn-store-primary {
 }
 
 .admin-photos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
-  max-height: 420px;
-  overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 10px;
   margin: 10px 0;
+  min-width: 0;
+}
+
+.admin-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 420px;
+  overflow-y: auto;
 }
 
 .admin-photos legend {

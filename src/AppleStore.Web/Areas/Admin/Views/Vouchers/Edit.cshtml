@@ -32,10 +32,10 @@
             </select>
 
             <label for="Value">Discount</label>
-            <input id="Value" name="Value" value="@form.Value" inputmode="decimal" />
+            <input id="Value" name="Value" value="@form.Value.ToString("0.##")" inputmode="decimal" />
 
             <label for="MinOrderAmount">Minimum order (VND), empty for none</label>
-            <input id="MinOrderAmount" name="MinOrderAmount" value="@form.MinOrderAmount" inputmode="numeric" />
+            <input id="MinOrderAmount" name="MinOrderAmount" value="@form.MinOrderAmount?.ToString("0.##")" inputmode="numeric" />
 
             <label for="StartsAt">Starts</label>
             <input id="StartsAt" name="StartsAt" type="datetime-local" value="@form.StartsAt.ToString("yyyy-MM-ddTHH:mm")" />

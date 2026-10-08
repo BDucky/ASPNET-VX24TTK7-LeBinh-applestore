@@ -33,7 +33,7 @@
             </select>
 
             <label for="BasePrice">Base price (VND), empty for "Contact for price"</label>
-            <input id="BasePrice" name="BasePrice" value="@form.BasePrice" inputmode="numeric" />
+            <input id="BasePrice" name="BasePrice" value="@form.BasePrice?.ToString("0.##")" inputmode="numeric" />
 
             <label for="Description">Description</label>
             <textarea id="Description" name="Description" rows="3">@form.Description</textarea>
@@ -46,6 +46,7 @@
 
             <fieldset class="admin-photos">
                 <legend>Photo (the shop's own photos, credited on the Credits page)</legend>
+                <div class="admin-photo-grid">
                 <label class="admin-photo">
                     <input type="radio" name="ImageUrl" value="" checked="@(form.ImageUrl is null)" />
                     <span class="admin-photo-none">No photo</span>
@@ -58,6 +59,7 @@
                         <span>@System.IO.Path.GetFileNameWithoutExtension(image)</span>
                     </label>
                 }
+                </div>
             </fieldset>
 
             <button type="submit" class="btn-store-primary">Save product</button>
@@ -83,7 +85,7 @@
                         <form method="post" asp-antiforgery="true" action="/Admin/Products/Variants/@v.Id" class="admin-variant-form">
                             <input type="hidden" name="SeenStock" value="@v.StockQty" />
                             <input type="hidden" name="Version" value="@v.Version" />
-                            <label>Price <input name="Price" value="@v.Price" inputmode="numeric" /></label>
+                            <label>Price <input name="Price" value="@v.Price?.ToString("0.##")" inputmode="numeric" /></label>
                             <label>Stock <input name="StockQty" value="@v.StockQty" inputmode="numeric" /></label>
                             <label class="account-check">
                                 <input type="checkbox" name="OnSale" value="true" checked="@v.OnSale" />
