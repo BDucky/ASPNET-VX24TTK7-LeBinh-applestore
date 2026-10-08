@@ -33,4 +33,5 @@ public enum RoleChangeOutcome
     Done,
     NotFound,
     OwnAccount,
+    InvalidRole,
 }

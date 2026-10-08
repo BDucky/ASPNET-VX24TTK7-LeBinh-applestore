@@ -49,6 +49,16 @@ public sealed class AdminUserServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task A_role_that_does_not_exist_is_refused()
+    {
+        var admin = await UserAsync("admin@example.com", "Admin", UserRole.Admin);
+        var person = await UserAsync("person@example.com", "Person");
+
+        Assert.Equal(RoleChangeOutcome.InvalidRole, await _sut.ChangeRoleAsync(admin.Id, person.Id, (UserRole)99));
+        Assert.Equal(UserRole.Customer, (await _host.UserManager.FindByIdAsync(person.Id.ToString()))!.Role);
+    }
+
+    [Fact]
     public async Task An_unknown_account_is_not_found()
     {
         var admin = await UserAsync("admin@example.com", "Admin", UserRole.Admin);
