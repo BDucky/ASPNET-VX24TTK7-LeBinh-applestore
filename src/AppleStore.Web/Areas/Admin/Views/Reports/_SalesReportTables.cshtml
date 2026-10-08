@@ -1,0 +1,46 @@
+@model AppleStore.Infrastructure.Services.SalesReport
+@using AppleStore.Infrastructure.Formatting
+@* The report body, shared by the report page and its print page. *@
+<dl class="admin-stats">
+    <div class="admin-stat"><dt>Revenue</dt><dd data-report-revenue>@PriceText.Vnd(Model.Revenue)</dd></div>
+    <div class="admin-stat"><dt>Paid orders</dt><dd>@Model.OrdersPaid</dd></div>
+    <div class="admin-stat"><dt>Items sold</dt><dd>@Model.Items</dd></div>
+    <div class="admin-stat"><dt>Average order</dt><dd>@PriceText.Vnd(Model.AverageOrder)</dd></div>
+</dl>
+<p class="account-hint">
+    Sales before discounts @PriceText.Vnd(Model.Sales), discounts @PriceText.Vnd(Model.Discount).
+    Also placed in this period: @Model.OrdersWaiting waiting for payment, @Model.OrdersCancelled cancelled (not counted).
+</p>
+
+<h2 class="checkout-heading">By day</h2>
+@if (Model.Days.Count == 0)
+{
+    <p class="account-lead">No paid orders in this period.</p>
+}
+else
+{
+    <table class="report-table">
+        <thead><tr><th>Date</th><th>Orders</th><th>Items</th><th>Revenue</th></tr></thead>
+        <tbody>
+            @foreach (var day in Model.Days)
+            {
+                <tr><td>@day.Date.ToString("dd/MM/yyyy")</td><td>@day.Orders</td><td>@day.Items</td><td>@PriceText.Vnd(day.Revenue)</td></tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2 class="checkout-heading">By product</h2>
+@if (Model.Products.Count > 0)
+{
+    <table class="report-table">
+        <thead><tr><th>Product</th><th>Quantity</th><th>Sales before discounts</th></tr></thead>
+        <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr><td>@product.Name</td><td>@product.Quantity</td><td>@PriceText.Vnd(product.Sales)</td></tr>
+            }
+        </tbody>
+    </table>
+}
+<p class="account-hint">Counted: paid orders that were not cancelled, by the day they were placed (Vietnam time). Revenue = quantity × unit price − discount.</p>

@@ -254,6 +254,18 @@ for one user lookup per signed-in request. Forms with a hand-written action
 ask for the anti-forgery token explicitly (`asp-antiforgery="true"`);
 `FormTokenTests` checks every post form on 21 pages.
 
+## Reports
+
+Added 2026-10-08, use cases 33-36. `ReportService` builds the sales report
+for a range of shop days: only paid, not cancelled orders count (owner's
+rule); revenue is quantity x unit price minus discount (BM_CALC_REVENUE_01);
+orders are stored in UTC and grouped by Vietnam day (fixed UTC+7, no
+daylight saving). `/Admin/Reports` (Admin and Employee) shows it, downloads it
+as .xlsx through ClosedXML (`SalesReportExcel`, amounts as numbers) and has a
+print page. Invoices: `/Orders/{id}/Invoice` for the owner, staff through
+`/Admin/Orders/{id}/Invoice`, one `Invoice` view on `_PrintLayout`, so the
+browser's "Save as PDF" makes the PDF.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`

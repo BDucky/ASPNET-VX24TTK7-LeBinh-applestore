@@ -2215,3 +2215,37 @@ a.btn-store-primary {
   padding: 0.4rem 0.6rem;
   font: inherit;
 }
+
+/* ---------- Reports ---------- */
+
+.report-range label {
+  align-self: center;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 16px;
+  font-size: 0.92rem;
+}
+
+.report-table th,
+.report-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.report-table th {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Amounts in the stat cards stay on one line at every width. */
+.admin-stat dd[data-report-revenue],
+.admin-stats .admin-stat dd {
+  font-size: clamp(1.15rem, 2vw, 1.9rem);
+  white-space: nowrap;
+}

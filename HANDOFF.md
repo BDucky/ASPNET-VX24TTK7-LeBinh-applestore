@@ -5,6 +5,16 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-08 (late): sales report, Excel export, invoices, task 10
+
+**What landed.** `ReportService`, `/Admin/Reports` with Excel (ClosedXML) and
+print, invoices for customers and staff. 426 tests; `verify-reports` 14 of
+14; all eight live checks pass. Owner: revenue = paid, not cancelled; .xlsx
+plus browser PDF; work several tasks per session.
+
+**Where to pick up:** task 11 (Word report, slides, demo data, screenshots);
+optional reviews, compare, wishlist.
+
 ## 2026-10-08 (night): whole-app review and fixes
 
 **What landed.** Branch `fix/review-findings`: the seven review fixes listed
