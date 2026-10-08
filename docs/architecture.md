@@ -197,7 +197,7 @@ credentials the only one is `SimulatedPaymentGateway`, a page inside the app
 
 | Piece | Role |
 |---|---|
-| `PaymentOptions` (`Payments:Mode`) | empty: cash only; `Simulated`: the in-app gateway. Options pattern with `ValidateOnStart`: an unknown mode, or the simulator in Production, stops the app |
+| `PaymentOptions` (`Payments:Mode`) | empty: cash only; `Simulated`: the in-app gateway. Options pattern with `ValidateOnStart`: an unknown mode, or the simulator anywhere but Development, stops the app |
 | `PaymentSignature` | HMAC-SHA512 over the fields sorted by name, compared in constant time (VNPay's scheme) |
 | `PaymentService` | starts a payment on the open attempt (a new `Payments` row after a failure) and settles the gateway's answer |
 | `PaymentsController` | "Pay now" (`POST /Payments/Pay/{orderId}`, owner only) and `/Payments/Return` |

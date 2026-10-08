@@ -14,7 +14,10 @@ public static class AdminMessages
     public const string VoucherDeleted = "Voucher deleted. Orders that used it keep their code.";
     public const string RoleChanged = "Role changed. Their open sessions were signed out.";
     public const string OwnRole = "You cannot change your own role.";
+    public const string InvalidRole = "Pick a role from the list.";
     public const string SaveFailed = "We could not save that. Please try again.";
+    // A number the model binder could not read binds to null or 0; it is never saved.
+    public const string UnreadableNumber = "Type numbers only, without dots or commas (for example 24990000).";
 
     public static string For(AdminCatalogResult result) => result.Outcome switch
     {
@@ -42,6 +45,7 @@ public static class AdminMessages
         VoucherAdminOutcome.InvalidLimit => "The limit is at least 1, or empty for no limit.",
         VoucherAdminOutcome.LimitBelowUsed => "The limit cannot be below the uses already made.",
         VoucherAdminOutcome.UnknownProduct => "Pick products from the list.",
+        VoucherAdminOutcome.CodeLocked => "This voucher has been used, so its code cannot change (orders keep it). Make a new voucher instead.",
         _ => "Someone changed this voucher after you opened it. Check it and save again.",
     };
 }

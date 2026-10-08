@@ -10,6 +10,8 @@ public enum RegistrationError
     InvalidOtp,
     PasswordTooWeak,
     EmailSendFailed,
+    // Five wrong codes: the attempt is dropped and the visitor registers again.
+    TooManyAttempts,
 }
 
 public record RegistrationStartResult(bool Success, string? AttemptId, RegistrationError? Error);

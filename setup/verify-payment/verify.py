@@ -171,7 +171,7 @@ def main():
                                  cwd=WEB, env=env, stdout=out, stderr=subprocess.STDOUT, timeout=120)
     text = prod_log.read_text()
     check("Production with Payments:Mode=Simulated refuses to start",
-          refused.returncode != 0 and "refused in Production" in text, f"exit {refused.returncode}")
+          refused.returncode != 0 and "refused outside Development" in text, f"exit {refused.returncode}")
 
     # 5. No gateway configured: cash on delivery only, no simulator.
     proc = h.start_app("Development", db, TMP / "app-off.log", {"Payments__Mode": ""})

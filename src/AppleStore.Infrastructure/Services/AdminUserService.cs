@@ -36,13 +36,17 @@ public class AdminUserService : IAdminUserService
     {
         if (actingAdminId == userId)
             return RoleChangeOutcome.OwnAccount;
+        if (!Enum.IsDefined(role))
+            return RoleChangeOutcome.InvalidRole;
         var user = await _users.FindByIdAsync(userId.ToString());
         if (user is null)
             return RoleChangeOutcome.NotFound;
 
         user.Role = role;
         // The new stamp ends the person's open sessions; their next sign-in carries the new role.
-        await _users.UpdateSecurityStampAsync(user);
+        var saved = await _users.UpdateSecurityStampAsync(user);
+        if (!saved.Succeeded)
+            throw new InvalidOperationException("Saving the role failed: " + string.Join(" ", saved.Errors.Select(e => e.Description)));
         return RoleChangeOutcome.Done;
     }
 }

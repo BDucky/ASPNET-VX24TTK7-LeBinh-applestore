@@ -4,6 +4,49 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-08: whole-app senior review and its fixes (`fix/review-findings`)
+
+A review pass in the corjl style: VERIFY gate, LIVE gate over every script,
+then an L4-L6 audit by two reviewers (security and authorization;
+correctness and concurrency) over the whole codebase. Each finding was
+checked by reading the code or by a RED test before anything was changed.
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 410 of 410 (12 new) |
+| live checks: account, admin, cart, checkout, payment, orders, admin-catalog | 69, 31, 23, 25, 16, 19, 15 |
+
+**Clean in review:** authorization on every action, ownership of orders,
+addresses, cart lines and payments, anti-forgery on every post, open
+redirects, XSS sinks, overposting, payment signatures and replays, tracked
+reads after bulk updates, transactions around multi-step writes.
+
+**Fixed (each RED then GREEN):**
+1. Blocking: an admin price typed as shown ("24.990.000") or unreadable was
+   saved as empty ("Contact for price"). Admin posts now check `ModelState`.
+2. The registration code could be guessed without limit; five wrong codes
+   now end the attempt (counted atomically).
+3. The simulated gateway was refused only in Production; now it runs only
+   in Development.
+4. An undefined role or payment method was accepted.
+5. Renaming a used voucher made a later cancel give the use back to the
+   wrong voucher; a used voucher keeps its code.
+6. Taking a product off sale did not move its version.
+7. A database failure while reading an order for its email gave an error
+   page after the order was saved.
+
+**Process slip:** one GREEN commit (`c5d1283`) was made while a test still
+failed, because the command chain used `;`. It was fixed in the next commit
+(`553ae47`); commits are now made only after the test run passes.
+
+**Left open (owner's call or a number needed):** no rate limit on `/Track`,
+the code forms and forgot-password; "1.000" in a voucher's discount box
+reads as 1 under the server's culture; no unique index on SKU (two retired
+variants share SKUs); some older pages (addresses, profile, opening
+checkout) rely on the global error page for a database failure.
+
 ## 2026-10-08: admin products, vouchers, accounts and photos (`feat/admin-products`)
 
 | Command | Result |

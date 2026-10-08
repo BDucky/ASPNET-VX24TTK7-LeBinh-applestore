@@ -156,6 +156,20 @@ public sealed class AdminCatalogServiceTests : IDisposable
         Assert.Equal(AdminCatalogOutcome.Changed, (await _sut.UpdateVariantAsync(_blue, new VariantChange(2m, 5, true, variant.StockQty, variant.Version))).Outcome);
     }
 
+    // Taken off sale in the same instant the edit page was opened: saving
+    // that page must not quietly put it back on sale.
+    [Fact]
+    public async Task Taking_off_sale_moves_the_version_so_an_open_edit_page_is_stale()
+    {
+        Run($"UPDATE Products SET UpdatedAt = '{Now.UtcDateTime:yyyy-MM-dd HH:mm:ss}' WHERE Id = {_phone}");
+        var seen = await VersionAsync(_phone);
+
+        await _sut.SetOnSaleAsync(_phone, false);
+
+        Assert.Equal(AdminCatalogOutcome.Changed, (await _sut.UpdateAsync(_phone, Input(name: "iPhone 17", category: _iphoneCategory), seen)).Outcome);
+        Assert.False((await _sut.GetAsync(_phone))!.OnSale);
+    }
+
     [Fact]
     public async Task Taking_a_product_off_sale_hides_it_from_the_shop_and_back()
     {

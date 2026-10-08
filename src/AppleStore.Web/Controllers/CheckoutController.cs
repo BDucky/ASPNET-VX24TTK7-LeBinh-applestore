@@ -65,8 +65,14 @@ public class CheckoutController : Controller
             ModelState.Clear();
             return Render(form, quote, null);
         }
-        if (form.PaymentMethod != PaymentMethod.Cod && !_payments.OnlineAvailable)
+        // A value the binder could not read, or one that is not offered, gets the
+        // same plain message rather than the binder's own.
+        if (ModelState[nameof(CheckoutViewModel.PaymentMethod)]?.Errors.Count > 0
+            || !Enum.IsDefined(form.PaymentMethod) || (form.PaymentMethod != PaymentMethod.Cod && !_payments.OnlineAvailable))
+        {
+            ModelState.Remove(nameof(CheckoutViewModel.PaymentMethod));
             ModelState.AddModelError(nameof(CheckoutViewModel.PaymentMethod), CheckoutMessages.MethodUnavailable);
+        }
         if (!ModelState.IsValid)
             return Render(form, quote, null);
 

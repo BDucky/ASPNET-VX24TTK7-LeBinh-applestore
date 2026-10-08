@@ -40,6 +40,8 @@ public class VouchersController : Controller
     [HttpPost("New"), ValidateAntiForgeryToken]
     public async Task<IActionResult> New(VoucherForm form, CancellationToken ct)
     {
+        if (!ModelState.IsValid)
+            return View("Edit", await PageAsync(null, form, 0, AdminMessages.UnreadableNumber, ct));
         var result = await RunAsync(() => _vouchers.CreateAsync(form.ToInput(), ct));
         if (result?.Outcome != VoucherAdminOutcome.Done)
             return View("Edit", await PageAsync(null, form, 0, result is null ? AdminMessages.SaveFailed : AdminMessages.For(result.Outcome), ct));
@@ -58,6 +60,8 @@ public class VouchersController : Controller
     [HttpPost("{id:int}"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, VoucherForm form, CancellationToken ct)
     {
+        if (!ModelState.IsValid)
+            return View(await PageAsync(id, form, (await _vouchers.GetAsync(id, ct))?.UsedCount ?? 0, AdminMessages.UnreadableNumber, ct));
         var result = await RunAsync(() => _vouchers.UpdateAsync(id, form.ToInput(), form.Version, ct));
         if (result?.Outcome == VoucherAdminOutcome.NotFound)
             return NotFound();

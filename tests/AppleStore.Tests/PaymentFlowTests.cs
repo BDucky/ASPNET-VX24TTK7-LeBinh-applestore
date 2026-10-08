@@ -110,6 +110,17 @@ public class PaymentFlowTests : PaymentFlowBase
     }
 
     [Fact]
+    public async Task A_payment_method_that_does_not_exist_is_refused()
+    {
+        var placed = await PlaceAsync(await ReadyToCheckOutAsync(), "99");
+
+        Assert.Equal(HttpStatusCode.OK, placed.StatusCode);
+        Assert.Contains("This payment method is not available.", WebUtility.HtmlDecode(await placed.Content.ReadAsStringAsync()));
+        using var scope = Factory.Services.CreateScope();
+        Assert.False(await scope.ServiceProvider.GetRequiredService<AppDbContext>().Orders.AnyAsync());
+    }
+
+    [Fact]
     public async Task Cash_on_delivery_still_goes_straight_to_the_order()
     {
         var placed = await PlaceAsync(await ReadyToCheckOutAsync(), "Cod");
@@ -268,8 +279,9 @@ public class PaymentStartupTests
 {
     [Theory]
     [InlineData("Production", "Simulated")]
+    [InlineData("Staging", "Simulated")]
     [InlineData("Development", "Sandbox")]
-    public void The_app_refuses_to_start_with_the_simulator_in_production_or_an_unknown_mode(string environment, string mode)
+    public void The_app_refuses_to_start_with_the_simulator_outside_development_or_an_unknown_mode(string environment, string mode)
     {
         using var factory = new AppleStoreWebFactory(new Dictionary<string, string?> { ["Payments:Mode"] = mode }, environment: environment);
 

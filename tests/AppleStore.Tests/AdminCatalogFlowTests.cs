@@ -166,6 +166,48 @@ public class AdminCatalogFlowTests : WebFlowTestBase
             Notice(await PageAsync($"/Admin/Products/{id}"), "error"));
     }
 
+    // Prices are shown as "24.990.000"; typed back like that, they must not
+    // be read as nothing (Contact for price) or as 24.99.
+    [Theory]
+    [InlineData("24.990.000")]
+    [InlineData("abc")]
+    public async Task A_price_the_server_cannot_read_is_refused_and_the_old_price_kept(string typed)
+    {
+        var (blue, _, _) = Seed();
+        await SignInAsync();
+        var id = await ProductIdAsync("iphone-17");
+        var row = Regex.Match(await PageAsync($"/Admin/Products/{id}"), $"action=\"/Admin/Products/Variants/{blue}\"[\\s\\S]*?</form>").Value;
+
+        await PostFormAsync($"/Admin/Products/Variants/{blue}", new()
+        {
+            ["Price"] = typed,
+            ["StockQty"] = "3",
+            ["OnSale"] = "true",
+            ["SeenStock"] = Field(row, "SeenStock"),
+            ["Version"] = Field(row, "Version"),
+        }, formPage: $"/Admin/Products/{id}");
+
+        Assert.Equal("Type numbers only, without dots or commas (for example 24990000).", Notice(await PageAsync($"/Admin/Products/{id}"), "error"));
+        using var scope = Factory.Services.CreateScope();
+        Assert.Equal(24_990_000m, await scope.ServiceProvider.GetRequiredService<AppDbContext>().ProductVariants.Where(v => v.Id == blue).Select(v => v.Price).SingleAsync());
+    }
+
+    [Fact]
+    public async Task A_product_or_voucher_number_the_server_cannot_read_is_refused_on_the_form()
+    {
+        Seed();
+        await SignInAsync();
+        var form = ProductForm("Mac mini M5", await CategoryIdAsync("iphone"));
+        form["BasePrice"] = "14.990.000";
+
+        var product = await PostFormAsync("/Admin/Products/New", form, formPage: "/Admin/Products/New");
+        var voucher = await PostFormAsync("/Admin/Vouchers/New", VoucherForm("DOTS", "1.000.000"), formPage: "/Admin/Vouchers/New");
+
+        Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await product.Content.ReadAsStringAsync()));
+        Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await voucher.Content.ReadAsStringAsync()));
+        Assert.Equal(HttpStatusCode.NotFound, (await Client.GetAsync("/Products/mac-mini-m5")).StatusCode);
+    }
+
     [Fact]
     public async Task An_admin_adds_a_variant()
     {

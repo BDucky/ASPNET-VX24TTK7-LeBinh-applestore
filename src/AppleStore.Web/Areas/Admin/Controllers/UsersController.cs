@@ -51,8 +51,12 @@ public class UsersController : Controller
 
         if (outcome == RoleChangeOutcome.NotFound)
             return NotFound();
-        TempData[outcome == RoleChangeOutcome.Done ? CartMessages.StatusKey : CartMessages.ErrorKey] =
-            outcome == RoleChangeOutcome.Done ? AdminMessages.RoleChanged : AdminMessages.OwnRole;
+        TempData[outcome == RoleChangeOutcome.Done ? CartMessages.StatusKey : CartMessages.ErrorKey] = outcome switch
+        {
+            RoleChangeOutcome.Done => AdminMessages.RoleChanged,
+            RoleChangeOutcome.InvalidRole => AdminMessages.InvalidRole,
+            _ => AdminMessages.OwnRole,
+        };
         return RedirectToAction(nameof(Index));
     }
 }

@@ -5,6 +5,16 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-08 (night): whole-app review and fixes
+
+**What landed.** Branch `fix/review-findings`: the seven review fixes listed
+in `docs/verification.md` (2026-10-08 review entry). 410 tests; all seven
+live checks pass. One GREEN commit was made red by a `;` command chain and
+fixed in the next commit.
+
+**Open for the owner:** rate-limit numbers; previous-model photos for five
+products; then task 10 (revenue report) and the report and slides.
+
 ## 2026-10-08 (evening): admin catalog, vouchers, roles, photos, task 9
 
 **What landed.** Branch `feat/admin-products`: `/Admin/Products`,

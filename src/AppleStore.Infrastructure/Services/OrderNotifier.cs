@@ -1,3 +1,4 @@
+using System.Data.Common;
 using AppleStore.Infrastructure.Data;
 using AppleStore.Infrastructure.Formatting;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,27 @@ public class OrderNotifier : IOrderNotifier
         _logger = logger;
     }
 
-    public async Task OrderPlacedAsync(int orderId, string link, CancellationToken ct = default)
+    public Task OrderPlacedAsync(int orderId, string link, CancellationToken ct = default) =>
+        GuardAsync(orderId, () => PlacedAsync(orderId, link, ct));
+
+    public Task OrderShippedAsync(int orderId, string link, CancellationToken ct = default) =>
+        GuardAsync(orderId, () => ShippedAsync(orderId, link, ct));
+
+    // The order is already saved when this runs, so nothing here may fail the
+    // request: a database or mail failure is logged and the shopper carries on.
+    private async Task GuardAsync(int orderId, Func<Task> send)
+    {
+        try
+        {
+            await send();
+        }
+        catch (Exception ex) when (ex is DbException or EmailSendException)
+        {
+            _logger.LogWarning(ex, "The email about order #{OrderId} could not be sent", orderId);
+        }
+    }
+
+    private async Task PlacedAsync(int orderId, string link, CancellationToken ct)
     {
         var order = await _db.Orders.AsNoTracking()
             .Where(o => o.Id == orderId)
@@ -34,7 +55,7 @@ public class OrderNotifier : IOrderNotifier
             $"See your order: {link}\n\nApple Store", ct);
     }
 
-    public async Task OrderShippedAsync(int orderId, string link, CancellationToken ct = default)
+    private async Task ShippedAsync(int orderId, string link, CancellationToken ct)
     {
         var order = await _db.Orders.AsNoTracking()
             .Where(o => o.Id == orderId)
@@ -55,15 +76,6 @@ public class OrderNotifier : IOrderNotifier
             $"Follow it: {link}\n\nApple Store", ct);
     }
 
-    private async Task SendAsync(int orderId, string to, string subject, string body, CancellationToken ct)
-    {
-        try
-        {
-            await _email.SendAsync(to, subject, body, ct);
-        }
-        catch (EmailSendException ex)
-        {
-            _logger.LogWarning(ex, "The email about order #{OrderId} could not be sent to {Email}", orderId, to);
-        }
-    }
+    private Task SendAsync(int orderId, string to, string subject, string body, CancellationToken ct) =>
+        _email.SendAsync(to, subject, body, ct);
 }

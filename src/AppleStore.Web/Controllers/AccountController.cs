@@ -111,11 +111,12 @@ public class AccountController : Controller
         var result = await _registration.ConfirmAsync(model.AttemptId, model.Code.Trim(), ct);
         if (!result.Success)
         {
-            ViewData["OtpExpired"] = result.Error is RegistrationError.AttemptNotFound or RegistrationError.EmailAlreadyUsed;
+            ViewData["OtpExpired"] = result.Error is RegistrationError.AttemptNotFound or RegistrationError.EmailAlreadyUsed or RegistrationError.TooManyAttempts;
             ModelState.AddModelError(string.Empty, result.Error switch
             {
                 RegistrationError.InvalidOtp => CodeRefused,
                 RegistrationError.AttemptNotFound => "This registration has expired. Please register again.",
+                RegistrationError.TooManyAttempts => "Too many wrong codes. Please register again.",
                 RegistrationError.EmailAlreadyUsed => "An account with this email already exists. Please sign in.",
                 _ => "Verification failed. Please try again.",
             });

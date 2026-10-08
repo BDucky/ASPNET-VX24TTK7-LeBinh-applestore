@@ -39,6 +39,32 @@ public class AccountFlowTests : WebFlowTestBase
     }
 
     [Fact]
+    public async Task Five_wrong_codes_end_the_attempt_with_a_way_to_register_again()
+    {
+        var register = await PostFormAsync("/Account/Register", new()
+        {
+            ["Email"] = "new@example.com",
+            ["FullName"] = "Nguyen Van A",
+            ["Password"] = "Password1",
+            ["ConfirmPassword"] = "Password1",
+        });
+        var verifyUrl = register.Headers.Location!.OriginalString;
+        var code = Regex.Match(Assert.Single(Factory.Email.Sent).Body, @"\d{6}").Value;
+        var wrong = code == "111111" ? "222222" : "111111";
+
+        HttpResponseMessage last = null!;
+        for (var i = 0; i < 5; i++)
+            last = await PostFormAsync(verifyUrl, new() { ["Code"] = wrong });
+        var html = System.Net.WebUtility.HtmlDecode(await last.Content.ReadAsStringAsync());
+
+        Assert.Contains("Too many wrong codes. Please register again.", html);
+        Assert.Contains("Register again", html);
+        var right = await PostFormAsync(verifyUrl, new() { ["Code"] = code });
+        Assert.Contains("This registration has expired", System.Net.WebUtility.HtmlDecode(await right.Content.ReadAsStringAsync()));
+        Assert.Null(await FindUserAsync("new@example.com"));
+    }
+
+    [Fact]
     public async Task Wrong_otp_keeps_the_visitor_on_the_page_and_creates_no_account()
     {
         var register = await PostFormAsync("/Account/Register", new()

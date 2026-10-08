@@ -111,11 +111,24 @@ public sealed class AdminVoucherServiceTests : IDisposable
             .PlaceOrderAsync(_alice, new DeliveryInput("A", "0900000000", "1 Street", null, null, null, null), "SALE10", (await QuoteAsync("SALE10")).Total);
         var seen = (await _sut.GetAsync(id))!;
 
-        var result = await _sut.UpdateAsync(id, Input(code: "SALE20", value: 20m), seen.Version);
+        var result = await _sut.UpdateAsync(id, Input(value: 20m), seen.Version);
 
         Assert.Equal(VoucherAdminOutcome.Done, result.Outcome);
         var after = (await _sut.GetAsync(id))!;
-        Assert.Equal(("SALE20", 20m, 1), (after.Code, after.Value, after.UsedCount));
+        Assert.Equal(("SALE10", 20m, 1), (after.Code, after.Value, after.UsedCount));
+    }
+
+    [Fact]
+    public async Task A_used_voucher_keeps_its_code_but_its_other_rules_can_change()
+    {
+        var id = (await _sut.CreateAsync(Input())).Id!.Value;
+        await new CheckoutService(_db, new CartService(_db), new FixedTime(Now))
+            .PlaceOrderAsync(_alice, new DeliveryInput("A", "0900000000", "1 Street", null, null, null, null), "SALE10", (await QuoteAsync("SALE10")).Total);
+        var seen = (await _sut.GetAsync(id))!.Version;
+
+        Assert.Equal(VoucherAdminOutcome.CodeLocked, (await _sut.UpdateAsync(id, Input(code: "RENAMED"), seen)).Outcome);
+        Assert.Equal(VoucherAdminOutcome.Done, (await _sut.UpdateAsync(id, Input(code: "sale10", value: 12m), seen)).Outcome);
+        Assert.Equal(("SALE10", 12m), ((await _sut.GetAsync(id))!.Code, (await _sut.GetAsync(id))!.Value));
     }
 
     [Fact]
