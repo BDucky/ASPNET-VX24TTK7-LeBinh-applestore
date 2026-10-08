@@ -1,0 +1,57 @@
+@model AppleStore.Web.ViewComponents.ProductReviewsBlock
+@{
+    var reviews = Model.Reviews;
+    string Stars(int n) => new string('★', n) + new string('☆', 5 - n);
+}
+<section class="pdp-reviews" aria-label="Reviews">
+    <h2 class="checkout-heading">Reviews</h2>
+    @if (reviews.Count == 0)
+    {
+        <p class="account-hint">No reviews yet.</p>
+    }
+    else
+    {
+        <p class="pdp-review-summary">
+            <span class="pdp-review-stars" aria-hidden="true">@Stars((int)Math.Round(reviews.Average ?? 0))</span>
+            <strong data-review-average>@reviews.Average?.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)</strong> out of 5,
+            @reviews.Count review@(reviews.Count == 1 ? "" : "s")
+        </p>
+        <ul class="pdp-review-list">
+            @foreach (var r in reviews.Reviews)
+            {
+                <li>
+                    <div><span class="pdp-review-stars" aria-label="@r.Rating out of 5">@Stars(r.Rating)</span> <strong>@r.Author</strong> <span class="account-hint">· verified purchase · @r.CreatedAt.AddHours(7).ToString("dd/MM/yyyy")@(r.UpdatedAt is null ? "" : " (edited)")</span></div>
+                    @if (r.Content is not null)
+                    {
+                        <p>@r.Content</p>
+                    }
+                    @if (r.Reply is not null)
+                    {
+                        <p class="pdp-review-reply"><strong>Apple Store:</strong> @r.Reply</p>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
+    @if (Model.CanReview == true)
+    {
+        <form asp-controller="Reviews" asp-action="Submit" asp-route-productId="@Model.ProductId" method="post" class="account-form pdp-review-form">
+            <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+            <label for="Rating">@(Model.Mine is null ? "Your rating" : "Change your rating")</label>
+            <select id="Rating" name="Rating">
+                @for (var n = 5; n >= 1; n--)
+                {
+                    <option value="@n" selected="@(Model.Mine?.Rating == n)">@n star@(n == 1 ? "" : "s")</option>
+                }
+            </select>
+            <label for="Content">Your review (optional)</label>
+            <textarea id="Content" name="Content" rows="3">@Model.Mine?.Content</textarea>
+            <button type="submit" class="btn-store-primary">@(Model.Mine is null ? "Post review" : "Update review")</button>
+        </form>
+    }
+    else if (Model.CanReview == false)
+    {
+        <p class="account-hint">You can review this after your order with it is delivered.</p>
+    }
+</section>
