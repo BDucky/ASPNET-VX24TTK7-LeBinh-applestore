@@ -95,6 +95,8 @@ Composite PK `(ListId, ProductId)`, `ListId (FK -> CompareLists)`.
 ### Reviews
 `Id (PK)`, `ProductId (FK -> Products)`, `UserId (FK -> Users)`, `Rating (int, 1-5)`, `Content (nvarchar max, nullable)`, `HasMedia/PurchaseVerified/Status (bit)`, `CreatedAt`
 
+**Added 2026-10-08 to Reviews (`feat/reviews`):** `Reply (nvarchar max, nullable)`, `RepliedAt`, `UpdatedAt` (nullable), and a unique index on `(ProductId, UserId)`. The report lets staff reply to reviews but had no column for it.
+
 ### VariantOptions
 Composite PK `(VariantId, OptionTypeId)`, `OptionValueId (FK -> OptionValues, not part of the key)`.
 

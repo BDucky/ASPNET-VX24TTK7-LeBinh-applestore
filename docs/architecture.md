@@ -266,6 +266,15 @@ print page. Invoices: `/Orders/{id}/Invoice` for the owner, staff through
 `/Admin/Orders/{id}/Invoice`, one `Invoice` view on `_PrintLayout`, so the
 browser's "Save as PDF" makes the PDF.
 
+## Reviews
+
+Added 2026-10-08, use case 32. `ReviewService` accepts a review only from a
+customer with a delivered (Completed) order containing the product, keeps
+one per customer per product (unique index; writing again edits it, and an
+edit never unhides a review staff hid), and lets staff reply and hide. The
+`ProductReviews` view component puts the block on a product's model and
+configuration pages; `/Admin/Reviews` is for Admin and Employee.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`

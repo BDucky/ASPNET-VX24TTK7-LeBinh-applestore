@@ -5,6 +5,15 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-08 (later still): product reviews
+
+**What landed.** `ReviewService`, the review block on product pages, posting
+and editing, `/Admin/Reviews` with reply and hide. 446 tests; all nine live
+checks pass. Rules stated before building: verified purchase = delivered
+order; one review per customer per product.
+
+**Where to pick up:** compare (use case 10), wishlist, then task 11.
+
 ## 2026-10-08 (late): sales report, Excel export, invoices, task 10
 
 **What landed.** `ReportService`, `/Admin/Reports` with Excel (ClosedXML) and

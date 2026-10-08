@@ -23,5 +23,6 @@ silently leaving setup incomplete.
 | `verify-orders/verify.py` | my orders, cancelling, staff confirm/ship/complete, tracking, live in a browser |
 | `verify-admin-catalog/verify.py` | admin products, variants, vouchers and roles end to end, live in a browser |
 | `verify-reports/verify.py` | sales report, Excel download, print page, invoices printed to PDF, live in a browser |
+| `verify-reviews/verify.py` | verified-purchase reviews, edits, staff reply and hide, live in a browser |
 
 All of them import `verifylib.py` (start the app, drive the browser, tally results).

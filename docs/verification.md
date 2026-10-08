@@ -4,6 +4,21 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-08: product reviews (`feat/reviews`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 446 of 446 (20 new) |
+| `python3 setup/verify-reviews/verify.py` | **9 of 9** |
+| earlier checks | account 69, admin 31, cart 23, checkout 25, payment 16, orders 19, admin-catalog 15, reports 14 |
+
+**Mutation checks** (each caught): an order not delivered counted as a
+purchase; an edit unhiding a hidden review; the staff review page open to
+every signed-in account. `FormTokenTests` now also walks `/Admin/Reviews` and
+`/Admin/Reports`.
+
 ## 2026-10-08: sales report, Excel export, invoices (`feat/admin-reports`)
 
 | Command | Result |
