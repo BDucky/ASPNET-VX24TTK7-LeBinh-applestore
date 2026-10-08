@@ -124,6 +124,13 @@ puts a demoable buying flow and the admin area first.
 - `/Track` has no limit on attempts; guessing needs both the order number
   and the receiver's full phone number. A rate limit would need a number
   from the owner.
+- No rate limit on `/Track`, the registration and reset code forms; the
+  built-in rate limiter needs numbers from the owner.
+- "1.000" typed as a voucher discount reads as 1 under the server culture.
+- No unique index on SKU (two retired AirTag variants share SKUs); two
+  admins adding the same new SKU at the same moment could both succeed.
+- Addresses, profile and opening checkout fall back to the global error page
+  on a database failure.
 - Five products on sale still have no photo: no licensed photo of the exact
   model exists yet (MagSafe Battery, Apple Watch Ultra 4, iPad Air 8 11"
   and 13", Apple Watch SE 3). Photos of the previous models exist; using
