@@ -1,0 +1,25 @@
+@model AppleStore.Web.Models.Checkout.SimulatorPage
+@using AppleStore.Web.Formatting
+@{
+    ViewData["Title"] = $"{Model.GatewayName} (simulated)";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card simulator">
+        <div class="hero-eyebrow">@Model.GatewayName, simulated</div>
+        <h1 class="account-title">Pay order #@Model.OrderId</h1>
+        <p class="account-lead">This page stands in for @Model.GatewayName while the store has no sandbox account. No money moves.</p>
+
+        <div class="simulator-amount" data-simulator-amount>@PriceText.Vnd(Model.Amount)</div>
+
+        <form method="post" asp-action="Answer" class="simulator-actions">
+            @foreach (var field in Model.Fields)
+            {
+                <input type="hidden" name="@field.Key" value="@field.Value" />
+            }
+            <button type="submit" name="result" value="00" class="btn-store-primary">Pay successfully</button>
+            <button type="submit" name="result" value="51" class="btn-store-ghost">Payment fails</button>
+            <button type="submit" name="result" value="24" class="btn-store-ghost">Cancel</button>
+        </form>
+    </div>
+</section>

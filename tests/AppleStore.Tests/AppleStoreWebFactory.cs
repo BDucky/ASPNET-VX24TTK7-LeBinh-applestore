@@ -16,6 +16,11 @@ namespace AppleStore.Tests;
 //
 // The schema exists before the app starts, as it does after
 // "dotnet ef database update", because startup reads it (AdminSeeder).
+// Settings passed here reach the app through IOptions and IConfiguration at
+// run time, but not code in Program.cs that reads configuration while
+// registering services (found 2026-10-08): decide such things with the
+// options pattern, as AddAppleStorePayments does.
+//
 // The SeedAdmin settings are blanked so the owner's user-secrets or
 // environment variables never seed an admin into a test; a test that wants
 // one passes its own settings.

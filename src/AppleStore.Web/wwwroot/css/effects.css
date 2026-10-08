@@ -1946,3 +1946,43 @@ a.btn-store-primary {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Payment ---------- */
+
+.checkout-methods {
+  display: grid;
+  gap: 8px;
+}
+
+.checkout-method {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 500 !important;
+  margin: 0 !important;
+}
+
+.checkout-method input {
+  margin-top: 4px;
+}
+
+.order-pay {
+  margin: 0 0 16px;
+}
+
+.simulator-amount {
+  font-family: var(--display-font);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 16px 0 20px;
+}
+
+.simulator-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

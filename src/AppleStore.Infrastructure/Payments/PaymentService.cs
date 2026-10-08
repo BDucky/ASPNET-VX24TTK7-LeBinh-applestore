@@ -29,6 +29,8 @@ public class PaymentService : IPaymentService
         _gateway = gateway;
     }
 
+    public bool OnlineAvailable => _gateway is not null;
+
     public async Task<PayStart> StartAsync(int userId, int orderId, CancellationToken ct = default)
     {
         var order = await _db.Orders

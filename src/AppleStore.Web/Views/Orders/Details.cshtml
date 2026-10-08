@@ -1,4 +1,5 @@
 @model AppleStore.Infrastructure.Services.OrderSummary
+@using AppleStore.Domain.Enums
 @using AppleStore.Web.Formatting
 @using AppleStore.Web.Models.Checkout
 @{
@@ -50,6 +51,13 @@
             <dt>Payment</dt>
             <dd>@CheckoutMessages.Method(Model.PaymentMethod), @CheckoutMessages.Payment(Model.PaymentStatus).ToLowerInvariant()</dd>
         </dl>
+
+        @if (Model.PaymentMethod != PaymentMethod.Cod && Model.PaymentStatus == OrderPaymentStatus.Unpaid)
+        {
+            <form asp-controller="Payments" asp-action="Pay" asp-route-orderId="@Model.Id" method="post" class="order-pay">
+                <button type="submit" class="btn-store-primary">Pay now</button>
+            </form>
+        }
 
         <a class="btn-store-ghost" asp-controller="Products" asp-action="Index">Continue shopping</a>
     </div>

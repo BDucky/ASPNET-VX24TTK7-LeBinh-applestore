@@ -1,5 +1,7 @@
 using System.Data.Common;
 using AppleStore.Domain.Entities;
+using AppleStore.Domain.Enums;
+using AppleStore.Infrastructure.Payments;
 using AppleStore.Infrastructure.Services;
 using AppleStore.Web.Models.Cart;
 using AppleStore.Web.Models.Checkout;
@@ -19,13 +21,15 @@ namespace AppleStore.Web.Controllers;
 public class CheckoutController : Controller
 {
     private readonly ICheckoutService _checkout;
+    private readonly IPaymentService _payments;
     private readonly IProfileService _profile;
     private readonly UserManager<User> _users;
     private readonly ILogger<CheckoutController> _logger;
 
-    public CheckoutController(ICheckoutService checkout, IProfileService profile, UserManager<User> users, ILogger<CheckoutController> logger)
+    public CheckoutController(ICheckoutService checkout, IPaymentService payments, IProfileService profile, UserManager<User> users, ILogger<CheckoutController> logger)
     {
         _checkout = checkout;
+        _payments = payments;
         _profile = profile;
         _users = users;
         _logger = logger;
@@ -42,7 +46,7 @@ public class CheckoutController : Controller
 
         var form = await StartingFormAsync(ct);
         form.ExpectedTotal = quote.Total;
-        return View(new CheckoutPage(form, quote, null, false, null));
+        return View(new CheckoutPage(form, quote, null, false, null, _payments.OnlineAvailable));
     }
 
     [HttpPost(""), ValidateAntiForgeryToken]
@@ -58,6 +62,8 @@ public class CheckoutController : Controller
             ModelState.Clear();
             return Render(form, quote, null);
         }
+        if (form.PaymentMethod != PaymentMethod.Cod && !_payments.OnlineAvailable)
+            ModelState.AddModelError(nameof(CheckoutViewModel.PaymentMethod), CheckoutMessages.MethodUnavailable);
         if (!ModelState.IsValid)
             return Render(form, quote, null);
 
@@ -65,7 +71,7 @@ public class CheckoutController : Controller
         try
         {
             var delivery = new DeliveryInput(form.FullName, form.Phone, form.AddressLine, form.Ward, form.District, form.City, form.Note);
-            result = await _checkout.PlaceOrderAsync(UserId, delivery, form.VoucherCode, form.ExpectedTotal, ct: ct);
+            result = await _checkout.PlaceOrderAsync(UserId, delivery, form.VoucherCode, form.ExpectedTotal, form.PaymentMethod, ct);
         }
         catch (Exception ex) when (ex is DbUpdateException or DbException)
         {
@@ -78,6 +84,10 @@ public class CheckoutController : Controller
         {
             case PlaceOrderOutcome.Placed:
                 TempData[CartMessages.StatusKey] = CheckoutMessages.Placed;
+                // Online: straight on to the gateway; the order page offers
+                // "Pay now" if that does not work out.
+                if (form.PaymentMethod != PaymentMethod.Cod)
+                    return await PaymentsController.StartAsync(this, _payments, UserId, result.OrderId!.Value, _logger, ct);
                 return RedirectToAction("Details", "Orders", new { id = result.OrderId });
             case PlaceOrderOutcome.CartEmpty:
                 return ToCart(CheckoutMessages.CartEmpty);
@@ -99,7 +109,8 @@ public class CheckoutController : Controller
     {
         form.ExpectedTotal = quote.Total;
         var voucherMessage = quote.VoucherCode is null ? null : CheckoutMessages.Voucher(quote);
-        return View(nameof(Index), new CheckoutPage(form, quote, voucherMessage, quote.VoucherCode is not null && quote.VoucherProblem == VoucherProblem.None, error));
+        return View(nameof(Index), new CheckoutPage(form, quote, voucherMessage, quote.VoucherCode is not null && quote.VoucherProblem == VoucherProblem.None, error,
+            _payments.OnlineAvailable));
     }
 
     private IActionResult? BackToCart(CheckoutQuote quote) => quote.Problem switch

@@ -167,7 +167,10 @@ public class PaymentFlowTests : PaymentFlowBase
 
         var again = await Client.GetAsync(Location(answered));
 
-        Assert.Equal("This order is already paid.", Notice(await PageAsync(Location(again)), "status"));
+        Assert.Equal("Payment received. Thank you.", Notice(await PageAsync(Location(again)), "status"));
+        using var scope = Factory.Services.CreateScope();
+        var payments = await scope.ServiceProvider.GetRequiredService<AppDbContext>().Payments.Select(p => p.Status).ToListAsync();
+        Assert.Equal([PaymentStatus.Success], payments);
     }
 
     [Fact]
@@ -182,6 +185,23 @@ public class PaymentFlowTests : PaymentFlowBase
         var html = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
         Assert.Contains("This payment link is not valid.", html);
         Assert.Contains("href=\"/\"", html);
+    }
+
+    [Fact]
+    public async Task A_simulator_form_with_a_changed_amount_is_refused_and_the_order_stays_unpaid()
+    {
+        var placed = await PlaceAsync(await ReadyToCheckOutAsync(), "VnPay");
+        var simulator = await PageAsync(Location(placed));
+        var fields = Regex.Matches(simulator, "<input type=\"hidden\" name=\"([^\"]+)\" value=\"([^\"]*)\"")
+            .ToDictionary(m => m.Groups[1].Value, m => WebUtility.HtmlDecode(m.Groups[2].Value));
+        fields.Remove("__RequestVerificationToken");
+        fields["amount"] = "1";
+        fields["result"] = "00";
+
+        var response = await PostFormAsync("/PaymentSimulator", fields, formPage: Location(placed));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(OrderPaymentStatus.Unpaid, await PaymentStatusAsync(await OnlyOrderIdAsync()));
     }
 
     [Fact]

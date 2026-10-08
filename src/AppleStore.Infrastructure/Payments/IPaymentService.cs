@@ -3,6 +3,9 @@ namespace AppleStore.Infrastructure.Payments;
 // Use case 17, online part. Cash on delivery needs none of this.
 public interface IPaymentService
 {
+    // False when no gateway is configured: only cash on delivery is offered.
+    bool OnlineAvailable { get; }
+
     Task<PayStart> StartAsync(int userId, int orderId, CancellationToken ct = default);
 
     // Fields from the gateway, from its server call or from the shopper's

@@ -1,8 +1,16 @@
 @model AppleStore.Web.Models.Checkout.CheckoutPage
+@using AppleStore.Domain.Enums
 @using AppleStore.Web.Formatting
 @{
     ViewData["Title"] = "Checkout";
     var quote = Model.Quote;
+    // Online methods only when a gateway is configured (Payments:Mode).
+    var methods = new List<(PaymentMethod Method, string Label, string Hint)> { (PaymentMethod.Cod, "Cash on delivery", "Pay when the order arrives.") };
+    if (Model.OnlineAvailable)
+    {
+        methods.Add((PaymentMethod.VnPay, "VNPay", "Bank card or banking app."));
+        methods.Add((PaymentMethod.MoMo, "MoMo", "MoMo wallet."));
+    }
 }
 
 <section class="statement is-compact account-page">
@@ -39,7 +47,20 @@
                 }
 
                 <h2 class="checkout-heading">Payment</h2>
-                <p class="account-hint">Cash on delivery. You pay when the order arrives.</p>
+                <div class="checkout-methods" role="radiogroup" aria-label="Payment">
+                    @foreach (var (method, label, hint) in methods)
+                    {
+                        <label class="checkout-method">
+                            <input type="radio" name="PaymentMethod" value="@method" checked="@(Model.Form.PaymentMethod == method)" />
+                            <span><strong>@label</strong> <span class="account-hint">@hint</span></span>
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="Form.PaymentMethod" class="account-field-error" data-valmsg-for="PaymentMethod"></span>
+                @if (ViewData.ModelState["PaymentMethod"]?.Errors.FirstOrDefault() is { } methodError)
+                {
+                    <span class="account-field-error">@methodError.ErrorMessage</span>
+                }
             </div>
 
             <aside class="checkout-summary" aria-label="Order summary">
