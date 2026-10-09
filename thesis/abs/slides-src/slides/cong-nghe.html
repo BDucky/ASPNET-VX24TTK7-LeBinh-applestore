@@ -1,0 +1,16 @@
+<section id="cong-nghe" data-transition="fade" style="background:#F4F2EC;color:#14161C;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;color:#2F5BE0;letter-spacing:3px;text-transform:uppercase">Công nghệ</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Công nghệ sử dụng</h2>
+</div>
+<table style="font-size:30px;color:#14161C">
+<tr><th style="width:30%">Thành phần</th><th style="width:70%">Lựa chọn</th></tr>
+<tr><td>Nền tảng web</td><td>.NET 10, ASP.NET Core MVC, Razor views</td></tr>
+<tr><td>Dữ liệu</td><td>Entity Framework Core (Code-First, migrations), SQLite khi phát triển, schema theo kiểu SQL Server</td></tr>
+<tr><td>Tài khoản</td><td>ASP.NET Core Identity trên bảng Users của đặc tả, OTP qua email (MailKit, Gmail SMTP)</td></tr>
+<tr><td>Báo cáo</td><td>ClosedXML (xuất Excel), trang in của trình duyệt (PDF)</td></tr>
+<tr><td>Kiểm thử</td><td>xUnit, WebApplicationFactory, Playwright (trình duyệt thật)</td></tr>
+<tr><td>Quản lý mã nguồn</td><td>Git, GitHub, mỗi chức năng một nhánh và một pull request</td></tr>
+</table>
+<aside>Nền tảng là .NET 10 với ASP.NET Core MVC. Dữ liệu dùng EF Core theo kiểu Code-First, khi phát triển chạy SQLite nhưng kiểu dữ liệu đặt theo SQL Server để sau này chuyển sang dễ dàng. Tài khoản dùng ASP.NET Core Identity. Kiểm thử có hai lớp: xUnit chạy app trong bộ nhớ, và Playwright điều khiển trình duyệt thật.</aside>
+</section>

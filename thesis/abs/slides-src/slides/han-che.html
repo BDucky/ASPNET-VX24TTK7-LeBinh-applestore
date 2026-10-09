@@ -1,0 +1,27 @@
+<section id="han-che" data-transition="fade" style="background:#F4F2EC;color:#14161C;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;color:#2F5BE0;letter-spacing:3px;text-transform:uppercase">Kết luận</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Hạn chế và hướng phát triển</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DDD9CF;border-radius:20px;padding:40px">
+<h3 style="font-size:36px;font-weight:700">Hạn chế</h3>
+<ul style="font-size:28px;color:#4A5060;line-height:1.5">
+<li>Chưa làm nhập kho và bán tại quầy (UC 20, 21)</li>
+<li>VNPay, MoMo chạy qua cổng giả lập, chưa có sandbox thật</li>
+<li>Chưa giới hạn số lần thử ở form mã OTP và tra cứu đơn</li>
+<li>Phát triển trên SQLite, chưa chạy thử SQL Server</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#14161C;color:#F4F2EC;border-radius:20px;padding:40px">
+<h3 style="font-size:36px;font-weight:700">Hướng phát triển</h3>
+<ul style="font-size:28px;color:#C9CCD6;line-height:1.5">
+<li>Hoàn thiện nhập kho, bán tại quầy, phiếu nhập và phiếu bán</li>
+<li>Kết nối sandbox VNPay, MoMo thật</li>
+<li>Rate limiting có sẵn của ASP.NET Core</li>
+<li>Triển khai lên máy chủ với SQL Server</li>
+</ul>
+</div>
+</div>
+<aside>Em nói rõ các hạn chế: hai use case nhập kho và bán tại quầy chưa làm, thanh toán online mới là giả lập, chưa giới hạn số lần thử, và mới chạy trên SQLite. Hướng phát triển đi thẳng vào các điểm đó, dùng tiếp các cơ chế có sẵn như rate limiting của ASP.NET Core.</aside>
+</section>

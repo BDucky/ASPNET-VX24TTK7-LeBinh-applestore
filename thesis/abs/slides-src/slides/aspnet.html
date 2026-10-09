@@ -1,0 +1,16 @@
+<section id="aspnet" data-transition="fade" style="background:#F4F2EC;color:#14161C;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;color:#2F5BE0;letter-spacing:3px;text-transform:uppercase">ASP.NET Core</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Cơ chế có sẵn được dùng</h2>
+</div>
+<table style="font-size:28px;color:#14161C">
+<tr><th style="width:30%">Cơ chế</th><th style="width:70%">Dùng ở đâu trong dự án</th></tr>
+<tr><td>Identity</td><td>Đăng nhập, khóa sau 5 lần sai, vai trò, đổi vai trò thì phiên cũ hết hiệu lực ngay</td></tr>
+<tr><td>Areas, [Authorize]</td><td>Khu /Admin; Employee vào đơn hàng, khuyến mãi, giá; Admin vào mọi trang</td></tr>
+<tr><td>EF Core migrations</td><td>Tạo và cập nhật CSDL, nạp sẵn danh mục sản phẩm và voucher mẫu</td></tr>
+<tr><td>Kiểm tra dữ liệu, anti-forgery</td><td>Mọi form POST có token; số không đọc được thì báo lỗi, không lưu</td></tr>
+<tr><td>Dependency injection, options</td><td>Service theo từng yêu cầu; cấu hình email, thanh toán được kiểm tra khi khởi động</td></tr>
+<tr><td>View component, partial, tag helper</td><td>Số lượng giỏ hàng, khối đánh giá, nút so sánh, liên kết lọc giá</td></tr>
+</table>
+<aside>Môn học chấm phần ASP.NET, nên em ưu tiên cơ chế có sẵn. Identity lo đăng nhập và vai trò. Areas và Authorize chia khu quản trị theo vai trò. EF Core migrations tạo cơ sở dữ liệu. Mọi form có token chống giả mạo. Cấu hình được kiểm tra ngay khi ứng dụng khởi động.</aside>
+</section>
