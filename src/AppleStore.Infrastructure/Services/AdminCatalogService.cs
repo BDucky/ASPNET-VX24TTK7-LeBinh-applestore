@@ -150,7 +150,7 @@ public class AdminCatalogService : IAdminCatalogService
         }
     }
 
-    public async Task<AdminCatalogResult> AddVariantAsync(int productId, VariantInput input, CancellationToken ct = default)
+    public async Task<AdminCatalogResult> AddVariantAsync(int productId, VariantInput input, int? userId = null, CancellationToken ct = default)
     {
         if (!await _db.Products.AnyAsync(p => p.Id == productId, ct))
             return new AdminCatalogResult(AdminCatalogOutcome.NotFound);
@@ -183,7 +183,7 @@ public class AdminCatalogService : IAdminCatalogService
         return new AdminCatalogResult(AdminCatalogOutcome.Done, variant.Id);
     }
 
-    public async Task<AdminCatalogResult> UpdateVariantAsync(int variantId, VariantChange change, CancellationToken ct = default)
+    public async Task<AdminCatalogResult> UpdateVariantAsync(int variantId, VariantChange change, int? userId = null, CancellationToken ct = default)
     {
         if (CheckVariant(change.Price, change.StockQty) is { } refused)
             return refused;

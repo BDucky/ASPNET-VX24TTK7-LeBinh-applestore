@@ -119,7 +119,7 @@ public class ProductsController : Controller
         if (!ModelState.IsValid)
             return Unreadable(id);
         var input = new VariantInput(form.Sku, form.Configuration, form.Color, form.Region, form.Price, form.StockQty, form.OnSale);
-        var result = await RunAsync(() => _catalog.AddVariantAsync(id, input, ct), "add a variant");
+        var result = await RunAsync(() => _catalog.AddVariantAsync(id, input, ct: ct), "add a variant");
         if (result?.Outcome == AdminCatalogOutcome.NotFound)
             return NotFound();
         return Back(id, result, AdminMessages.VariantAdded);
@@ -134,7 +134,7 @@ public class ProductsController : Controller
         if (!ModelState.IsValid)
             return Unreadable(productId.Value);
         var change = new VariantChange(form.Price, form.StockQty, form.OnSale, form.SeenStock, form.Version);
-        var result = await RunAsync(() => _catalog.UpdateVariantAsync(variantId, change, ct), "save a variant");
+        var result = await RunAsync(() => _catalog.UpdateVariantAsync(variantId, change, ct: ct), "save a variant");
         return Back(productId.Value, result, AdminMessages.VariantSaved);
     }
 
