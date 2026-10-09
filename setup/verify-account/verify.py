@@ -26,7 +26,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from verifylib import WEB, Harness, otp_for  # noqa: E402
+from verifylib import WEB, Harness, migrate, otp_for  # noqa: E402
 
 h = Harness("verify-account", 5286)
 APP, TMP = h.app, h.tmp
@@ -38,7 +38,11 @@ PASSWORD = "Password1"
 
 
 def main():
+    # The developer's own database (real catalog), brought up to the latest
+    # migration first: a copy behind the code fails on any new column (found
+    # 2026-10-09, when promotions added Vouchers.Name).
     shutil.copy(WEB / "AppleStore.db", TMP / "app.db")
+    migrate(TMP / "app.db")
     log = TMP / "app.log"
     h.open_browser()
     proc = start_app("Development", TMP / "app.db", log)
@@ -380,6 +384,7 @@ def main():
     unreachable = {"Smtp__Host": "127.0.0.1", "Smtp__Port": "1", "Smtp__UserName": "u",
                    "Smtp__Password": "p", "Smtp__FromAddress": "store@example.com"}
     shutil.copy(WEB / "AppleStore.db", TMP / "app-smtp.db")
+    migrate(TMP / "app-smtp.db")
     proc = start_app("Development", TMP / "app-smtp.db", TMP / "app-smtp.log", unreachable)
     try:
         r = step(r"""
