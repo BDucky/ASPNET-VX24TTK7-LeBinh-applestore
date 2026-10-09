@@ -109,9 +109,16 @@ def main():
   out.file = download.suggestedFilename();
   await download.saveAs('sales.xlsx');
   await page.screenshot({ path: 'report-1440.png', fullPage: true });
+  // Every amount inside its card, and the shop nav on one row (both seen
+  // broken in the report's screenshots, 2026-10-09).
+  const fits = () => page.evaluate(() => Array.from(document.querySelectorAll('.admin-stat dd')).every(dd =>
+    dd.getBoundingClientRect().right <= dd.closest('.admin-stat').getBoundingClientRect().right + 1 && dd.scrollWidth <= dd.clientWidth + 1));
+  out.fits1440 = await fits();
+  out.navRows = await page.evaluate(() => new Set(Array.from(document.querySelectorAll('.site-nav-links .nav-link')).map(a => Math.round(a.getBoundingClientRect().top))).size);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
   out.scroll = await page.evaluate(() => document.documentElement.scrollWidth);
+  out.fits390 = await fits();
   await page.screenshot({ path: 'report-390.png', fullPage: true });
   await page.setViewportSize({ width: 1440, height: 900 });
   const print = await page.context().newPage();
@@ -129,6 +136,8 @@ def main():
             names = re.findall(r'<(?:\w+:)?sheet name="([^"]+)"', workbook.read("xl/workbook.xml").decode())
         check("the Excel download is a real workbook with three sheets", r["file"].startswith("sales-") and r["file"].endswith(".xlsx") and names == ["Summary", "By day", "By product"], f"{r['file']} {names}")
         check("the report fits 390px", r["scroll"] <= 390, str(r["scroll"]))
+        check("every amount stays inside its card at 1440px and 390px", r["fits1440"] and r["fits390"], f"{r['fits1440']} {r['fits390']}")
+        check("the shop nav stays on one row with an admin signed in", r["navRows"] == 1, str(r["navRows"]))
         check("the print page has no shop navigation", r["printNav"] == 0 and r["printTitle"] == "Sales report", str(r))
         check("no console errors on the report", r["consoleErrors"] == [], str(r["consoleErrors"]))
 

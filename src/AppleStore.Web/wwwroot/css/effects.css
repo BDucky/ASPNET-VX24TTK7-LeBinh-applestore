@@ -157,6 +157,7 @@ p {
 }
 
 .site-nav .nav-link {
+  white-space: nowrap;
   color: var(--text) !important;
   font-weight: 600;
   font-size: 0.95rem;
@@ -1337,6 +1338,7 @@ body.has-custom-cursor button {
   display: flex;
   align-items: center;
   gap: 12px;
+  white-space: nowrap;
   margin-left: clamp(8px, 2vw, 24px);
   font-size: 0.9rem;
 }
@@ -1601,7 +1603,9 @@ a.btn-store-primary {
 
 .admin-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  /* Two by two on a desktop, one per row on a phone: wide enough for an
+     amount like 37.440.000 VNĐ on one line (seen cut off 2026-10-09). */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 12px;
   margin: 20px 0 0;
 }
@@ -2243,11 +2247,12 @@ a.btn-store-primary {
   font-weight: 500;
 }
 
-/* Amounts in the stat cards stay on one line at every width. */
+/* Amounts in the stat cards: scaled with the window, and a very large one
+   breaks before "VNĐ" instead of running out of its card. */
 .admin-stat dd[data-report-revenue],
 .admin-stats .admin-stat dd {
   font-size: clamp(1.15rem, 2vw, 1.9rem);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 /* ---------- Reviews ---------- */
