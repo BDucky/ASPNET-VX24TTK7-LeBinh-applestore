@@ -1,0 +1,8 @@
+@model int
+@* "Add to compare" on a product's pages. Open to visitors: the list is a
+   cookie, no account needed. Comes back to the page it was pressed on. *@
+<form class="compare-add" asp-controller="Compare" asp-action="Add" method="post">
+    <input type="hidden" name="productId" value="@Model" />
+    <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" data-choice-return />
+    <button type="submit" class="btn-store-ghost">Add to compare</button>
+</form>

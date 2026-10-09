@@ -275,6 +275,15 @@ edit never unhides a review staff hid), and lets staff reply and hide. The
 `ProductReviews` view component puts the block on a product's model and
 configuration pages; `/Admin/Reviews` is for Admin and Employee.
 
+## Compare
+
+Added 2026-10-08, use case 10, open to visitors. The list of product ids
+lives in one cookie (`CompareCookie`, no account needed); `CompareService`
+decides what may join it (at most 3 visible products, any category) and
+builds the columns with the catalog's own variant grouping and the review
+service's average, so the compare page cannot disagree with the product page.
+A product hidden after it was added drops out and frees its slot.
+
 ## Email
 
 `IEmailSender` is the only thing the services call. `AddAppleStoreEmail`

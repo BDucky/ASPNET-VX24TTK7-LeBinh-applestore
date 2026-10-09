@@ -75,6 +75,11 @@ made default instead). A user only ever sees and changes their own addresses.
 ### CompareLists
 `Id (PK)`, `UserId (FK -> Users)`
 
+**Not used (2026-10-08, `feat/compare`):** the report lets a Guest compare, and
+this table needs a user. The owner chose to keep the compare list in a cookie
+(`AppleStore.Compare`, product ids) for everyone, so this table and
+`CompareItems` stay empty. They are kept so the schema still matches the report.
+
 ### ProductAttributeValues
 Composite PK `(ProductId, AttributeId)`, `ValueText (nvarchar 255, nullable)`, `ValueNumber (decimal, nullable)`
 

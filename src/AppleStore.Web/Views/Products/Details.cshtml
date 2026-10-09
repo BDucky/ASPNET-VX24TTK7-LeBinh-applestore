@@ -16,6 +16,7 @@
         <partial name="_ModelStrip" model="strip" />
     }
     <h1 class="visually-hidden">@Model.Name</h1>
+    <partial name="_CompareButton" model="Model.Id" />
 
     @if (Model.Configurations.Any())
     {

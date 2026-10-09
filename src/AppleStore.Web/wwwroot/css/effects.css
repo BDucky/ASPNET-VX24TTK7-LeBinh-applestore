@@ -2296,3 +2296,63 @@ a.btn-store-primary {
   padding: 0.6rem 0.9rem;
   font: inherit;
 }
+
+/* ---------- Compare ---------- */
+
+.compare-add {
+  margin: 8px 0 16px;
+}
+
+/* Three columns can be wider than a phone: the table scrolls, the page does not. */
+.compare-scroll {
+  overflow-x: auto;
+}
+
+.compare-table th[scope="col"] {
+  min-width: 180px;
+  vertical-align: top;
+}
+
+.compare-table th[scope="row"] {
+  white-space: nowrap;
+}
+
+/* One value per line: configuration names are long. */
+.compare-values {
+  display: block;
+}
+
+/* On a phone the row labels stay in view while the products scroll past. */
+@media (max-width: 575.98px) {
+  .compare-table th[scope="col"] {
+    min-width: 150px;
+  }
+
+  .compare-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg-card);
+    min-width: 0;
+    white-space: normal;
+    width: 84px;
+  }
+}
+
+.compare-photo img {
+  display: block;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.compare-name {
+  display: block;
+  margin: 8px 0 4px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.compare-clear {
+  margin-top: 8px;
+}

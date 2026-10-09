@@ -4,6 +4,36 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-08: compare products (`feat/compare`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 472 of 472 (26 new) |
+| `python3 setup/verify-compare/verify.py` | **12 of 12** |
+| earlier checks, rerun 2026-10-09 | account 69, admin 31, cart 23, checkout 25, payment 16, orders 19, admin-catalog 15, reports 14, reviews 9 |
+
+**Mutation checks** (each caught): no cap when reading the list; a hidden
+product still holding a slot; hidden products shown; adding without checking
+the product exists; the nav reading the old cookie on the page that trims
+it (this one first survived, because the cap hid it; a sharper test was
+added). `FormTokenTests` now also walks a model page and `/Compare`.
+
+**Review (code-reviewer agent).** No blocking findings. Fixed: the nav count
+was the request's old cookie on the same page that trimmed the list, and a
+hand-edited cookie could show any count (now the list this response wrote,
+capped at 3). Added tests: database failure on the page and on add keeps the
+list, `//evil` and `/\evil` return addresses. Kept as a known limit: two tabs
+adding at once, the last response wins (see `docs/finish-plan.md`).
+
+**Oddities chased.** Twice a warm build server reported Razor errors in views
+the change did not touch (`Home/Index`, `Products/Index`, `Reports/Print`).
+`dotnet build-server shutdown` cleared it and a fresh `--no-incremental` build
+was clean both times, so it is the compiler server, not the code. The live
+script's first two runs failed on its own SQL: SQLite stores prices as text, so
+`min()` compared strings; the script now casts.
+
 ## 2026-10-08: product reviews (`feat/reviews`)
 
 | Command | Result |

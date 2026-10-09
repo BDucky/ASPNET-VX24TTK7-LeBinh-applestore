@@ -5,6 +5,20 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-08 (evening): compare products
+
+**What landed.** `CompareService` (columns from active variants and visible
+reviews, sharing the catalog's grouping), `/Compare`, "Add to compare" on the
+model and configuration pages, a "Compare (n)" nav link. The list is a cookie
+(owner's choice), at most 3, any categories. 472 tests; live check 12 of 12,
+all ten live checks rerun and passing on 2026-10-09.
+
+**Watch out:** if `dotnet build` suddenly reports Razor errors in untouched
+views, run `dotnet build-server shutdown` and build again (see
+`docs/verification.md`, compare entry).
+
+**Where to pick up:** wishlist (`Favorites` table exists), then task 11.
+
 ## 2026-10-08 (later still): product reviews
 
 **What landed.** `ReviewService`, the review block on product pages, posting

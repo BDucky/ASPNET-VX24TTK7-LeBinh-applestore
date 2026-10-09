@@ -222,7 +222,7 @@
     var skuEl = root.querySelector("[data-choice-sku]");
     var stockEl = root.querySelector("[data-choice-stock]");
     var variantInput = root.querySelector("[data-choice-variant]");
-    var returnInput = root.querySelector("[data-choice-return]");
+    var returnInputs = root.querySelectorAll("[data-choice-return]");
     var buyButton = root.querySelector("[data-choice-buy]");
     var signInLink = root.querySelector("[data-choice-signin]");
     var selected = choices.filter(function (c) { return c.sku === (skuEl && skuEl.textContent.trim()); })[0] || choices[0];
@@ -257,10 +257,10 @@
       if (selected.color) url.searchParams.set("color", selected.color); else url.searchParams.delete("color");
       if (selected.region) url.searchParams.set("region", selected.region); else url.searchParams.delete("region");
       history.replaceState(null, "", url);
-      // The cart form posts this choice and comes back to it.
+      // The cart and compare forms come back to this choice.
       var here = url.pathname + url.search;
       if (variantInput) variantInput.value = selected.id;
-      if (returnInput) returnInput.value = here;
+      returnInputs.forEach(function (input) { input.value = here; });
       if (buyButton) buyButton.disabled = !selected.buyable;
       if (signInLink) signInLink.setAttribute("href", "/Account/Login?returnUrl=" + encodeURIComponent(here));
     }
