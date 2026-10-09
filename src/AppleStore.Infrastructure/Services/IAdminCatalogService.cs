@@ -9,6 +9,7 @@ public interface IAdminCatalogService
     Task<AdminCatalogResult> CreateAsync(ProductInput input, CancellationToken ct = default);
     Task<AdminCatalogResult> UpdateAsync(int productId, ProductInput input, long version, CancellationToken ct = default);
     Task<AdminCatalogResult> SetOnSaleAsync(int productId, bool onSale, CancellationToken ct = default);
-    Task<AdminCatalogResult> AddVariantAsync(int productId, VariantInput input, CancellationToken ct = default);
-    Task<AdminCatalogResult> UpdateVariantAsync(int variantId, VariantChange change, CancellationToken ct = default);
+    // userId: who made the change, for the price history (BM_PRICE_01).
+    Task<AdminCatalogResult> AddVariantAsync(int productId, VariantInput input, int? userId = null, CancellationToken ct = default);
+    Task<AdminCatalogResult> UpdateVariantAsync(int variantId, VariantChange change, int? userId = null, CancellationToken ct = default);
 }

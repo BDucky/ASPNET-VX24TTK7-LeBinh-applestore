@@ -1,4 +1,5 @@
 using AppleStore.Domain.Entities;
+using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -150,7 +151,7 @@ public class AdminCatalogService : IAdminCatalogService
         }
     }
 
-    public async Task<AdminCatalogResult> AddVariantAsync(int productId, VariantInput input, CancellationToken ct = default)
+    public async Task<AdminCatalogResult> AddVariantAsync(int productId, VariantInput input, int? userId = null, CancellationToken ct = default)
     {
         if (!await _db.Products.AnyAsync(p => p.Id == productId, ct))
             return new AdminCatalogResult(AdminCatalogOutcome.NotFound);
@@ -174,6 +175,9 @@ public class AdminCatalogService : IAdminCatalogService
             UpdatedAt = Now,
         };
         _db.ProductVariants.Add(variant);
+        // The first entry of its price history (BM_PRICE_01).
+        if (input.Price is not null)
+            _db.PriceChanges.Add(new PriceChange { Variant = variant, NewPrice = input.Price, Source = PriceChangeSource.NewVariant, ChangedByUserId = userId, ChangedAt = Now });
         foreach (var (code, value) in new[] { ("config", input.Configuration), ("color", input.Color), ("region", input.Region) })
         {
             if (Blank(value) is { } text)
@@ -183,21 +187,44 @@ public class AdminCatalogService : IAdminCatalogService
         return new AdminCatalogResult(AdminCatalogOutcome.Done, variant.Id);
     }
 
-    public async Task<AdminCatalogResult> UpdateVariantAsync(int variantId, VariantChange change, CancellationToken ct = default)
+    public async Task<AdminCatalogResult> UpdateVariantAsync(int variantId, VariantChange change, int? userId = null, CancellationToken ct = default)
     {
         if (CheckVariant(change.Price, change.StockQty) is { } refused)
             return refused;
 
         var next = RowVersion.Next(change.Version, Now);
+        // Every price change moves the version, so the price read here at
+        // the version the admin saw is the price this update replaces; the
+        // log row is written in the same transaction (BM_PRICE_01).
+        await using var tx = await _db.Database.BeginTransactionAsync(ct);
+        var seen = new DateTime(change.Version);
+        var oldPrice = await _db.ProductVariants.Where(v => v.Id == variantId && v.UpdatedAt == seen).Select(v => v.Price).FirstOrDefaultAsync(ct);
         var saved = await _db.ProductVariants
-            .Where(v => v.Id == variantId && v.UpdatedAt == new DateTime(change.Version) && v.StockQty == change.SeenStock)
+            .Where(v => v.Id == variantId && v.UpdatedAt == seen && v.StockQty == change.SeenStock && v.Price == oldPrice)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(v => v.Price, change.Price)
                 .SetProperty(v => v.StockQty, change.StockQty)
                 .SetProperty(v => v.Status, change.OnSale)
                 .SetProperty(v => v.UpdatedAt, next), ct);
         if (saved == 1)
+        {
+            if (oldPrice != change.Price)
+            {
+                _db.PriceChanges.Add(new PriceChange
+                {
+                    VariantId = variantId,
+                    OldPrice = oldPrice,
+                    NewPrice = change.Price,
+                    Source = PriceChangeSource.Edit,
+                    ChangedByUserId = userId,
+                    ChangedAt = Now,
+                });
+                await _db.SaveChangesAsync(ct);
+            }
+            await tx.CommitAsync(ct);
             return new AdminCatalogResult(AdminCatalogOutcome.Done, variantId);
+        }
+        await tx.RollbackAsync(ct);
 
         var current = await _db.ProductVariants.Where(v => v.Id == variantId).Select(v => (int?)v.StockQty).FirstOrDefaultAsync(ct);
         return current is null
@@ -214,15 +241,15 @@ public class AdminCatalogService : IAdminCatalogService
         // Only the shop's own photos, matched exactly: no outside address, no path tricks.
         if (Blank(input.ImageUrl) is { } image && !_images.All().Contains(image))
             return new AdminCatalogResult(AdminCatalogOutcome.ImageNotInLibrary);
-        if (input.BasePrice is <= 0)
+        if (input.BasePrice is <= 0 or > PriceLimits.Max)
             return new AdminCatalogResult(AdminCatalogOutcome.InvalidPrice);
         return null;
     }
 
-    // Same rules as the schema: a price is positive or not set ("Contact for
-    // price"), stock is never negative.
+    // Same rules as the schema: a price is positive and fits decimal(12,2), or
+    // is not set ("Contact for price"); stock is never negative.
     private static AdminCatalogResult? CheckVariant(decimal? price, int stock) =>
-        price is <= 0 ? new AdminCatalogResult(AdminCatalogOutcome.InvalidPrice)
+        price is <= 0 or > PriceLimits.Max ? new AdminCatalogResult(AdminCatalogOutcome.InvalidPrice)
         : stock < 0 ? new AdminCatalogResult(AdminCatalogOutcome.InvalidStock)
         : null;
 

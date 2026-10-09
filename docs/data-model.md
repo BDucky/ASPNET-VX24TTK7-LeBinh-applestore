@@ -117,6 +117,11 @@ The report keeps only `Orders.VoucherCode`; BM_VOUCHER_01 describes percent or f
 
 **Added 2026-10-09 (`feat/promotions`, use case 28):** `Kind (int: Code=0, Automatic=1)` and `Name (nvarchar 120, nullable)`; `Code` became nullable. The owner chose to keep promotions in this table: an `Automatic` row is a promotion with a name and no code, minimum order or usage limit, and it lowers prices while it runs (`SalePrices`). The unique index on `Code` ignores the nulls (SQLite allows several, the SQL Server provider filters them out).
 
+### PriceChanges (added 2026-10-09, not in the report)
+`Id (PK)`, `VariantId (FK -> ProductVariants, cascade)`, `OldPrice`, `NewPrice (decimal(12,2), nullable: Contact for price)`, `Source (int: Edit=0, Batch=1, NewVariant=2)`, `ChangedByUserId (FK -> Users, set null)`, `ChangedAt`
+
+BM_PRICE_01 asks for a price-change history log. One row per variant whose own price changed, written in the same transaction as the change. Indexes on `(VariantId, ChangedAt)` and `ChangedAt` for the history page.
+
 ### VoucherProducts (added 2026-10-07)
 Composite PK `(VoucherId, ProductId)`, both cascading. A voucher with rows here applies only to those products.
 

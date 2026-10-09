@@ -118,3 +118,23 @@ public sealed record VoucherPage(int? Id, VoucherForm Form, int UsedCount, IRead
 public sealed record UsersPage(IReadOnlyList<UserAdminRow> Users, string? Search, int CurrentUserId);
 
 public sealed record ReportPage(DateOnly From, DateOnly To, SalesReport? Report, string? Error);
+
+// BM_PRICE_01. Value is nullable so a box left empty or unreadable is told
+// apart from a real number (model state reports it).
+public sealed class PriceBatchForm
+{
+    public List<int> ProductIds { get; set; } = [];
+    public int? CategoryId { get; set; }
+    public PriceBatchMode Mode { get; set; }
+    public decimal? Value { get; set; }
+
+    // An amount is whole dong typed without separators. "1.000" binds as 1
+    // with three decimals (scale 3), so it is refused instead of adding one
+    // dong where a thousand was meant (found 2026-10-09).
+    public bool AmountIsWhole => Mode != PriceBatchMode.Amount || Value is not { } v || v.Scale == 0;
+
+    public PriceBatchInput ToInput() => new(ProductIds, CategoryId, Mode, Value ?? 0m);
+}
+
+public sealed record PricesPage(PriceBatchForm Form, IReadOnlyList<(int Id, string Name)> Products, IReadOnlyList<(int Id, string Name)> Categories,
+    IReadOnlyList<PriceChangeRow> History, int? ProductFilter, string? Error);

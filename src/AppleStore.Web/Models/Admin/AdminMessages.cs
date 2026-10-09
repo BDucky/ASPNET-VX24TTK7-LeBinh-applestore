@@ -25,7 +25,7 @@ public static class AdminMessages
         AdminCatalogOutcome.NameTaken => "Another product already uses this name (their page addresses would clash).",
         AdminCatalogOutcome.UnknownCategory => "Pick a category.",
         AdminCatalogOutcome.ImageNotInLibrary => "Pick a photo from the list.",
-        AdminCatalogOutcome.InvalidPrice => "A price is more than 0, or empty for \"Contact for price\".",
+        AdminCatalogOutcome.InvalidPrice => "A price is more than 0 and at most 9.999.999.999, or empty for \"Contact for price\".",
         AdminCatalogOutcome.InvalidStock => "Stock cannot be below 0.",
         AdminCatalogOutcome.MissingSku => "Enter a SKU.",
         AdminCatalogOutcome.SkuTaken => "Another variant already uses this SKU.",
@@ -49,5 +49,23 @@ public static class AdminMessages
         VoucherAdminOutcome.PromotionPercent => "A promotion takes off less than 100%, so nothing is given away.",
         VoucherAdminOutcome.CodeLocked => "This voucher has been used, so its code cannot change (orders keep it). Make a new voucher instead.",
         _ => "Someone changed this voucher after you opened it. Check it and save again.",
+    };
+
+    public static string For(PriceBatchResult result) => result.Outcome switch
+    {
+        PriceBatchOutcome.Done => $"Changed {result.Changed} price{(result.Changed == 1 ? "" : "s")}.",
+        PriceBatchOutcome.NothingSelected => "Pick products or a category.",
+        PriceBatchOutcome.InvalidValue => "Enter a change other than 0, and above -100%.",
+        PriceBatchOutcome.PriceTooLow => $"That would bring {result.Sku} to 0 or less. Nothing was changed.",
+        PriceBatchOutcome.PriceTooHigh => $"That would bring {result.Sku} above the largest price the shop stores. Nothing was changed.",
+        PriceBatchOutcome.NothingToChange => "No price would change (none has a price, or the change rounds away).",
+        _ => "Someone changed one of these prices meanwhile. Nothing was changed; try again.",
+    };
+
+    public static string Source(Domain.Enums.PriceChangeSource source) => source switch
+    {
+        Domain.Enums.PriceChangeSource.Batch => "Batch",
+        Domain.Enums.PriceChangeSource.NewVariant => "New variant",
+        _ => "Edited",
     };
 }

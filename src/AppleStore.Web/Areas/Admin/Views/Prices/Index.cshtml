@@ -1,0 +1,92 @@
+@model AppleStore.Web.Models.Admin.PricesPage
+@using AppleStore.Infrastructure.Formatting
+@using AppleStore.Infrastructure.Services
+@using AppleStore.Web.Models.Admin
+@{
+    ViewData["Title"] = "Prices";
+    var form = Model.Form;
+}
+
+@* BM_PRICE_01: change many prices at once, and every price change logged. *@
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Prices</h1>
+        <partial name="_AdminNav" />
+        <p class="account-hint">Change the price of every variant of the products you pick, or of a whole category, at once. A percent lands on a whole 1.000 dong. If any price would reach 0, or someone changes one meanwhile, nothing is changed. Variants without a price are left alone.</p>
+        @if (Model.Error is not null)
+        {
+            <p class="account-error" role="alert">@Model.Error</p>
+        }
+
+        <form method="post" asp-action="Batch" class="account-form admin-form" novalidate>
+            <label for="ProductIds">Products</label>
+            <select id="ProductIds" name="ProductIds" multiple size="8">
+                @foreach (var (id, name) in Model.Products)
+                {
+                    <option value="@id" selected="@form.ProductIds.Contains(id)">@name</option>
+                }
+            </select>
+
+            <label for="CategoryId">Or a whole category</label>
+            <select id="CategoryId" name="CategoryId">
+                <option value="">None</option>
+                @foreach (var (id, name) in Model.Categories)
+                {
+                    <option value="@id" selected="@(form.CategoryId == id)">@name</option>
+                }
+            </select>
+
+            <label for="Mode">Change by</label>
+            <select id="Mode" name="Mode">
+                <option value="Percent" selected="@(form.Mode == PriceBatchMode.Percent)">Percent (negative to lower)</option>
+                <option value="Amount" selected="@(form.Mode == PriceBatchMode.Amount)">Amount in VND (negative to lower)</option>
+            </select>
+
+            <label for="Value">Change</label>
+            <input id="Value" name="Value" value="@form.Value?.ToString("0.##")" inputmode="decimal" />
+
+            <button type="submit" class="btn-store-primary">Change prices</button>
+        </form>
+
+        <h2 class="account-subtitle">Price history</h2>
+        <form method="get" asp-action="Index" class="admin-filter">
+            <label for="product">Product</label>
+            <select id="product" name="product" onchange="this.form.submit()">
+                <option value="">All products</option>
+                @foreach (var (id, name) in Model.Products)
+                {
+                    <option value="@id" selected="@(Model.ProductFilter == id)">@name</option>
+                }
+            </select>
+        </form>
+        @if (Model.History.Count == 0)
+        {
+            <p class="account-lead">No price changes yet.</p>
+        }
+        else
+        {
+            <div class="compare-scroll">
+                <table class="report-table">
+                    <thead>
+                        <tr><th scope="col">When</th><th scope="col">Product</th><th scope="col">SKU</th><th scope="col">Old</th><th scope="col">New</th><th scope="col">How</th><th scope="col">By</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model.History)
+                        {
+                            <tr data-price-change="@c.Id">
+                                <td>@((c.ChangedAt + ReportService.ShopOffset).ToString("dd/MM/yyyy HH:mm"))</td>
+                                <td>@c.ProductName</td>
+                                <td>@c.Sku</td>
+                                <td>@(c.Source == AppleStore.Domain.Enums.PriceChangeSource.NewVariant ? "None" : PriceText.Vnd(c.OldPrice))</td>
+                                <td>@PriceText.Vnd(c.NewPrice)</td>
+                                <td>@AdminMessages.Source(c.Source)</td>
+                                <td>@(c.ChangedBy ?? "Deleted account")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>
