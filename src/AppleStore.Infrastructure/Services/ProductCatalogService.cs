@@ -12,7 +12,8 @@ public class ProductCatalogService : IProductCatalogService
         _db = db;
     }
 
-    public async Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured, CancellationToken ct = default)
+    public async Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured,
+        PriceBand band = PriceBand.Any, CancellationToken ct = default)
     {
         var products = _db.Products
             .Include(p => p.Category)
@@ -29,8 +30,16 @@ public class ProductCatalogService : IProductCatalogService
         var list = await products.OrderBy(p => p.SortOrder).ThenBy(p => p.Id).ToListAsync(ct);
         var productIds = list.Select(p => p.Id).ToList();
 
-        var lowestActivePrices = await _db.ProductVariants
-            .Where(v => v.Status && productIds.Contains(v.ProductId))
+        // With a band, only prices inside it count, so a product's card shows
+        // its lowest price in the band and a product with none drops out.
+        var range = PriceBands.Find(band);
+        var activeVariants = _db.ProductVariants.Where(v => v.Status && productIds.Contains(v.ProductId));
+        if (range?.Min is { } min)
+            activeVariants = activeVariants.Where(v => v.Price >= min);
+        if (range?.Max is { } max)
+            activeVariants = activeVariants.Where(v => v.Price < max);
+
+        var lowestActivePrices = await activeVariants
             .GroupBy(v => v.ProductId)
             .Select(g => new { ProductId = g.Key, MinPrice = g.Min(v => v.Price) })
             .ToDictionaryAsync(x => x.ProductId, x => x.MinPrice, ct);
@@ -40,6 +49,11 @@ public class ProductCatalogService : IProductCatalogService
             .GroupBy(i => i.ProductId)
             .Select(g => new { ProductId = g.Key, ImageUrl = g.OrderBy(i => i.SortOrder).First().ImageUrl })
             .ToDictionaryAsync(x => x.ProductId, x => x.ImageUrl, ct);
+
+        if (range is not null)
+            list = list.Where(p => lowestActivePrices.GetValueOrDefault(p.Id) is not null).ToList();
+        if (sort == ProductSort.Newest)
+            list = list.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id).ToList();
 
         var summaries = list
             .Select(p => new ProductSummary(

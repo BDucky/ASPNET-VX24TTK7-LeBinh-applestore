@@ -10,14 +10,17 @@ public class FakeProductCatalogService : IProductCatalogService
 
     public string? LastCategorySlug { get; private set; }
     public string? LastQuery { get; private set; }
+    public PriceBand LastBand { get; private set; }
     public string? LastSlugRequested { get; private set; }
     public string? LastConfigurationProductSlugRequested { get; private set; }
     public string? LastConfigurationSlugRequested { get; private set; }
 
-    public Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured, CancellationToken ct = default)
+    public Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured,
+        PriceBand band = PriceBand.Any, CancellationToken ct = default)
     {
         LastCategorySlug = categorySlug;
         LastQuery = query;
+        LastBand = band;
         return Task.FromResult(ProductsToReturn);
     }
 

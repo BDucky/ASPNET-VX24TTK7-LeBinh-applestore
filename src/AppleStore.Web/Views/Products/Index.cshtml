@@ -17,7 +17,16 @@
     // model strip and a promo banner: no grid, no toolbar. A search, or no
     // category at all, still gets the grid with sort, because search and
     // sort are report requirements (use cases 7-10).
-    var isCategoryLanding = categoryName is not null && string.IsNullOrWhiteSpace(Model.Query);
+    // A price band asks for a filtered grid, so it also skips the landing.
+    var isCategoryLanding = categoryName is not null && string.IsNullOrWhiteSpace(Model.Query) && Model.Band == PriceBand.Any;
+    string BandUrl(PriceBand band) => Url.Action("Index", "Products", new
+    {
+        category = Model.SelectedCategory,
+        q = string.IsNullOrWhiteSpace(Model.Query) ? null : Model.Query,
+        sort = Model.Sort == ProductSort.Featured ? (ProductSort?)null : Model.Sort,
+        band = band == PriceBand.Any ? (PriceBand?)null : band,
+    })!;
+    var bandChoices = new[] { new PriceBandInfo(PriceBand.Any, "All prices", null, null) }.Concat(PriceBands.All);
     ViewData["Title"] = categoryName ?? (string.IsNullOrWhiteSpace(Model.Query) ? "All products" : $"Search: {Model.Query}");
     ViewData["NavCategory"] = Model.SelectedCategory;
 }
@@ -48,6 +57,10 @@ else
                 {
                     <input type="hidden" name="category" value="@Model.SelectedCategory" />
                 }
+                @if (Model.Band != PriceBand.Any)
+                {
+                    <input type="hidden" name="band" value="@Model.Band" />
+                }
                 <input type="search" name="q" value="@Model.Query" placeholder="Search products&hellip;" class="product-search-input" aria-label="Search products" />
                 <button type="submit" class="btn-store-primary">Search</button>
             </form>
@@ -62,19 +75,32 @@ else
                     {
                         <input type="hidden" name="q" value="@Model.Query" />
                     }
+                    @if (Model.Band != PriceBand.Any)
+                    {
+                        <input type="hidden" name="band" value="@Model.Band" />
+                    }
                     <label for="sort-select">Sort</label>
                     <select id="sort-select" name="sort" class="sort-select" onchange="this.form.submit()">
                         <option value="Featured" selected="@(Model.Sort == ProductSort.Featured)">Featured</option>
                         <option value="PriceAscending" selected="@(Model.Sort == ProductSort.PriceAscending)">Price: low to high</option>
                         <option value="PriceDescending" selected="@(Model.Sort == ProductSort.PriceDescending)">Price: high to low</option>
+                        <option value="Newest" selected="@(Model.Sort == ProductSort.Newest)">Newest</option>
                     </select>
                 </form>
             </div>
         </div>
 
+        <nav class="price-bands" aria-label="Price">
+            @foreach (var choice in bandChoices)
+            {
+                var on = choice.Band == Model.Band;
+                <a class="price-band @(on ? "is-active" : "")" href="@BandUrl(choice.Band)" aria-current="@(on ? "true" : null)" data-price-band="@choice.Band">@choice.Label</a>
+            }
+        </nav>
+
         @if (!Model.Products.Any())
         {
-            <p class="empty-state">No products match. Try a different search or category.</p>
+            <p class="empty-state">No products match. Try a different search, category or price.</p>
         }
         else
         {

@@ -4,6 +4,40 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-09: filter by price, sort by newest (`feat/price-filter`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 492 of 492 (20 new) |
+| `python3 setup/verify-catalog-filter/verify.py` | **16 of 16** |
+| related checks rerun | compare 12, cart 23, account 69 |
+
+The live check compares each band with the database itself (52 products on
+sale: 11, 14, 25 and 15 per band, a product can sit in two) and checks every
+card price is inside its band.
+
+**Mutation checks:** band not dropping products (9 tests failed), the upper
+bound made inclusive (1), no Id tie-break for Newest (1), category landing
+ignoring the band (2): all caught. A fifth, removing the controller's check of
+unknown bands, survived: MVC's enum binder already refuses undefined values,
+so the check was dead code and was removed.
+
+**Decimal on SQLite.** Prices are stored as text, so the tests use 6.490.000
+against the 10 million bound: compared as text it would fall out of "Under 10
+million". It stays in, so EF Core compares the numbers.
+
+**Review (code-reviewer agent).** No blocking findings. Added from it: tests
+for a band name in another case and as its number, and the empty-list message
+now names price.
+
+**Oddities chased.** The first desktop screenshot showed one card where the
+page counted 15: it was taken while the window grew from 390px and the cards
+were still fading in. A fresh load shows four per row; the script now reloads
+before the shot. The warm build server's Razor errors came back twice more
+after view edits; `dotnet build-server shutdown` clears them each time.
+
 ## 2026-10-08: compare products (`feat/compare`)
 
 | Command | Result |

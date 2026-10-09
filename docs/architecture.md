@@ -275,6 +275,16 @@ edit never unhides a review staff hid), and lets staff reply and hide. The
 `ProductReviews` view component puts the block on a product's model and
 configuration pages; `/Admin/Reviews` is for Admin and Employee.
 
+## Product list filters
+
+Added 2026-10-09, use case 8. `/Products` takes `category`, `q`, `sort`
+(`Featured`, `PriceAscending`, `PriceDescending`, `Newest`) and `band`. The
+bands live in one table, `PriceBands`; a product is in a band when an active
+variant is priced inside it, and its card then shows the lowest such price.
+An unknown band in the URL is refused by MVC's enum binder and means "all
+prices". Every band link keeps the other three values, and the search and sort
+forms carry the band as a hidden field.
+
 ## Compare
 
 Added 2026-10-08, use case 10, open to visitors. The list of product ids

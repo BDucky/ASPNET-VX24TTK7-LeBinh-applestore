@@ -5,6 +5,17 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-09: filter by price, sort by newest (use case 8)
+
+**What landed.** Price bands on `/Products` (one table, `PriceBands`), the
+"Newest" sort, band links that keep search, category and sort. Owner chose
+preset bands and "any active variant in the band". 492 tests; live check
+`verify-catalog-filter` 16 of 16. Also PR #26: the week 4 progress report
+rewritten in full.
+
+**Where to pick up:** use case 28 (promotions), then 20 (stock intake) and 21
+(in-person sale), then task 11. Wishlist is not one of the 37 use cases.
+
 ## 2026-10-08 (evening): compare products
 
 **What landed.** `CompareService` (columns from active variants and visible
