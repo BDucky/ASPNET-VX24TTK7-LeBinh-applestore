@@ -157,6 +157,33 @@ public sealed class CheckoutServiceTests : IDisposable
         Assert.Equal(23_740_500m, await TotalAsync());
     }
 
+    [Fact]
+    public async Task A_promotion_ending_after_the_page_was_shown_asks_to_confirm_the_new_total()
+    {
+        AddPromotion("Ends soon", VoucherDiscountType.Percent, 5m);
+        await _cart.AddAsync(_alice, _phone, 1);
+        var shown = await TotalAsync();
+
+        Set($"update Vouchers set EndsAt = '{Now.UtcDateTime.AddMinutes(-1):yyyy-MM-dd HH:mm:ss}' where Kind = 1");
+        var placed = await _sut.PlaceOrderAsync(_alice, Delivery, null, shown);
+
+        Assert.Equal((23_740_500m, PlaceOrderOutcome.TotalChanged), (shown, placed.Outcome));
+        Assert.Equal(0, State().Orders);
+        Assert.Equal(24_990_000m, await TotalAsync());
+    }
+
+    // Checkout reads only code vouchers: an automatic row is never a code to
+    // type, even one given a code outside the admin pages (review 2026-10-09).
+    [Fact]
+    public async Task A_promotion_row_is_never_accepted_as_a_typed_code()
+    {
+        AddPromotion("Sneaky", VoucherDiscountType.Percent, 50m, ProductOf(_pods));
+        Set("update Vouchers set Code = 'SNEAKY' where Kind = 1");
+        await _cart.AddAsync(_alice, _phone, 1);
+
+        Assert.Equal(VoucherProblem.NotFound, (await _sut.QuoteAsync(_alice, "SNEAKY")).VoucherProblem);
+    }
+
     private int ProductOf(int variantId)
     {
         using var db = _shop.Context();

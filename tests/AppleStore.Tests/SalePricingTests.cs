@@ -142,6 +142,18 @@ public sealed class SalePricingTests : IDisposable
         Assert.Equal(new SalePrice(1_000_000m - 100_000m, 1_000_000m, "Small"), await PriceAsync(_phone, 1_000_000m));
     }
 
+    // Only the admin pages refuse these; a row written another way is skipped.
+    [Theory]
+    [InlineData(VoucherDiscountType.Fixed, -100_000)]
+    [InlineData(VoucherDiscountType.Percent, -10)]
+    [InlineData(VoucherDiscountType.Fixed, 0)]
+    public async Task A_zero_or_negative_promotion_changes_nothing(VoucherDiscountType type, int value)
+    {
+        AddPromotion(_db, "Broken", type, value);
+
+        Assert.Equal(new SalePrice(1_000_000m), await PriceAsync(_phone, 1_000_000m));
+    }
+
     [Fact]
     public async Task No_price_stays_no_price()
     {

@@ -158,12 +158,17 @@ public class PromotionAdminFlowTests : WebFlowTestBase
         await SignInAsync(UserRole.Employee, "staff@example.com");
 
         var open = await Client.GetAsync($"/Admin/Promotions/{voucher}");
+        var form = PromotionForm("Hijack", "90");
+        form["Version"] = "0";
+        var post = await PostFormAsync($"/Admin/Promotions/{voucher}", form, formPage: "/Admin/Promotions/New");
         var delete = await PostFormAsync($"/Admin/Promotions/{voucher}/Delete", new(), formPage: "/Admin/Promotions");
         var vouchers = await Client.GetAsync("/Admin/Vouchers");
 
-        Assert.Equal((HttpStatusCode.NotFound, HttpStatusCode.NotFound, HttpStatusCode.Redirect), (open.StatusCode, delete.StatusCode, vouchers.StatusCode));
+        Assert.Equal((HttpStatusCode.NotFound, HttpStatusCode.NotFound, HttpStatusCode.NotFound, HttpStatusCode.Redirect),
+            (open.StatusCode, post.StatusCode, delete.StatusCode, vouchers.StatusCode));
         using var scope = Factory.Services.CreateScope();
-        Assert.True(await scope.ServiceProvider.GetRequiredService<AppDbContext>().Vouchers.AnyAsync(v => v.Id == voucher));
+        var kept = await scope.ServiceProvider.GetRequiredService<AppDbContext>().Vouchers.SingleAsync(v => v.Id == voucher);
+        Assert.Equal(("KEEP10", 10m, VoucherKind.Code, (string?)null), (kept.Code, kept.DiscountValue, kept.Kind, kept.Name));
     }
 
     [Fact]
