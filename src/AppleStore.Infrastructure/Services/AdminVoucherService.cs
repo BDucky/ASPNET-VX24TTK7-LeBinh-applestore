@@ -19,11 +19,11 @@ public class AdminVoucherService : IAdminVoucherService
         _time = time;
     }
 
-    public async Task<IReadOnlyList<VoucherAdminRow>> ListAsync(CancellationToken ct = default) =>
+    public async Task<IReadOnlyList<VoucherAdminRow>> ListAsync(VoucherKind kind = VoucherKind.Code, CancellationToken ct = default) =>
         (await _db.Vouchers.AsNoTracking().OrderByDescending(v => v.Id).ToListAsync(ct))
             .Select(v => Row(v, [])).ToList();
 
-    public async Task<VoucherAdminRow?> GetAsync(int voucherId, CancellationToken ct = default)
+    public async Task<VoucherAdminRow?> GetAsync(int voucherId, VoucherKind kind = VoucherKind.Code, CancellationToken ct = default)
     {
         var voucher = await _db.Vouchers.AsNoTracking().FirstOrDefaultAsync(v => v.Id == voucherId, ct);
         if (voucher is null)
@@ -94,7 +94,7 @@ public class AdminVoucherService : IAdminVoucherService
         return new VoucherAdminResult(VoucherAdminOutcome.Done, voucherId);
     }
 
-    public async Task<VoucherAdminResult> DeleteAsync(int voucherId, CancellationToken ct = default)
+    public async Task<VoucherAdminResult> DeleteAsync(int voucherId, VoucherKind kind = VoucherKind.Code, CancellationToken ct = default)
     {
         var deleted = await _db.Vouchers.Where(v => v.Id == voucherId).ExecuteDeleteAsync(ct);
         return new VoucherAdminResult(deleted == 1 ? VoucherAdminOutcome.Done : VoucherAdminOutcome.NotFound);
