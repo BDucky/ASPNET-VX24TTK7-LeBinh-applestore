@@ -4,6 +4,41 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-09: batch prices and price history (`feat/price-history`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 566 of 566 (31 new) |
+| `python3 setup/verify-prices/verify.py` | **11 of 11**, every price and log row compared with the database |
+| all other live checks, rerun | account 69, admin 31, cart 23, checkout 25, payment 16, orders 19, admin-catalog 15, reports 14, reviews 9, compare 12, catalog-filter 16, promotions 15 |
+
+**Mutation checks** (all caught): the batch without compare-and-swap; no
+rounding; a price of 0 allowed; no version move (a stale edit page could then
+save the old price back); the category ignored; a log row on every save; the
+wrong old price logged; amounts with a dot allowed; no staff id; the page for
+admins only; the mode check; the price ceiling.
+
+**Found while testing:** "1.000" typed as an amount binds as 1, which would
+have added one dong instead of a thousand. Amounts must now be whole numbers
+(C# keeps "1.000" with three decimals, so it can be told apart). The class
+of bug is the one already listed for vouchers.
+
+**Review (code-reviewer agent).** No blocking findings; the log cannot
+disagree with the saved price, because only the two price writers change a
+price and both move the version. Fixed from it: a huge number crashed the page
+or stored a price beyond decimal(12,2) (now refused everywhere through
+`PriceLimits`); a forged mode value; the staff id read two ways (now one
+extension). Added a test that a sale during a batch neither stops it nor
+loses its stock. The history page lists every change, with no cap (none was
+asked for).
+
+**Oddities.** A full-page desktop screenshot showed the page repeated:
+Playwright stitches full-page shots badly with the fixed background; the
+script now takes a normal shot. The warm build server's Razor errors came
+back after a batch of live checks; `dotnet build-server shutdown` cleared them.
+
 ## 2026-10-09: promotions (`feat/promotions`)
 
 | Command | Result |

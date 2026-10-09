@@ -5,6 +5,18 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-09 (evening): batch prices and price history (BM_PRICE_01)
+
+**What landed.** `PriceChanges` table, `PriceService` (batch, all or
+nothing), logging on every price save, `/Admin/Prices` for admins and
+employees. 566 tests; all 13 live checks pass.
+
+**Do this after pulling:** `dotnet ef database update` (migration
+`PriceChangeHistory`).
+
+**Where to pick up:** task 11 (Vietnamese Word report, online slides with a
+.pptx export, owner's choice), then use cases 20 and 21.
+
 ## 2026-10-09 (later): promotions (use case 28)
 
 **What landed.** Automatic promotions in the `Vouchers` table (`Kind`,

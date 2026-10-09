@@ -275,6 +275,17 @@ edit never unhides a review staff hid), and lets staff reply and hide. The
 `ProductReviews` view component puts the block on a product's model and
 configuration pages; `/Admin/Reviews` is for Admin and Employee.
 
+## Prices and their history
+
+Added 2026-10-09, BM_PRICE_01. `/Admin/Prices` (Admin and Employee) changes
+the price of every variant of the picked products, or of a category, by a
+percent (rounded to 1.000 dong) or an amount. `PriceService` does it in one
+transaction: each variant is saved only at the price and version it read,
+and any refusal undoes the whole batch. Every price change, batch or single
+save on the product page (`AdminCatalogService`), writes a `PriceChanges`
+row in the same transaction. `PriceLimits.Max` is the one ceiling for every
+price write.
+
 ## Promotions and the sale price
 
 Added 2026-10-09, use case 28. A promotion is a `Vouchers` row of kind

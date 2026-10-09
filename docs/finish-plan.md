@@ -72,7 +72,7 @@ puts a demoable buying flow and the admin area first.
 | 10c | Compare products | 10 | `feat/compare` | controller with a cookie, partial views, anti-forgery, service shared with the catalog | done, verified 12/12, PR #25 |
 | 10d | Filter by price, sort by newest | 8 | `feat/price-filter` | model binding of enums from the query string, one dispatch table, tag helpers keeping state in links | done, verified 16/16, PR #27 |
 | 10e | Promotions | 28 | `feat/promotions` | EF migration, a base controller with thin subclasses per role, one owner for the sale price, `TimeProvider` | done, verified 15/15, PR #28 |
-| 10f | Price-change history | 28 (BM_PRICE_01) | | | next (owner chose a separate PR) |
+| 10f | Batch prices and price history | 28 (BM_PRICE_01) | `feat/price-history` | EF migration, a transaction with compare-and-swap writes, `[Authorize]` for two roles | done, verified 11/11, PR #29 |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
@@ -80,7 +80,7 @@ puts a demoable buying flow and the admin area first.
 
 | Decision | Needed by task | Notes |
 |---|---|---|
-| Report language and who writes which chapter | 11 | sample report is Vietnamese |
+| Report written by Claude in Vietnamese (owner, 2026-10-09); slides online with a .pptx export (owner) | 11 | decided |
 
 ## Decided
 
@@ -89,6 +89,7 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Prices | 2026-10-09 | batch by products or a category, percent or amount, all or nothing; a percent result rounded to 1.000 dong; admins and employees use /Admin/Prices (owner). Off-sale variants included, unpriced ones skipped, an amount typed with a dot refused, prices capped at what decimal(12,2) holds (Claude's) |
 | Promotions | 2026-10-09 | owner: one table (Vouchers gets Kind and Name), a time-window discount layer worked out when a price is read, vouchers stack on the lowered price, the largest discount wins, Admin and Employee manage promotions, price history in its own PR. Claude's: nothing is ever made free (a discount reaching the price is skipped; a promotion percent stays below 100) |
 | Price filter | 2026-10-09 | preset bands, and a product belongs to a band when one active variant is priced inside it (owner). Bands under 10, 10-20, 20-40, 40 million and over, min included and max not; the card shows the lowest price inside the band; brand filter left out since every product is Apple (Claude's, accepted) |
 | Compare | 2026-10-08 | list kept in a cookie for visitors and customers alike, at most 3 products, any categories (owner chose all three). Rows are price, stock, configurations, colours, regions, rating, because the attribute tables are empty (Claude's) |
