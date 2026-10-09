@@ -2406,3 +2406,17 @@ a.btn-store-primary {
   font-size: 0.78rem;
   font-weight: 600;
 }
+
+/* ---------- Prices (BM_PRICE_01) ---------- */
+
+.account-subtitle {
+  margin: 28px 0 8px;
+  font-size: 1.2rem;
+}
+
+.admin-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}

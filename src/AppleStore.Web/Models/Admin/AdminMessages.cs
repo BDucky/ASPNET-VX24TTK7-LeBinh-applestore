@@ -50,4 +50,21 @@ public static class AdminMessages
         VoucherAdminOutcome.CodeLocked => "This voucher has been used, so its code cannot change (orders keep it). Make a new voucher instead.",
         _ => "Someone changed this voucher after you opened it. Check it and save again.",
     };
+
+    public static string For(PriceBatchResult result) => result.Outcome switch
+    {
+        PriceBatchOutcome.Done => $"Changed {result.Changed} price{(result.Changed == 1 ? "" : "s")}.",
+        PriceBatchOutcome.NothingSelected => "Pick products or a category.",
+        PriceBatchOutcome.InvalidValue => "Enter a change other than 0, and above -100%.",
+        PriceBatchOutcome.PriceTooLow => $"That would bring {result.Sku} to 0 or less. Nothing was changed.",
+        PriceBatchOutcome.NothingToChange => "No price would change (none has a price, or the change rounds away).",
+        _ => "Someone changed one of these prices meanwhile. Nothing was changed; try again.",
+    };
+
+    public static string Source(Domain.Enums.PriceChangeSource source) => source switch
+    {
+        Domain.Enums.PriceChangeSource.Batch => "Batch",
+        Domain.Enums.PriceChangeSource.NewVariant => "New variant",
+        _ => "Edited",
+    };
 }
