@@ -83,7 +83,10 @@ public class PromotionAdminFlowTests : WebFlowTestBase
         Assert.Matches("data-choice-price[^>]*>22\\.491\\.000 VNĐ<", variant);
         Assert.Matches("data-choice-was[^>]*>24\\.990\\.000 VNĐ<", variant);
         Assert.Contains("Phone week", variant);
-        Assert.Matches("class=\"price-was\"[^>]*>24\\.990\\.000 VNĐ<", await PageAsync("/Products/iphone-17"));
+        var model = await PageAsync("/Products/iphone-17");
+        Assert.Matches("class=\"price-was\"[^>]*>24\\.990\\.000 VNĐ<", model);
+        Assert.DoesNotContain("@if", model);
+        Assert.DoesNotContain("@if", variant);
     }
 
     [Fact]
@@ -100,6 +103,8 @@ public class PromotionAdminFlowTests : WebFlowTestBase
 
         Assert.Matches("data-cart-subtotal[^>]*>\\s*22\\.491\\.000 VNĐ\\s*<", cart);
         Assert.Matches("class=\"price-was\"[^>]*>24\\.990\\.000 VNĐ<", cart);
+        // Razor reads "each@if" as text: the code must not leak onto the page (found live 2026-10-09).
+        Assert.DoesNotContain("@if", cart);
     }
 
     [Fact]
