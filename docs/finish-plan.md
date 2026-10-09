@@ -73,7 +73,7 @@ puts a demoable buying flow and the admin area first.
 | 10d | Filter by price, sort by newest | 8 | `feat/price-filter` | model binding of enums from the query string, one dispatch table, tag helpers keeping state in links | done, verified 16/16, PR #27 |
 | 10e | Promotions | 28 | `feat/promotions` | EF migration, a base controller with thin subclasses per role, one owner for the sale price, `TimeProvider` | done, verified 15/15, PR #28 |
 | 10f | Batch prices and price history | 28 (BM_PRICE_01) | `feat/price-history` | EF migration, a transaction with compare-and-swap writes, `[Authorize]` for two roles | done, verified 11/11, PR #29 |
-| 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
+| 11 | Report (Word, 5 chapters) and cover, slides | | `docs/thesis-report` | chapter 2 explains the mechanisms above | report .docx and 14-slide online deck done 2026-10-09; PDF and .pptx export waiting on the owner (no Word or LibreOffice on this machine) |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)

@@ -5,6 +5,20 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-09 (night): report and slides, task 11
+
+**What landed.** Branch `docs/thesis-report`: `setup/screenshots/capture.py`
+(24 screenshots to `thesis/doc/hinh/`), the Vietnamese Word report
+`thesis/doc/BaoCao_ChuyenDeASPNET_LeBinh_470124170_VX24TTK7.docx` (built by
+`setup/report/build.js`: `npm install` in that folder, then
+`node build.js <repo>`), and a 14-slide online deck
+(https://claude.ai/artifact/JNrn7bidSq78ZbvTEhnfxv, source in
+`thesis/abs/slides-src/`). Cover: Học kỳ 7, Trà Vinh, tháng 10/2026 (owner).
+
+**Open:** PDF of the report into `thesis/pdf/` and the deck's .pptx into
+`thesis/abs/` (no Word or LibreOffice here). When the report opens in Word,
+answer Yes to update fields (table of contents, lists of figures and tables).
+
 ## 2026-10-09 (evening): batch prices and price history (BM_PRICE_01)
 
 **What landed.** `PriceChanges` table, `PriceService` (batch, all or
