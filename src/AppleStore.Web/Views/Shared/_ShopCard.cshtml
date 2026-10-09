@@ -19,7 +19,13 @@
         <h3>@Model.Title</h3>
         @if (Model.Price is not null)
         {
-            <div class="price"><span class="price-label">From:</span> @PriceText.Vnd(Model.Price)</div>
+            <div class="price">
+                <span class="price-label">From:</span> @PriceText.Vnd(Model.Price)
+                @if (Model.WasPrice is not null)
+                {
+                    <s class="price-was">@PriceText.Vnd(Model.WasPrice)</s>
+                }
+            </div>
         }
         else
         {

@@ -2387,3 +2387,22 @@ a.btn-store-primary {
   background: var(--accent-soft);
   border-color: var(--accent);
 }
+
+/* ---------- Promotions (use case 28) ---------- */
+
+.price-was {
+  margin-left: 8px;
+  color: var(--text-muted);
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.pdp-promo {
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  color: var(--text);
+  background: var(--accent-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+}

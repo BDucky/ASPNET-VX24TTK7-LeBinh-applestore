@@ -2,12 +2,15 @@ namespace AppleStore.Infrastructure.Services;
 
 // FromPrice is the lowest active variant price. Null when no variant has a
 // price yet, which the storefront shows as "Contact for price".
-public record ProductSummary(int Id, string Name, string Slug, string CategoryName, string CategorySlug, decimal? FromPrice, string? ImageUrl);
+// WasPrice is set when a promotion lowered the variant that gives FromPrice.
+public record ProductSummary(int Id, string Name, string Slug, string CategoryName, string CategorySlug, decimal? FromPrice, string? ImageUrl,
+    decimal? WasPrice = null);
 
 // One card on a model page: a storage/size/connectivity configuration, the
 // way rauvang.com groups its variants (for example "iPhone 18 Pro Max 256GB
 // ( VN )"). Its colours and regions are chosen on the configuration's page.
-public record ConfigurationSummary(string Name, string Slug, decimal? FromPrice, bool InStock);
+// WasPrice is the own price of the choice giving FromPrice, while a promotion lowers it.
+public record ConfigurationSummary(string Name, string Slug, decimal? FromPrice, bool InStock, decimal? WasPrice = null);
 
 public record ProductDetail(
     int Id,
@@ -24,7 +27,9 @@ public record ProductDetail(
 
 // One purchasable variant inside a configuration: a colour and region pair.
 // VariantId is what the cart form posts: SKUs are not unique across variants.
-public record VariantChoice(int VariantId, string SKU, string? Color, string? Region, decimal? Price, int StockQty);
+// Price is the sale price (SalePrices); WasPrice and PromotionName are set while a promotion lowers it.
+public record VariantChoice(int VariantId, string SKU, string? Color, string? Region, decimal? Price, int StockQty,
+    decimal? WasPrice = null, string? PromotionName = null);
 
 public record ConfigurationDetail(
     int ProductId,

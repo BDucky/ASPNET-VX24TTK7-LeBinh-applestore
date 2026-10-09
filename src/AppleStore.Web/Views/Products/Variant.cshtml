@@ -17,6 +17,8 @@
         color = c.Color,
         region = c.Region,
         price = PriceText.Vnd(c.Price),
+        was = c.WasPrice is null ? null : PriceText.Vnd(c.WasPrice),
+        promo = c.PromotionName,
         stock = c.StockQty,
     }));
     var here = Context.Request.Path + Context.Request.QueryString;
@@ -56,6 +58,9 @@
             <div class="pdp-price-row">
                 <span class="pdp-price-label">Price</span>
                 <span class="pdp-price" data-choice-price>@PriceText.Vnd(selected.Price)</span>
+                @* A running promotion (use case 28): the old price crossed out and its name. *@
+                <s class="price-was" data-choice-was hidden="@(selected.WasPrice is null)">@(selected.WasPrice is null ? "" : PriceText.Vnd(selected.WasPrice))</s>
+                <span class="pdp-promo" data-choice-promo hidden="@(selected.PromotionName is null)">@selected.PromotionName</span>
                 <span class="pdp-warranty">Warranty: <span>12 months, 1-for-1 on defects</span></span>
             </div>
 

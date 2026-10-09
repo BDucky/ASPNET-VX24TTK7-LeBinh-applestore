@@ -38,7 +38,7 @@ public class FormTokenTests : WebFlowTestBase
             ["Intent"] = "place",
         }, formPage: "/Checkout");
         await PostFormAsync("/Cart/Add", new() { ["VariantId"] = blue.ToString(), ["Quantity"] = "1", ["ReturnUrl"] = "/Cart" }, formPage: PhoneVariantUrl);
-        int productId, voucherId;
+        int productId, voucherId, promotionId;
         using (var scope = Factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -55,6 +55,7 @@ public class FormTokenTests : WebFlowTestBase
             });
             await db.SaveChangesAsync();
             voucherId = await db.Vouchers.Select(v => v.Id).FirstAsync();
+            promotionId = SalePricingTests.AddPromotion(db, "Forms", VoucherDiscountType.Percent, 5m, starts: DateTime.UtcNow.AddDays(-1), ends: DateTime.UtcNow.AddDays(1));
         }
         await PostFormAsync("/Compare/Add", new() { ["ProductId"] = productId.ToString(), ["ReturnUrl"] = "/Compare" }, formPage: "/Products/iphone-17");
         var orderPath = placed.Headers.Location!.OriginalString;
@@ -65,7 +66,7 @@ public class FormTokenTests : WebFlowTestBase
             "/", PhoneVariantUrl, "/Cart", "/Checkout", orderPath, "/Orders", "/Track", "/Account", "/Account/Profile", "/Account/ChangePassword",
             "/Account/Addresses/Create", "/Admin", "/Admin/Orders", $"/Admin/Orders/{orderId}", "/Admin/Products", "/Admin/Products/New",
             $"/Admin/Products/{productId}", "/Admin/Vouchers", "/Admin/Vouchers/New", $"/Admin/Vouchers/{voucherId}", "/Admin/Users",
-            "/Admin/Reviews", "/Admin/Reports", "/Products/iphone-17", "/Compare",
+            "/Admin/Reviews", "/Admin/Reports", "/Products/iphone-17", "/Compare", "/Admin/Promotions", "/Admin/Promotions/New", $"/Admin/Promotions/{promotionId}",
         };
         var missing = new List<string>();
         foreach (var page in pages)

@@ -28,7 +28,8 @@
                     imageUrl,
                     config.Name,
                     config.InStock ? "In stock" : "Out of stock",
-                    config.FromPrice);
+                    config.FromPrice,
+                    config.WasPrice);
                 <partial name="_ShopCard" model="card" />
             }
         </div>

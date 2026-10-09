@@ -10,10 +10,12 @@ namespace AppleStore.Infrastructure.Services;
 public class CartService : ICartService
 {
     private readonly AppDbContext _db;
+    private readonly TimeProvider _time;
 
-    public CartService(AppDbContext db)
+    public CartService(AppDbContext db, TimeProvider? time = null)
     {
         _db = db;
+        _time = time ?? TimeProvider.System;
     }
 
     public async Task<CartResult> AddAsync(int userId, int variantId, int quantity, CancellationToken ct = default)
@@ -125,6 +127,8 @@ public class CartService : ICartService
             return new CartView([]);
 
         var options = await VariantOptionLookup.LoadAsync(_db, rows.Select(r => r.VariantId).ToList(), ct);
+        // The price charged is the sale price; checkout totals these lines.
+        var prices = await SalePrices.LoadAsync(_db, _time.GetUtcNow().UtcDateTime, ct);
         var productIds = rows.Select(r => r.ProductId).Distinct().ToList();
         var images = (await _db.ProductImages
                 .Where(im => productIds.Contains(im.ProductId))
@@ -137,6 +141,7 @@ public class CartService : ICartService
         return new CartView(rows.Select(r =>
         {
             var configuration = options.ConfigurationName(r.VariantId, r.ProductName);
+            var sale = prices.For(r.ProductId, r.Price);
             return new CartLine(
                 r.Id,
                 r.VariantId,
@@ -148,10 +153,11 @@ public class CartService : ICartService
                 options.Get(r.VariantId, "color"),
                 options.Get(r.VariantId, "region"),
                 images.GetValueOrDefault(r.ProductId),
-                r.Price,
+                sale.Price,
                 r.Quantity,
                 r.StockQty,
-                Problem(r.OnSale, r.Price, r.StockQty, r.Quantity));
+                Problem(r.OnSale, r.Price, r.StockQty, r.Quantity),
+                sale.WasPrice);
         }).ToList());
     }
 

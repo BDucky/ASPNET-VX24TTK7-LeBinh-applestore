@@ -5,6 +5,22 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-09 (later): promotions (use case 28)
+
+**What landed.** Automatic promotions in the `Vouchers` table (`Kind`,
+`Name`), `SalePrices` as the one owner of the price shown and charged,
+`/Admin/Promotions` for admins and employees on a shared base controller,
+crossed-out old prices in the shop and cart. 535 tests; all 12 live checks pass.
+
+**Do this after pulling:** `dotnet ef database update` (new migration
+`VoucherKindForPromotions`). Without it product pages give an error page.
+
+**Watch out:** if a build reports Razor errors in views nobody changed, run
+`dotnet build-server shutdown` and build again.
+
+**Where to pick up:** price-change history (BM_PRICE_01, owner chose its own
+PR), then use cases 20 (stock intake) and 21 (in-person sale), then task 11.
+
 ## 2026-10-09: filter by price, sort by newest (use case 8)
 
 **What landed.** Price bands on `/Products` (one table, `PriceBands`), the

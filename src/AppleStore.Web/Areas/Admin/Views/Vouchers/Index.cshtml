@@ -1,24 +1,28 @@
 @model IReadOnlyList<AppleStore.Infrastructure.Services.VoucherAdminRow>
 @using AppleStore.Domain.Enums
 @using AppleStore.Infrastructure.Formatting
+@using AppleStore.Web.Models.Admin
+@* Shared by the vouchers and promotions pages (DiscountAdminController). *@
 @{
-    ViewData["Title"] = "Vouchers";
+    var kind = ViewData[nameof(VoucherKind)] as VoucherKind? ?? VoucherKind.Code;
+    var text = DiscountPageText.For(kind);
+    ViewData["Title"] = text.Title;
 }
 
 <section class="statement is-compact account-page">
     <div class="account-card is-full">
         <div class="hero-eyebrow">Admin</div>
-        <h1 class="account-title">Vouchers</h1>
+        <h1 class="account-title">@text.Title</h1>
         <partial name="_AdminNav" />
-        <div class="cart-actions"><a class="btn-store-primary" asp-action="New">Add a voucher</a></div>
+        <div class="cart-actions"><a class="btn-store-primary" asp-action="New">Add a @text.Noun</a></div>
 
         <ul class="order-list">
             @foreach (var v in Model)
             {
                 <li>
                     <a class="order-list-link" asp-action="Edit" asp-route-id="@v.Id">
-                        <span class="order-list-id">@v.Code</span>
-                        <span class="order-list-meta">@(v.Type == VoucherDiscountType.Percent ? $"{v.Value:0.##}% off" : $"{PriceText.Vnd(v.Value)} off")@(v.MinOrderAmount is { } min ? $" from {PriceText.Vnd(min)}" : "") · until @DateTime.SpecifyKind(v.EndsAt, DateTimeKind.Utc).ToLocalTime().ToString("dd/MM/yyyy") · used @v.UsedCount@(v.UsageLimit is { } limit ? $" of {limit}" : "")</span>
+                        <span class="order-list-id">@text.Rules.Label(v.Code, v.Name)</span>
+                        <span class="order-list-meta">@(v.Type == VoucherDiscountType.Percent ? $"{v.Value:0.##}% off" : $"{PriceText.Vnd(v.Value)} off")@(v.MinOrderAmount is { } min ? $" from {PriceText.Vnd(min)}" : "") · until @DateTime.SpecifyKind(v.EndsAt, DateTimeKind.Utc).ToLocalTime().ToString("dd/MM/yyyy")@(text.Rules.HasLimits ? $" · used {v.UsedCount}{(v.UsageLimit is { } limit ? $" of {limit}" : "")}" : "")</span>
                         <span class="order-list-status">@(v.IsActive ? "Active" : "Inactive")</span>
                     </a>
                 </li>

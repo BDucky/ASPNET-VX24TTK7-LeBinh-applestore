@@ -39,7 +39,13 @@
                             <div class="cart-line-options">
                                 @string.Join(" · ", new[] { line.Color, line.Region }.OfType<string>())
                             </div>
-                            <div class="cart-line-price">@PriceText.Vnd(line.UnitPrice) each</div>
+                            <div class="cart-line-price">
+                                @PriceText.Vnd(line.UnitPrice) each
+                                @if (line.WasUnitPrice is not null)
+                                {
+                                    <s class="price-was">@PriceText.Vnd(line.WasUnitPrice)</s>
+                                }
+                            </div>
                             @if (problem is not null)
                             {
                                 <div class="cart-line-problem">@problem</div>
