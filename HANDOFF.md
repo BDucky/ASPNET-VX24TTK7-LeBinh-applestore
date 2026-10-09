@@ -5,6 +5,86 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-09 (late night): state for resuming on another machine
+
+**Resume from branch `docs/thesis-report`** (PR #31, draft, not merged). It
+is `dev` (PRs #12 to #30 merged) plus the report and slide drafts and this
+handoff. Read `docs/finish-plan.md` first, as the project CLAUDE.md says.
+
+**Where the project stands**
+
+| Item | State |
+|---|---|
+| Use cases | 35 of 37 done; 20 (stock intake) and 21 (in-person sale) not started |
+| Tests | 566 xUnit, all pass |
+| Live checks | 13 scripts under `setup/verify-*/`, 277 checks, all pass on 2026-10-09 |
+| Report | Vietnamese .docx draft in `thesis/doc/`, built by `setup/report/build.js` |
+| Slides | 14-slide online deck https://claude.ai/artifact/JNrn7bidSq78ZbvTEhnfxv (same claude.ai account), source in `thesis/abs/slides-src/` |
+| Progress report | `progress-report/2026-10-07-week-4.md`, current to 2026-10-09 |
+
+**Next, in this order** (rows 11a, 11b, 11c in `docs/finish-plan.md`)
+
+1. Use case 20, stock intake. The schema has no receipt tables, so plan it
+   and ask the owner the open questions in the plan before writing tests.
+2. Use case 21, in-person sale. Same: ask first (tax, numbering, walk-in
+   customer).
+3. Final pass on the report and slides: change
+   `setup/screenshots/capture.py` to crop each shot to the part that matters
+   (a card, a table, the price block) at 2x, one large image per slide (the
+   owner agreed the current ones are too small: a two-image slide shrinks
+   14px text to about 8px), retake, rebuild the report, update the deck,
+   export the PDF to `thesis/pdf/` and the .pptx to `thesis/abs/`, merge PR #31.
+
+**Setting up the new machine**
+
+1. Install the .NET 10 SDK (this machine: 10.0.400), Python 3, Node 22, and
+   `playwright-cli` (this machine: 0.1.17, installed with pnpm), then run its
+   browser install once.
+2. `git clone` the repo, `git checkout docs/thesis-report`,
+   `dotnet tool restore`, then
+   `dotnet ef database update --project src/AppleStore.Infrastructure --startup-project src/AppleStore.Web`
+   (the database is not in git; this builds it with the full catalog).
+3. User-secrets (not in git), in `src/AppleStore.Web`:
+   `SeedAdmin:Email` and `SeedAdmin:Password` for the first admin; the
+   `Smtp:*` settings only if real email is wanted (README). Without SMTP the
+   codes are written to the console.
+4. Check: `dotnet build --no-incremental && dotnet test` (566 pass), then
+   any `python3 setup/verify-<name>/verify.py`.
+5. For the report build: `cd setup/report && npm install && node build.js ../..`.
+   For the PDF and .pptx a machine with Word or LibreOffice is needed.
+
+**Not in git, copy it yourself if needed**
+
+- `~/.claude/CLAUDE.md`: the owner's global rules (TDD with a plan gate,
+  senior review method, Extend do not copy, reply format). The project
+  `CLAUDE.md` in the repo holds the project-specific parts.
+- The instructor's sample (cover and 5-chapter report template) in
+  `~/Downloads/chia sẽ khóa học.rar`. Not committed: it contains another
+  student's report. The cover facts are already in the report draft.
+- Claude's memory on the old machine. What it held, as agreements:
+  - Commits: the owner gave a standing yes to split, step-by-step commits
+    and a PR merge into `dev` when everything is green, for finish-plan
+    tasks. Anything outside that: ask first.
+  - Plan gate: before tests for anything with logic, show the plan and ask
+    the open decisions (the owner answers with the multiple-choice prompt).
+  - Every feature should visibly use an ASP.NET Core built-in (Identity,
+    Areas, EF migrations, tag helpers, validation); chapter 2 of the report
+    explains them.
+  - UI work must land as visible changes and be checked in the browser
+    (screenshots at 1440 and 390, the `verify-*` scripts), not just described.
+  - Replies to the owner: Vietnamese, short, numbered sections with tables,
+    no em dashes or arrows (project `CLAUDE.md`).
+
+**Known issues to keep in mind**
+
+- A warm build server sometimes reports Razor errors in views nobody
+  changed; `dotnet build-server shutdown` and build again. Not reproducible
+  on demand.
+- After pulling, always `dotnet ef database update`: a database behind the
+  migrations gives error pages (the app does not migrate itself).
+- Known product limits are listed under "Known gaps carried forward" in
+  `docs/finish-plan.md`.
+
 ## 2026-10-09 (night): report and slides, task 11
 
 **What landed.** Branch `docs/thesis-report`: `setup/screenshots/capture.py`

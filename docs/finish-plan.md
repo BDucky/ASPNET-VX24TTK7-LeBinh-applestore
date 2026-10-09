@@ -74,6 +74,9 @@ puts a demoable buying flow and the admin area first.
 | 10e | Promotions | 28 | `feat/promotions` | EF migration, a base controller with thin subclasses per role, one owner for the sale price, `TimeProvider` | done, verified 15/15, PR #28 |
 | 10f | Batch prices and price history | 28 (BM_PRICE_01) | `feat/price-history` | EF migration, a transaction with compare-and-swap writes, `[Authorize]` for two roles | done, verified 11/11, PR #29 |
 | 11 | Report (Word, 5 chapters) and cover, slides | | `docs/thesis-report` | chapter 2 explains the mechanisms above | report .docx and 14-slide online deck done 2026-10-09; PDF and .pptx export waiting on the owner (no Word or LibreOffice on this machine) |
+| 11a | Use case 20, stock intake (BM_STOCK_01) | 20 | `feat/stock-intake` | needs new tables (receipts are not in the schema): ask the owner first | next |
+| 11b | Use case 21, in-person sale (BM_INVOICE_01) | 21 | `feat/in-store-sale` | ask the owner first (tax, receipt numbering, walk-in customer) | after 11a |
+| 11c | Final pass on report and slides | | `docs/thesis-report` (PR #31, draft) | retake screenshots cropped to the part that matters at 2x, one large image per slide (owner agreed 2026-10-09 that the current ones are too small), rebuild the report, export PDF and .pptx, merge | after 11b |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)
@@ -81,6 +84,9 @@ puts a demoable buying flow and the admin area first.
 | Decision | Needed by task | Notes |
 |---|---|---|
 | Report written by Claude in Vietnamese (owner, 2026-10-09); slides online with a .pptx export (owner) | 11 | decided |
+| Keep the cover line "TRƯỜNG ĐẠI HỌC TRÀ VINH" above "Trường Kỹ thuật và Công nghệ"? The instructor's sample has no such line | 11c | open |
+| Stock intake: receipt tables, supplier field, who may do it | 11a | open |
+| In-person sale: tax rate (BM_INVOICE_01 has "+ tax"), receipt numbering, walk-in customer without an account | 11b | open |
 
 ## Decided
 
