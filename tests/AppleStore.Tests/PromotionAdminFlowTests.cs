@@ -168,8 +168,8 @@ public class PromotionAdminFlowTests : WebFlowTestBase
         await SignInAsync(UserRole.Customer, "shopper@example.com");
         var customer = await Client.GetAsync("/Admin/Promotions");
 
-        Assert.StartsWith("/Account/Login", Location(anonymous));
-        Assert.StartsWith("/Account/AccessDenied", Location(customer));
+        Assert.StartsWith("/Account/Login", anonymous.Headers.Location!.PathAndQuery);
+        Assert.StartsWith("/Account/AccessDenied", customer.Headers.Location!.PathAndQuery);
     }
 
     [Fact]

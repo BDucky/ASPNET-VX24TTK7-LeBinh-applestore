@@ -219,6 +219,8 @@
     var colorChips = root.querySelectorAll("[data-choice-color]");
     var regionChips = root.querySelectorAll("[data-choice-region]");
     var priceEl = root.querySelector("[data-choice-price]");
+    var wasEl = root.querySelector("[data-choice-was]");
+    var promoEl = root.querySelector("[data-choice-promo]");
     var skuEl = root.querySelector("[data-choice-sku]");
     var stockEl = root.querySelector("[data-choice-stock]");
     var variantInput = root.querySelector("[data-choice-variant]");
@@ -247,6 +249,8 @@
         if (on) chip.setAttribute("aria-current", "true"); else chip.removeAttribute("aria-current");
       });
       if (priceEl) priceEl.textContent = selected.price;
+      if (wasEl) { wasEl.textContent = selected.was || ""; wasEl.hidden = !selected.was; }
+      if (promoEl) { promoEl.textContent = selected.promo || ""; promoEl.hidden = !selected.promo; }
       if (skuEl) skuEl.textContent = selected.sku;
       if (stockEl) {
         stockEl.textContent = selected.stock > 0 ? selected.stock + " in stock" : "Out of stock";

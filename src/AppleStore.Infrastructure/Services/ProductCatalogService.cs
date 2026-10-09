@@ -93,11 +93,11 @@ public class ProductCatalogService : IProductCatalogService
             return null;
 
         var configurations = (await LoadConfigurationsAsync(_db, product, await SalePricesAsync(ct), ct))
-            .Select(g => new ConfigurationSummary(
-                g.Name,
-                g.Slug,
-                g.Choices.Select(c => c.Price).Min(),
-                g.Choices.Any(c => c.StockQty > 0)))
+            .Select(g =>
+            {
+                var cheapest = g.Choices.Where(c => c.Price is not null).MinBy(c => c.Price);
+                return new ConfigurationSummary(g.Name, g.Slug, cheapest?.Price, g.Choices.Any(c => c.StockQty > 0), cheapest?.WasPrice);
+            })
             .ToList();
 
         return new ProductDetail(product.Id, product.Name, product.Slug, product.Description, product.Category.Name, product.Category.Slug, configurations, await ImageUrlsAsync(_db, product.Id, ct));

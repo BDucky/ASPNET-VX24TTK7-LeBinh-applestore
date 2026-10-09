@@ -9,7 +9,8 @@ public record ProductSummary(int Id, string Name, string Slug, string CategoryNa
 // One card on a model page: a storage/size/connectivity configuration, the
 // way rauvang.com groups its variants (for example "iPhone 18 Pro Max 256GB
 // ( VN )"). Its colours and regions are chosen on the configuration's page.
-public record ConfigurationSummary(string Name, string Slug, decimal? FromPrice, bool InStock);
+// WasPrice is the own price of the choice giving FromPrice, while a promotion lowers it.
+public record ConfigurationSummary(string Name, string Slug, decimal? FromPrice, bool InStock, decimal? WasPrice = null);
 
 public record ProductDetail(
     int Id,

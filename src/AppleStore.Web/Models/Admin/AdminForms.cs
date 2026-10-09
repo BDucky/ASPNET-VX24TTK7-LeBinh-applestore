@@ -83,10 +83,10 @@ public sealed class VoucherForm
     public long Version { get; set; }
 
     // Admins type the shop's local time; vouchers are checked in UTC.
-    // The kind is the page's; a promotion's form has no code, minimum or limit.
-    public VoucherInput ToInput(VoucherKind kind) => kind == VoucherKind.Automatic
-        ? new(null, Type, Value, null, Utc(StartsAt), Utc(EndsAt), null, IsActive, ProductIds, kind, Name)
-        : new(Code, Type, Value, MinOrderAmount, Utc(StartsAt), Utc(EndsAt), UsageLimit, IsActive, ProductIds, kind);
+    // The kind is the page's, never the post's. Which fields a kind keeps is
+    // AdminVoucherService's rule, so everything posted is passed on.
+    public VoucherInput ToInput(VoucherKind kind) =>
+        new(Code, Type, Value, MinOrderAmount, Utc(StartsAt), Utc(EndsAt), UsageLimit, IsActive, ProductIds, kind, Name);
 
     private static DateTime Utc(DateTime local) => DateTime.SpecifyKind(local, DateTimeKind.Local).ToUniversalTime();
 
