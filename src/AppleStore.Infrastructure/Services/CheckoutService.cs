@@ -49,9 +49,8 @@ public class CheckoutService : ICheckoutService
             voucherId);
     }
 
-    // BM_VOUCHER_01. Both ends of the window count as valid; a percent
-    // discount rounds to whole dong, half away from zero; no discount exceeds
-    // the lines it applies to.
+    // BM_VOUCHER_01. Both ends of the window count as valid; the amount comes
+    // from DiscountMath, taken from the lines the voucher applies to.
     private async Task<(decimal Discount, VoucherProblem Problem, decimal? Minimum, int? VoucherId)> DiscountAsync(
         string code, CartView cart, decimal subtotal, CancellationToken ct)
     {
@@ -76,10 +75,7 @@ public class CheckoutService : ICheckoutService
         if (eligible == 0m)
             return (0m, VoucherProblem.NoEligibleProducts, null, voucher.Id);
 
-        var discount = voucher.DiscountType == VoucherDiscountType.Percent
-            ? Math.Round(eligible * voucher.DiscountValue / 100m, 0, MidpointRounding.AwayFromZero)
-            : voucher.DiscountValue;
-        return (Math.Min(discount, eligible), VoucherProblem.None, null, voucher.Id);
+        return (DiscountMath.Amount(voucher.DiscountType, voucher.DiscountValue, eligible), VoucherProblem.None, null, voucher.Id);
     }
 
     public async Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal,
