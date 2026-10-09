@@ -70,7 +70,9 @@ puts a demoable buying flow and the admin area first.
 | 10 | Revenue report, export, invoices | 33-36 | `feat/admin-reports` | LINQ aggregation, `File` result (ClosedXML .xlsx), print layout | done, verified 14/14, PR #23 |
 | 10b | Product reviews | 32 | `feat/reviews` | view component, `[Authorize]`, unique index, EF migration | done, verified 9/9, PR #24 |
 | 10c | Compare products | 10 | `feat/compare` | controller with a cookie, partial views, anti-forgery, service shared with the catalog | done, verified 12/12, PR #25 |
-| 10d | Filter by price, sort by newest | 8 | `feat/price-filter` | model binding of enums from the query string, one dispatch table, tag helpers keeping state in links | done, verified 16/16, PR pending |
+| 10d | Filter by price, sort by newest | 8 | `feat/price-filter` | model binding of enums from the query string, one dispatch table, tag helpers keeping state in links | done, verified 16/16, PR #27 |
+| 10e | Promotions | 28 | `feat/promotions` | EF migration, a base controller with thin subclasses per role, one owner for the sale price, `TimeProvider` | done, verified 15/15, PR #28 |
+| 10f | Price-change history | 28 (BM_PRICE_01) | | | next (owner chose a separate PR) |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
@@ -87,6 +89,7 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Promotions | 2026-10-09 | owner: one table (Vouchers gets Kind and Name), a time-window discount layer worked out when a price is read, vouchers stack on the lowered price, the largest discount wins, Admin and Employee manage promotions, price history in its own PR. Claude's: nothing is ever made free (a discount reaching the price is skipped; a promotion percent stays below 100) |
 | Price filter | 2026-10-09 | preset bands, and a product belongs to a band when one active variant is priced inside it (owner). Bands under 10, 10-20, 20-40, 40 million and over, min included and max not; the card shows the lowest price inside the band; brand filter left out since every product is Apple (Claude's, accepted) |
 | Compare | 2026-10-08 | list kept in a cookie for visitors and customers alike, at most 3 products, any categories (owner chose all three). Rows are price, stock, configurations, colours, regions, rating, because the attribute tables are empty (Claude's) |
 | Reviews | 2026-10-08 | verified purchase = a delivered order with the product (report: "after a verified purchase"); one review per customer per product, editable; staff reply and hide ("remove"); no photos yet (Claude's, stated before building) |
@@ -107,6 +110,9 @@ puts a demoable buying flow and the admin area first.
 | Real email | 2026-10-05 | Gmail SMTP with an App Password held in user-secrets on the owner's machine; without SMTP settings mail stays in the log |
 
 ## Known gaps carried forward
+
+- Promotions (2026-10-09 review): the home page loads the running promotions once per product it shows (a few small queries); a fixed discount may have fractions of a dong, as vouchers already could; if one promotion ends and another starts between the checkout page and the press with the same total, the order goes through at the total the shopper saw.
+- After pulling the promotions change, run `dotnet ef database update` once: a database without the `Vouchers.Kind` and `Name` columns gives an error page on product pages (the app does not migrate itself).
 
 - Compare, two tabs at once (2026-10-08 review): the list is a cookie, so when two tabs add at the same moment the response that lands last wins and the other product drops out, although that tab said "Added". The cap of 3 still holds. A cost of the owner's cookie choice; a table per account would fix it for signed-in users only.
 

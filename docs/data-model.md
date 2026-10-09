@@ -115,6 +115,8 @@ Option type codes in use (seeded 2026-09-25): `config` (the configuration card a
 
 The report keeps only `Orders.VoucherCode`; BM_VOUCHER_01 describes percent or fixed discounts, all or some products, a minimum order, a usage count and a time window, so the owner chose a table. `Orders.VoucherCode` still holds the code as text, so an order keeps its code even if the voucher row changes later.
 
+**Added 2026-10-09 (`feat/promotions`, use case 28):** `Kind (int: Code=0, Automatic=1)` and `Name (nvarchar 120, nullable)`; `Code` became nullable. The owner chose to keep promotions in this table: an `Automatic` row is a promotion with a name and no code, minimum order or usage limit, and it lowers prices while it runs (`SalePrices`). The unique index on `Code` ignores the nulls (SQLite allows several, the SQL Server provider filters them out).
+
 ### VoucherProducts (added 2026-10-07)
 Composite PK `(VoucherId, ProductId)`, both cascading. A voucher with rows here applies only to those products.
 

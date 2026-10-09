@@ -275,6 +275,21 @@ edit never unhides a review staff hid), and lets staff reply and hide. The
 `ProductReviews` view component puts the block on a product's model and
 configuration pages; `/Admin/Reviews` is for Admin and Employee.
 
+## Promotions and the sale price
+
+Added 2026-10-09, use case 28. A promotion is a `Vouchers` row of kind
+`Automatic`. `SalePrices` (Infrastructure/Services/SalePricing.cs) loads the
+promotions running now and turns a variant's own price into the price shown
+and charged; the product list and its price bands, the configuration page,
+compare and the cart read it, and checkout and order lines follow the cart.
+`DiscountMath` is the one formula for vouchers and promotions.
+
+The staff pages are one base controller, `DiscountAdminController`, with two
+thin subclasses: `VouchersController` (Admin, kind Code) and
+`PromotionsController` (Admin and Employee, kind Automatic). Every service
+call names its kind, so the promotions page cannot reach a code voucher;
+`VoucherKindRules` says which fields each kind has.
+
 ## Product list filters
 
 Added 2026-10-09, use case 8. `/Products` takes `category`, `q`, `sort`

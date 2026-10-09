@@ -4,6 +4,49 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-09: promotions (`feat/promotions`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 535 of 535 (43 new) |
+| `python3 setup/verify-promotions/verify.py` | **15 of 15** |
+| all other live checks, rerun | account 69, admin 31, cart 23, checkout 25, payment 16, orders 19, admin-catalog 15, reports 14, reviews 9, compare 12, catalog-filter 16 |
+
+**Mutation checks** (all caught in the end): a free price allowed; the
+window's end exclusive; code vouchers counted as promotions; the smallest
+discount winning; a promotion's product list ignored; the cart charging the
+own price; bands using the own price; each page reaching the other kind
+(get, update, delete); 100% allowed; promotions page for admins only; a
+promotion keeping a posted code or limits; the kind rules record changed.
+One survived first: "a promotion keeps no minimum or limit" was enforced in
+both the form and the service, so breaking the service changed nothing. The
+form's copy was removed and the service owns the rule.
+
+**Found by the live check:** the cart printed `@if (line.WasUnitPrice ...`
+as text, because Razor reads `each@if` as an email-like word. The web test
+had passed since the `<s>` tag inside still rendered; it now also checks no
+`@if` reaches the page (RED then GREEN). The live check's own first runs
+failed twice on its own logic (one colour sold in two regions at two prices;
+the page reloaded to its default colour before buying).
+
+**Found by the account check:** it copies the developer's database, which
+did not have the new columns, so product pages gave a 500. The script now
+migrates its copy first; the step is in `HANDOFF.md`.
+
+**Review (code-reviewer agent).** No blocking findings. Fixed from it:
+checkout looked a typed code up in every row (now code vouchers only, RED
+then GREEN); the kind had defaults (now required); four scattered kind checks
+(now `VoucherKindRules`). Tests added for a promotion ending between page and
+press, stored zero or negative values, and an employee posting an edit to a
+voucher's id. Kept as known limits: see `docs/finish-plan.md`.
+
+**Build server.** The Razor errors in untouched views came back during
+mutation runs, after several incremental builds in a row. Not reproducible
+on demand (incremental, project-only and `dotnet ef` builds were all clean
+when tried); `dotnet build-server shutdown` before each run avoids it.
+
 ## 2026-10-09: filter by price, sort by newest (`feat/price-filter`)
 
 | Command | Result |
