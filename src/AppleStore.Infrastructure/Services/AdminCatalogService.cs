@@ -1,4 +1,5 @@
 using AppleStore.Domain.Entities;
+using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -174,6 +175,9 @@ public class AdminCatalogService : IAdminCatalogService
             UpdatedAt = Now,
         };
         _db.ProductVariants.Add(variant);
+        // The first entry of its price history (BM_PRICE_01).
+        if (input.Price is not null)
+            _db.PriceChanges.Add(new PriceChange { Variant = variant, NewPrice = input.Price, Source = PriceChangeSource.NewVariant, ChangedByUserId = userId, ChangedAt = Now });
         foreach (var (code, value) in new[] { ("config", input.Configuration), ("color", input.Color), ("region", input.Region) })
         {
             if (Blank(value) is { } text)
@@ -189,15 +193,38 @@ public class AdminCatalogService : IAdminCatalogService
             return refused;
 
         var next = RowVersion.Next(change.Version, Now);
+        // Every price change moves the version, so the price read here at
+        // the version the admin saw is the price this update replaces; the
+        // log row is written in the same transaction (BM_PRICE_01).
+        await using var tx = await _db.Database.BeginTransactionAsync(ct);
+        var seen = new DateTime(change.Version);
+        var oldPrice = await _db.ProductVariants.Where(v => v.Id == variantId && v.UpdatedAt == seen).Select(v => v.Price).FirstOrDefaultAsync(ct);
         var saved = await _db.ProductVariants
-            .Where(v => v.Id == variantId && v.UpdatedAt == new DateTime(change.Version) && v.StockQty == change.SeenStock)
+            .Where(v => v.Id == variantId && v.UpdatedAt == seen && v.StockQty == change.SeenStock && v.Price == oldPrice)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(v => v.Price, change.Price)
                 .SetProperty(v => v.StockQty, change.StockQty)
                 .SetProperty(v => v.Status, change.OnSale)
                 .SetProperty(v => v.UpdatedAt, next), ct);
         if (saved == 1)
+        {
+            if (oldPrice != change.Price)
+            {
+                _db.PriceChanges.Add(new PriceChange
+                {
+                    VariantId = variantId,
+                    OldPrice = oldPrice,
+                    NewPrice = change.Price,
+                    Source = PriceChangeSource.Edit,
+                    ChangedByUserId = userId,
+                    ChangedAt = Now,
+                });
+                await _db.SaveChangesAsync(ct);
+            }
+            await tx.CommitAsync(ct);
             return new AdminCatalogResult(AdminCatalogOutcome.Done, variantId);
+        }
+        await tx.RollbackAsync(ct);
 
         var current = await _db.ProductVariants.Where(v => v.Id == variantId).Select(v => (int?)v.StockQty).FirstOrDefaultAsync(ct);
         return current is null

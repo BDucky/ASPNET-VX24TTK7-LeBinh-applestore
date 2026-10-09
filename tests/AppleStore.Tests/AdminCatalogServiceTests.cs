@@ -287,6 +287,16 @@ public sealed class AdminCatalogServiceTests : IDisposable
 
     // ---------- Price history (BM_PRICE_01) ----------
 
+    // A real account: the log's ChangedByUserId is a foreign key.
+    private int Staff()
+    {
+        using var db = _shop.Context();
+        var staff = ShopTestDb.NewUser($"staff{Guid.NewGuid():N}@example.com");
+        db.Add(staff);
+        db.SaveChanges();
+        return staff.Id;
+    }
+
     private List<PriceChange> PriceLog()
     {
         using var db = _shop.Context();
@@ -296,12 +306,13 @@ public sealed class AdminCatalogServiceTests : IDisposable
     [Fact]
     public async Task Saving_a_new_price_logs_it_with_who_changed_it()
     {
+        var staff = Staff();
         var seen = (await _sut.GetAsync(_phone))!.Variants.Single(v => v.Id == _blue);
 
-        await _sut.UpdateVariantAsync(_blue, new VariantChange(23_990_000m, seen.StockQty, true, seen.StockQty, seen.Version), 42);
+        await _sut.UpdateVariantAsync(_blue, new VariantChange(23_990_000m, seen.StockQty, true, seen.StockQty, seen.Version), staff);
 
         var change = Assert.Single(PriceLog());
-        Assert.Equal((_blue, 24_990_000m, 23_990_000m, Domain.Enums.PriceChangeSource.Edit, 42, Now.UtcDateTime),
+        Assert.Equal((_blue, 24_990_000m, 23_990_000m, Domain.Enums.PriceChangeSource.Edit, staff, Now.UtcDateTime),
             (change.VariantId, change.OldPrice, change.NewPrice, change.Source, change.ChangedByUserId, change.ChangedAt));
     }
 
@@ -310,8 +321,8 @@ public sealed class AdminCatalogServiceTests : IDisposable
     {
         var seen = (await _sut.GetAsync(_phone))!.Variants.Single(v => v.Id == _blue);
 
-        await _sut.UpdateVariantAsync(_blue, new VariantChange(24_990_000m, 9, true, seen.StockQty, seen.Version), 42);
-        var stale = await _sut.UpdateVariantAsync(_blue, new VariantChange(1m, 9, true, seen.StockQty, seen.Version), 42);
+        await _sut.UpdateVariantAsync(_blue, new VariantChange(24_990_000m, 9, true, seen.StockQty, seen.Version), Staff());
+        var stale = await _sut.UpdateVariantAsync(_blue, new VariantChange(1m, 9, true, seen.StockQty, seen.Version), Staff());
 
         Assert.Equal(AdminCatalogOutcome.Changed, stale.Outcome);
         Assert.Empty(PriceLog());
@@ -322,7 +333,7 @@ public sealed class AdminCatalogServiceTests : IDisposable
     {
         var seen = (await _sut.GetAsync(_phone))!.Variants.Single(v => v.Id == _blue);
 
-        await _sut.UpdateVariantAsync(_blue, new VariantChange(null, seen.StockQty, true, seen.StockQty, seen.Version), 42);
+        await _sut.UpdateVariantAsync(_blue, new VariantChange(null, seen.StockQty, true, seen.StockQty, seen.Version), Staff());
 
         var change = Assert.Single(PriceLog());
         Assert.Equal((24_990_000m, (decimal?)null), (change.OldPrice, change.NewPrice));
@@ -331,11 +342,12 @@ public sealed class AdminCatalogServiceTests : IDisposable
     [Fact]
     public async Task A_new_variant_with_a_price_starts_its_history()
     {
-        var priced = await _sut.AddVariantAsync(_phone, new VariantInput("IP17-PINK", "iPhone 17 256GB", "Pink", "VN/A", 24_990_000m, 3, true), 42);
-        await _sut.AddVariantAsync(_phone, new VariantInput("IP17-ASK", "iPhone 17 256GB", "Gold", "VN/A", null, 3, true), 42);
+        var staff = Staff();
+        var priced = await _sut.AddVariantAsync(_phone, new VariantInput("IP17-PINK", "iPhone 17 256GB", "Pink", "VN/A", 24_990_000m, 3, true), staff);
+        await _sut.AddVariantAsync(_phone, new VariantInput("IP17-ASK", "iPhone 17 256GB", "Gold", "VN/A", null, 3, true), staff);
 
         var change = Assert.Single(PriceLog());
-        Assert.Equal((priced.Id!.Value, (decimal?)null, 24_990_000m, Domain.Enums.PriceChangeSource.NewVariant, 42),
+        Assert.Equal((priced.Id!.Value, (decimal?)null, 24_990_000m, Domain.Enums.PriceChangeSource.NewVariant, staff),
             (change.VariantId, change.OldPrice, change.NewPrice, change.Source, change.ChangedByUserId));
     }
 }
