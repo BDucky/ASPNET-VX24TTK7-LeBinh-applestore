@@ -18,10 +18,12 @@ public class ProductsController : Controller
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> Index(string? category, string? q, ProductSort sort = ProductSort.Featured, CancellationToken ct = default)
+    public async Task<IActionResult> Index(string? category, string? q, ProductSort sort = ProductSort.Featured, PriceBand band = PriceBand.Any, CancellationToken ct = default)
     {
-        var products = await _catalog.GetProductsAsync(category, q, sort, ct: ct);
-        return View(new ProductListViewModel(products, category, q, sort));
+        // A hand-edited band ("99", "junk") never gets here: MVC's enum binder
+        // refuses undefined values and leaves Any (CatalogFilterFlowTests).
+        var products = await _catalog.GetProductsAsync(category, q, sort, band, ct);
+        return View(new ProductListViewModel(products, category, q, sort, band));
     }
 
     [HttpGet("{slug}")]

@@ -111,6 +111,8 @@ public class CatalogFilterFlowTests : WebFlowTestBase
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(3, CardNames(page).Count);
+        Assert.DoesNotContain("name=\"band\"", page);
+        Assert.Matches("aria-current=\"true\"[^>]*data-price-band=\"Any\"", page);
     }
 
     [Fact]
