@@ -54,7 +54,7 @@ public class CheckoutService : ICheckoutService
     private async Task<(decimal Discount, VoucherProblem Problem, decimal? Minimum, int? VoucherId)> DiscountAsync(
         string code, CartView cart, decimal subtotal, CancellationToken ct)
     {
-        var voucher = await _db.Vouchers.AsNoTracking().FirstOrDefaultAsync(v => v.Code == code, ct);
+        var voucher = await _db.Vouchers.AsNoTracking().FirstOrDefaultAsync(v => v.Code == code && v.Kind == VoucherKind.Code, ct);
         if (voucher is null)
             return (0m, VoucherProblem.NotFound, null, null);
 
