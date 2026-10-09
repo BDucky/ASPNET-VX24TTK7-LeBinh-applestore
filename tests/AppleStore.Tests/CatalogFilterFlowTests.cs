@@ -115,6 +115,20 @@ public class CatalogFilterFlowTests : WebFlowTestBase
         Assert.Matches("aria-current=\"true\"[^>]*data-price-band=\"Any\"", page);
     }
 
+    // MVC binds enum names in any case, and their numbers: both are a real band.
+    [Theory]
+    [InlineData("over40m")]
+    [InlineData("4")]
+    public async Task A_band_in_another_case_or_as_its_number_still_filters(string band)
+    {
+        SeedShop();
+
+        var page = await PageAsync($"/Products?band={band}");
+
+        Assert.Equal(["MacBook Pro"], CardNames(page));
+        Assert.Matches("aria-current=\"true\"[^>]*data-price-band=\"Over40M\"", page);
+    }
+
     [Fact]
     public async Task An_empty_band_says_so_and_offers_all_prices()
     {
@@ -122,7 +136,7 @@ public class CatalogFilterFlowTests : WebFlowTestBase
 
         var page = await PageAsync("/Products?category=airpods&band=Over40M");
 
-        Assert.Contains("No products match", page);
+        Assert.Contains("No products match. Try a different search, category or price.", page);
         Assert.Contains("data-price-band=\"Any\"", page);
     }
 }
