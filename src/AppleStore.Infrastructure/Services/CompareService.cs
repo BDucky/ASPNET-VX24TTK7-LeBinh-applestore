@@ -30,13 +30,14 @@ public class CompareService : ICompareService
             .Where(p => ids.Contains(p.Id))
             .ToDictionaryAsync(p => p.Id, ct);
 
+        var prices = await SalePrices.LoadAsync(_db, _time.GetUtcNow().UtcDateTime, ct);
         var columns = new List<CompareColumn>();
         foreach (var id in ids)
         {
             // Gone between the two reads: leave it out like any hidden product.
             if (!products.TryGetValue(id, out var product))
                 continue;
-            var configurations = await ProductCatalogService.LoadConfigurationsAsync(_db, product, ct);
+            var configurations = await ProductCatalogService.LoadConfigurationsAsync(_db, product, prices, ct);
             var choices = configurations.SelectMany(c => c.Choices).ToList();
             var reviews = await _reviews.ForProductAsync(id, ct);
             columns.Add(new CompareColumn(
