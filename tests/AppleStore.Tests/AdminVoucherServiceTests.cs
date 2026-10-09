@@ -186,4 +186,95 @@ public sealed class AdminVoucherServiceTests : IDisposable
 
         Assert.Equal(["SECOND", "FIRST"], (await _sut.ListAsync()).Select(v => v.Code));
     }
+
+    // ---------- Promotions (use case 28) ----------
+
+    private VoucherInput Promotion(string? name = "Phone week", VoucherDiscountType type = VoucherDiscountType.Percent, decimal value = 10m, params int[] products) =>
+        new(null, type, value, null, Now.UtcDateTime.AddDays(-1), Now.UtcDateTime.AddDays(30), null, true, products, VoucherKind.Automatic, name);
+
+    [Fact]
+    public async Task A_promotion_is_stored_without_a_code_and_lowers_the_cart_price()
+    {
+        var result = await _sut.CreateAsync(Promotion(products: [_phoneProduct]));
+
+        Assert.Equal(VoucherAdminOutcome.Done, result.Outcome);
+        var row = (await _sut.GetAsync(result.Id!.Value, VoucherKind.Automatic))!;
+        Assert.Equal((VoucherKind.Automatic, "Phone week", (string?)null, (decimal?)null, (int?)null), (row.Kind, row.Name, row.Code, row.MinOrderAmount, row.UsageLimit));
+        var cart = new CartService(_db, new FixedTime(Now));
+        await cart.AddAsync(_alice, _phone, 1);
+        Assert.Equal(18_000_000m, Assert.Single((await cart.GetAsync(_alice)).Lines).UnitPrice);
+    }
+
+    [Fact]
+    public async Task Two_promotions_can_both_be_saved_without_codes()
+    {
+        Assert.Equal(VoucherAdminOutcome.Done, (await _sut.CreateAsync(Promotion("One"))).Outcome);
+        Assert.Equal(VoucherAdminOutcome.Done, (await _sut.CreateAsync(Promotion("Two"))).Outcome);
+    }
+
+    [Theory]
+    [InlineData(null, 10, VoucherAdminOutcome.MissingName)]
+    [InlineData("  ", 10, VoucherAdminOutcome.MissingName)]
+    [InlineData("All of it", 100, VoucherAdminOutcome.PromotionPercent)]
+    public async Task A_promotion_against_the_rules_is_refused(string? name, int percent, VoucherAdminOutcome expected)
+    {
+        Assert.Equal(expected, (await _sut.CreateAsync(Promotion(name, value: percent))).Outcome);
+    }
+
+    // A code voucher keeps its own rule: 100% is allowed there.
+    [Fact]
+    public async Task A_hundred_percent_voucher_is_still_allowed()
+    {
+        Assert.Equal(VoucherAdminOutcome.Done, (await _sut.CreateAsync(Input(code: "FREE", value: 100m))).Outcome);
+    }
+
+    [Fact]
+    public async Task Each_page_lists_and_opens_only_its_own_kind()
+    {
+        var voucher = (await _sut.CreateAsync(Input())).Id!.Value;
+        var promotion = (await _sut.CreateAsync(Promotion())).Id!.Value;
+
+        Assert.Equal([voucher], (await _sut.ListAsync(VoucherKind.Code)).Select(r => r.Id));
+        Assert.Equal([promotion], (await _sut.ListAsync(VoucherKind.Automatic)).Select(r => r.Id));
+        Assert.Null(await _sut.GetAsync(voucher, VoucherKind.Automatic));
+        Assert.Null(await _sut.GetAsync(promotion, VoucherKind.Code));
+    }
+
+    // The promotions page is open to employees; it must not edit or delete a code voucher.
+    [Fact]
+    public async Task The_promotions_side_cannot_change_or_delete_a_voucher()
+    {
+        var voucher = (await _sut.GetAsync((await _sut.CreateAsync(Input())).Id!.Value))!;
+
+        var update = await _sut.UpdateAsync(voucher.Id, Promotion("Hijack", value: 90m), voucher.Version);
+        var delete = await _sut.DeleteAsync(voucher.Id, VoucherKind.Automatic);
+
+        Assert.Equal((VoucherAdminOutcome.NotFound, VoucherAdminOutcome.NotFound), (update.Outcome, delete.Outcome));
+        var after = (await _sut.GetAsync(voucher.Id))!;
+        Assert.Equal(("SALE10", 10m, VoucherKind.Code), (after.Code, after.Value, after.Kind));
+    }
+
+    [Fact]
+    public async Task The_vouchers_side_cannot_change_or_delete_a_promotion()
+    {
+        var promotion = (await _sut.GetAsync((await _sut.CreateAsync(Promotion())).Id!.Value, VoucherKind.Automatic))!;
+
+        var update = await _sut.UpdateAsync(promotion.Id, Input(code: "TAKEN"), promotion.Version);
+        var delete = await _sut.DeleteAsync(promotion.Id, VoucherKind.Code);
+
+        Assert.Equal((VoucherAdminOutcome.NotFound, VoucherAdminOutcome.NotFound), (update.Outcome, delete.Outcome));
+        Assert.Equal("Phone week", (await _sut.GetAsync(promotion.Id, VoucherKind.Automatic))!.Name);
+    }
+
+    [Fact]
+    public async Task A_promotion_edit_saves_its_name_and_keeps_no_code()
+    {
+        var created = (await _sut.GetAsync((await _sut.CreateAsync(Promotion())).Id!.Value, VoucherKind.Automatic))!;
+
+        var result = await _sut.UpdateAsync(created.Id, Promotion("Phone fortnight", value: 15m), created.Version);
+
+        Assert.Equal(VoucherAdminOutcome.Done, result.Outcome);
+        var after = (await _sut.GetAsync(created.Id, VoucherKind.Automatic))!;
+        Assert.Equal(("Phone fortnight", 15m, (string?)null), (after.Name, after.Value, after.Code));
+    }
 }
