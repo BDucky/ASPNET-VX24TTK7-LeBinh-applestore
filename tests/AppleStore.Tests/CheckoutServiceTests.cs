@@ -44,7 +44,7 @@ public sealed class CheckoutServiceTests : IDisposable
         _db.ChangeTracker.Clear();
         (_alice, _bob, _phone, _pods, _cheap, _podsProduct) = (alice.Id, bob.Id, phone.Id, pods.Id, cheap.Id, airpods.Id);
 
-        _cart = new CartService(_db);
+        _cart = new CartService(_db, new FixedTime(Now));
         _sut = new CheckoutService(_db, _cart, new FixedTime(Now));
     }
 
@@ -99,6 +99,69 @@ public sealed class CheckoutServiceTests : IDisposable
     }
 
     private async Task<decimal> TotalAsync(string? code = null) => (await _sut.QuoteAsync(_alice, code)).Total;
+
+    // ---------- Promotions (use case 28) ----------
+
+    private void AddPromotion(string name, VoucherDiscountType type, decimal value, params int[] onlyProducts)
+    {
+        using var db = _shop.Context();
+        SalePricingTests.AddPromotion(db, name, type, value, onlyProducts: onlyProducts);
+    }
+
+    [Fact]
+    public async Task A_running_promotion_is_what_the_order_charges_and_records()
+    {
+        AddPromotion("Phone week", VoucherDiscountType.Fixed, 2_000_000m, ProductOf(_phone));
+        await _cart.AddAsync(_alice, _phone, 2);
+
+        var quote = await _sut.QuoteAsync(_alice, null);
+        var placed = await _sut.PlaceOrderAsync(_alice, Delivery, null, quote.Total);
+
+        Assert.Equal(45_980_000m, quote.Subtotal);
+        Assert.Equal(PlaceOrderOutcome.Placed, placed.Outcome);
+        using var db = _shop.Context();
+        Assert.Equal(22_990_000m, db.OrderItems.Single().Price);
+        Assert.Equal(45_980_000m, db.Orders.Single().TotalAmount);
+    }
+
+    // Owner's choice: a voucher stacks, taken from the already lowered prices,
+    // and its minimum is checked against them too.
+    [Fact]
+    public async Task A_voucher_is_taken_from_the_promotion_price()
+    {
+        AddPromotion("Phone week", VoucherDiscountType.Fixed, 2_000_000m, ProductOf(_phone));
+        AddVoucher("TENPC", VoucherDiscountType.Percent, 10m);
+        AddVoucher("MIN24", VoucherDiscountType.Fixed, 100_000m, min: 24_000_000m);
+        await _cart.AddAsync(_alice, _phone, 1);
+
+        var tenPercent = await _sut.QuoteAsync(_alice, "TENPC");
+        var minimum = await _sut.QuoteAsync(_alice, "MIN24");
+
+        Assert.Equal((22_990_000m, 2_299_000m, 20_691_000m), (tenPercent.Subtotal, tenPercent.Discount, tenPercent.Total));
+        Assert.Equal(VoucherProblem.BelowMinimum, minimum.VoucherProblem);
+    }
+
+    // The page showed one total, a promotion started before the press: the
+    // shopper is shown the new total instead of being charged it unseen.
+    [Fact]
+    public async Task A_promotion_starting_after_the_page_was_shown_asks_to_confirm_the_new_total()
+    {
+        await _cart.AddAsync(_alice, _phone, 1);
+        var shown = await TotalAsync();
+
+        AddPromotion("Flash", VoucherDiscountType.Percent, 5m);
+        var placed = await _sut.PlaceOrderAsync(_alice, Delivery, null, shown);
+
+        Assert.Equal(PlaceOrderOutcome.TotalChanged, placed.Outcome);
+        Assert.Equal(0, State().Orders);
+        Assert.Equal(23_740_500m, await TotalAsync());
+    }
+
+    private int ProductOf(int variantId)
+    {
+        using var db = _shop.Context();
+        return db.ProductVariants.Single(v => v.Id == variantId).ProductId;
+    }
 
     // ---------- Quote ----------
 

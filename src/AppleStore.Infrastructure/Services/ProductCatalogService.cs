@@ -6,10 +6,12 @@ namespace AppleStore.Infrastructure.Services;
 public class ProductCatalogService : IProductCatalogService
 {
     private readonly AppDbContext _db;
+    private readonly TimeProvider _time;
 
-    public ProductCatalogService(AppDbContext db)
+    public ProductCatalogService(AppDbContext db, TimeProvider? time = null)
     {
         _db = db;
+        _time = time ?? TimeProvider.System;
     }
 
     public async Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured,

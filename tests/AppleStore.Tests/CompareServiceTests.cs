@@ -78,6 +78,17 @@ public sealed class CompareServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task BuildAsync_prices_follow_a_running_promotion()
+    {
+        SalePricingTests.AddPromotion(_db, "Phone week", Domain.Enums.VoucherDiscountType.Fixed, 990_000m, starts: Now.UtcDateTime.AddDays(-1), ends: Now.UtcDateTime.AddDays(1), onlyProducts: [_phone]);
+        var sut = new CompareService(_db, new ReviewService(_db, new FixedTime(Now)), new FixedTime(Now));
+
+        var column = Assert.Single(await sut.BuildAsync([_phone]));
+
+        Assert.Equal(24_000_000m, column.FromPrice);
+    }
+
+    [Fact]
     public async Task BuildAsync_keeps_the_order_given_and_mixes_categories()
     {
         var columns = await _sut.BuildAsync([_watch, _phone, _pods]);

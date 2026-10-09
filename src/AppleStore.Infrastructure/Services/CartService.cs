@@ -10,10 +10,12 @@ namespace AppleStore.Infrastructure.Services;
 public class CartService : ICartService
 {
     private readonly AppDbContext _db;
+    private readonly TimeProvider _time;
 
-    public CartService(AppDbContext db)
+    public CartService(AppDbContext db, TimeProvider? time = null)
     {
         _db = db;
+        _time = time ?? TimeProvider.System;
     }
 
     public async Task<CartResult> AddAsync(int userId, int variantId, int quantity, CancellationToken ct = default)

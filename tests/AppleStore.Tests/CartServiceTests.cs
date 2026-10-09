@@ -1,3 +1,4 @@
+using AppleStore.Domain.Enums;
 using AppleStore.Domain.Entities;
 using AppleStore.Infrastructure.Data;
 using AppleStore.Infrastructure.Services;
@@ -71,6 +72,21 @@ public sealed class CartServiceTests : IDisposable
     }
 
     // ---------- Add ----------
+
+    // Use case 28: the cart shows and totals the promotion price, and the old one.
+    [Fact]
+    public async Task A_running_promotion_sets_the_line_price_and_keeps_the_old_one()
+    {
+        var blue = Variant("PROMO-BLUE", 24_990_000m, 5);
+        using (var db = NewContext())
+            SalePricingTests.AddPromotion(db, "Phone week", VoucherDiscountType.Percent, 10m, onlyProducts: [_iphone.Id]);
+        var sut = new CartService(_db, new FixedTime(new DateTimeOffset(SalePricingTests.Now)));
+        await sut.AddAsync(_alice.Id, blue.Id, 2);
+
+        var line = Assert.Single((await sut.GetAsync(_alice.Id)).Lines);
+
+        Assert.Equal((22_491_000m, 24_990_000m, 44_982_000m), (line.UnitPrice, line.WasUnitPrice, line.LineTotal));
+    }
 
     [Fact]
     public async Task Adding_creates_the_cart_and_one_line()

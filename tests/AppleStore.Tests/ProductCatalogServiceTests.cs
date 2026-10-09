@@ -275,6 +275,67 @@ public class ProductCatalogServiceTests
         Assert.Equal(new[] { "expensive", "cheap", "contact" }, result.Select(p => p.Slug));
     }
 
+    // Use case 28: the list and the configuration page show the promotion
+    // price, and price bands use it (a 41.6 million phone at 10% off is in
+    // the 20-40 band, not the 40+ one).
+    private static async Task<(ProductCatalogService Sut, SqliteInMemoryFixture Fixture)> PromotionShopAsync()
+    {
+        var fixture = new SqliteInMemoryFixture();
+        fixture.Context.Database.EnsureCreated();
+        var sut = new ProductCatalogService(fixture.Context, new FixedTime(new DateTimeOffset(SalePricingTests.Now)));
+        var iphone = NewCategory("iPhone", "iphone");
+        var phone = NewProduct(iphone, "iPhone 18 Pro Max", "iphone-18-pro-max", 0m);
+        var other = NewProduct(iphone, "iPhone 17", "iphone-17", 0m);
+        fixture.Context.AddRange(phone, other);
+        AddVariant(fixture, phone, "P1", 41_600_000m, 1, config: "256GB", color: "Blue", region: "VN/A");
+        AddVariant(fixture, phone, "P2", 46_000_000m, 1, config: "512GB", color: "Blue", region: "VN/A");
+        AddVariant(fixture, other, "O1", 24_990_000m, 1, config: "256GB");
+        await fixture.Context.SaveChangesAsync();
+        SalePricingTests.AddPromotion(fixture.Context, "Pro week", Domain.Enums.VoucherDiscountType.Percent, 10m, onlyProducts: [phone.Id]);
+        return (sut, fixture);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_shows_the_promotion_price_and_the_old_one()
+    {
+        var (sut, fixture) = await PromotionShopAsync();
+        using var _ = fixture;
+
+        var list = await sut.GetProductsAsync();
+
+        var phone = list.Single(p => p.Slug == "iphone-18-pro-max");
+        var other = list.Single(p => p.Slug == "iphone-17");
+        Assert.Equal((37_440_000m, 41_600_000m), (phone.FromPrice, phone.WasPrice));
+        Assert.Equal((24_990_000m, (decimal?)null), (other.FromPrice, other.WasPrice));
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_price_bands_use_the_promotion_price()
+    {
+        var (sut, fixture) = await PromotionShopAsync();
+        using var _ = fixture;
+
+        var mid = await sut.GetProductsAsync(band: PriceBand.From20MTo40M);
+        var top = await sut.GetProductsAsync(band: PriceBand.Over40M);
+
+        Assert.Equal(new[] { "iphone-18-pro-max", "iphone-17" }, mid.Select(p => p.Slug));
+        Assert.Equal(new[] { "iphone-18-pro-max" }, top.Select(p => p.Slug));
+        Assert.Equal(41_400_000m, top.Single().FromPrice);
+    }
+
+    [Fact]
+    public async Task GetConfigurationAsync_choices_carry_the_promotion_price_and_name()
+    {
+        var (sut, fixture) = await PromotionShopAsync();
+        using var _ = fixture;
+
+        var choice = Assert.Single((await sut.GetConfigurationAsync("iphone-18-pro-max", "256gb"))!.Choices);
+        var detail = await sut.GetBySlugAsync("iphone-18-pro-max");
+
+        Assert.Equal((37_440_000m, 41_600_000m, "Pro week"), (choice.Price, choice.WasPrice, choice.PromotionName));
+        Assert.Equal(37_440_000m, detail!.FromPrice);
+    }
+
     // Use case 8. Two products straddle bands: "split" has a 25M and a 45M
     // variant, "edge" sits exactly on 10M. "retired" has a cheap variant that
     // is off sale, "contact" has no price at all.

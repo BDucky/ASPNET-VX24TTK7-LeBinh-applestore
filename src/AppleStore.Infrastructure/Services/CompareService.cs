@@ -14,11 +14,13 @@ public class CompareService : ICompareService
 
     private readonly AppDbContext _db;
     private readonly IReviewService _reviews;
+    private readonly TimeProvider _time;
 
-    public CompareService(AppDbContext db, IReviewService reviews)
+    public CompareService(AppDbContext db, IReviewService reviews, TimeProvider? time = null)
     {
         _db = db;
         _reviews = reviews;
+        _time = time ?? TimeProvider.System;
     }
 
     public async Task<IReadOnlyList<CompareColumn>> BuildAsync(IReadOnlyList<int> productIds, CancellationToken ct = default)
