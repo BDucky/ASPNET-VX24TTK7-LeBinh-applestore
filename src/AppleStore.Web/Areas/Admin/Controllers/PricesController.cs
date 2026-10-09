@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Data;
 using AppleStore.Infrastructure.Services;
@@ -40,7 +39,7 @@ public class PricesController : Controller
         PriceBatchResult result;
         try
         {
-            result = await _prices.ApplyBatchAsync(form.ToInput(), int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!), ct);
+            result = await _prices.ApplyBatchAsync(form.ToInput(), User.AccountId()!.Value, ct);
         }
         catch (Exception ex) when (ex.IsDatabaseFailure())
         {

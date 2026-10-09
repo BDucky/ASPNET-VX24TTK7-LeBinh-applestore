@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AppleStore.Domain.Enums;
 using AppleStore.Infrastructure.Data;
 using AppleStore.Infrastructure.Services;
@@ -120,7 +119,7 @@ public class ProductsController : Controller
         if (!ModelState.IsValid)
             return Unreadable(id);
         var input = new VariantInput(form.Sku, form.Configuration, form.Color, form.Region, form.Price, form.StockQty, form.OnSale);
-        var result = await RunAsync(() => _catalog.AddVariantAsync(id, input, StaffId, ct), "add a variant");
+        var result = await RunAsync(() => _catalog.AddVariantAsync(id, input, User.AccountId(), ct), "add a variant");
         if (result?.Outcome == AdminCatalogOutcome.NotFound)
             return NotFound();
         return Back(id, result, AdminMessages.VariantAdded);
@@ -135,12 +134,9 @@ public class ProductsController : Controller
         if (!ModelState.IsValid)
             return Unreadable(productId.Value);
         var change = new VariantChange(form.Price, form.StockQty, form.OnSale, form.SeenStock, form.Version);
-        var result = await RunAsync(() => _catalog.UpdateVariantAsync(variantId, change, StaffId, ct), "save a variant");
+        var result = await RunAsync(() => _catalog.UpdateVariantAsync(variantId, change, User.AccountId(), ct), "save a variant");
         return Back(productId.Value, result, AdminMessages.VariantSaved);
     }
-
-    // Who saved a price, for the price history.
-    private int? StaffId => int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
 
     private RedirectToActionResult Unreadable(int productId)
     {

@@ -241,15 +241,15 @@ public class AdminCatalogService : IAdminCatalogService
         // Only the shop's own photos, matched exactly: no outside address, no path tricks.
         if (Blank(input.ImageUrl) is { } image && !_images.All().Contains(image))
             return new AdminCatalogResult(AdminCatalogOutcome.ImageNotInLibrary);
-        if (input.BasePrice is <= 0)
+        if (input.BasePrice is <= 0 or > PriceLimits.Max)
             return new AdminCatalogResult(AdminCatalogOutcome.InvalidPrice);
         return null;
     }
 
-    // Same rules as the schema: a price is positive or not set ("Contact for
-    // price"), stock is never negative.
+    // Same rules as the schema: a price is positive and fits decimal(12,2), or
+    // is not set ("Contact for price"); stock is never negative.
     private static AdminCatalogResult? CheckVariant(decimal? price, int stock) =>
-        price is <= 0 ? new AdminCatalogResult(AdminCatalogOutcome.InvalidPrice)
+        price is <= 0 or > PriceLimits.Max ? new AdminCatalogResult(AdminCatalogOutcome.InvalidPrice)
         : stock < 0 ? new AdminCatalogResult(AdminCatalogOutcome.InvalidStock)
         : null;
 

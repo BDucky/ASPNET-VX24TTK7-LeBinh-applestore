@@ -30,7 +30,7 @@ public class PriceService : IPriceService
         var products = input.ProductIds.Distinct().ToList();
         if (products.Count == 0 && input.CategoryId is null)
             return new PriceBatchResult(PriceBatchOutcome.NothingSelected);
-        if (input.Value == 0 || (input.Mode == PriceBatchMode.Percent && input.Value <= -100))
+        if (!Enum.IsDefined(input.Mode) || input.Value == 0 || (input.Mode == PriceBatchMode.Percent && input.Value <= -100))
             return new PriceBatchResult(PriceBatchOutcome.InvalidValue);
 
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
@@ -45,6 +45,8 @@ public class PriceService : IPriceService
             .ToList();
         if (changes.FirstOrDefault(c => c.New <= 0) is { SKU: not null } tooLow)
             return new PriceBatchResult(PriceBatchOutcome.PriceTooLow, Sku: tooLow.SKU);
+        if (changes.FirstOrDefault(c => c.New > PriceLimits.Max) is { SKU: not null } tooHigh)
+            return new PriceBatchResult(PriceBatchOutcome.PriceTooHigh, Sku: tooHigh.SKU);
         if (changes.Count == 0)
             return new PriceBatchResult(PriceBatchOutcome.NothingToChange);
 
@@ -75,9 +77,20 @@ public class PriceService : IPriceService
         return new PriceBatchResult(PriceBatchOutcome.Done, changes.Count);
     }
 
-    private static decimal NewPrice(PriceBatchInput input, decimal price) => input.Mode == PriceBatchMode.Percent
-        ? Math.Round(price * (100m + input.Value) / 100m / RoundTo, 0, MidpointRounding.AwayFromZero) * RoundTo
-        : price + input.Value;
+    // A result too big for decimal itself is treated as above the limit.
+    private static decimal NewPrice(PriceBatchInput input, decimal price)
+    {
+        try
+        {
+            return input.Mode == PriceBatchMode.Percent
+                ? Math.Round(price * (100m + input.Value) / 100m / RoundTo, 0, MidpointRounding.AwayFromZero) * RoundTo
+                : price + input.Value;
+        }
+        catch (OverflowException)
+        {
+            return decimal.MaxValue;
+        }
+    }
 
     public async Task<IReadOnlyList<PriceChangeRow>> HistoryAsync(int? productId = null, CancellationToken ct = default) =>
         await _db.PriceChanges.AsNoTracking()
