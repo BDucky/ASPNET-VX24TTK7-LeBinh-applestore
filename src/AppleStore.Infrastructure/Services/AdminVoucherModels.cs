@@ -2,7 +2,7 @@ using AppleStore.Domain.Enums;
 
 namespace AppleStore.Infrastructure.Services;
 
-public sealed record VoucherAdminRow(int Id, string Code, VoucherDiscountType Type, decimal Value, decimal? MinOrderAmount,
+public sealed record VoucherAdminRow(int Id, string? Code, VoucherDiscountType Type, decimal Value, decimal? MinOrderAmount,
     DateTime StartsAt, DateTime EndsAt, int? UsageLimit, int UsedCount, bool IsActive, IReadOnlyList<int> ProductIds, long Version);
 
 public sealed record VoucherInput(string? Code, VoucherDiscountType Type, decimal Value, decimal? MinOrderAmount,

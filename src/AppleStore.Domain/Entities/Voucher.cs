@@ -7,10 +7,17 @@ namespace AppleStore.Domain.Entities;
 // Rules from BM_VOUCHER_01: percent or fixed, all products or some products
 // (VoucherProduct rows), an optional minimum order, a usage limit and a time
 // window. Code is stored upper case and matched without regard to case.
+//
+// Kind added 2026-10-09 (use case 28): an Automatic row is a promotion, with
+// a Name and no Code, minimum order or usage limit.
 public class Voucher
 {
     public int Id { get; set; }
-    public string Code { get; set; } = string.Empty;
+    public VoucherKind Kind { get; set; }
+    // Null only for an Automatic promotion.
+    public string? Code { get; set; }
+    // A promotion's name, shown next to the sale price.
+    public string? Name { get; set; }
     public VoucherDiscountType DiscountType { get; set; }
     public decimal DiscountValue { get; set; }
     public decimal? MinOrderAmount { get; set; }
