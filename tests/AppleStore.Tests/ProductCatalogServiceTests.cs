@@ -275,6 +275,118 @@ public class ProductCatalogServiceTests
         Assert.Equal(new[] { "expensive", "cheap", "contact" }, result.Select(p => p.Slug));
     }
 
+    // Use case 8. Two products straddle bands: "split" has a 25M and a 45M
+    // variant, "edge" sits exactly on 10M. "retired" has a cheap variant that
+    // is off sale, "contact" has no price at all.
+    private static async Task<(ProductCatalogService Sut, SqliteInMemoryFixture Fixture)> BandShopAsync()
+    {
+        var (sut, fixture) = CreateSut();
+        var iphone = NewCategory("iPhone", "iphone");
+        var mac = NewCategory("Mac", "mac");
+        var cheap = NewProduct(iphone, "Cheap Phone", "cheap", 0m, sortOrder: 0);
+        var edge = NewProduct(iphone, "Edge Phone", "edge", 0m, sortOrder: 1);
+        var split = NewProduct(iphone, "Split Phone", "split", 0m, sortOrder: 2);
+        var retired = NewProduct(iphone, "Retired Phone", "retired", 0m, sortOrder: 3);
+        var contact = NewProduct(iphone, "Contact Phone", "contact", 0m, sortOrder: 4);
+        var laptop = NewProduct(mac, "Split Laptop", "laptop", 0m, sortOrder: 5);
+        fixture.Context.AddRange(cheap, edge, split, retired, contact, laptop);
+        AddVariant(fixture, cheap, "C", 6_490_000m, 1);
+        AddVariant(fixture, edge, "E", 10_000_000m, 1);
+        AddVariant(fixture, split, "S1", 25_000_000m, 1);
+        AddVariant(fixture, split, "S2", 45_000_000m, 1);
+        AddVariant(fixture, retired, "R1", 5_000_000m, 1, status: false);
+        AddVariant(fixture, retired, "R2", 30_000_000m, 1);
+        AddVariant(fixture, contact, "N", null, 1);
+        AddVariant(fixture, laptop, "L", 39_999_999m, 1);
+        await fixture.Context.SaveChangesAsync();
+        return (sut, fixture);
+    }
+
+    [Theory]
+    [InlineData(PriceBand.Under10M, "cheap")]
+    [InlineData(PriceBand.From10MTo20M, "edge")]
+    [InlineData(PriceBand.From20MTo40M, "split,retired,laptop")]
+    [InlineData(PriceBand.Over40M, "split")]
+    public async Task GetProductsAsync_keeps_products_with_an_active_variant_in_the_band(PriceBand band, string expected)
+    {
+        var (sut, fixture) = await BandShopAsync();
+        using var _ = fixture;
+
+        var result = await sut.GetProductsAsync(band: band);
+
+        Assert.Equal(expected.Split(','), result.Select(p => p.Slug));
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_in_a_band_shows_the_lowest_price_inside_it()
+    {
+        var (sut, fixture) = await BandShopAsync();
+        using var _ = fixture;
+
+        var over = await sut.GetProductsAsync(band: PriceBand.Over40M);
+        var any = await sut.GetProductsAsync();
+
+        Assert.Equal(45_000_000m, Assert.Single(over).FromPrice);
+        Assert.Equal(25_000_000m, any.Single(p => p.Slug == "split").FromPrice);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_without_a_band_still_lists_unpriced_products()
+    {
+        var (sut, fixture) = await BandShopAsync();
+        using var _ = fixture;
+
+        Assert.Contains("contact", (await sut.GetProductsAsync()).Select(p => p.Slug));
+        Assert.DoesNotContain("contact", (await sut.GetProductsAsync(band: PriceBand.Under10M)).Select(p => p.Slug));
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_band_combines_with_category_query_and_price_sort()
+    {
+        var (sut, fixture) = await BandShopAsync();
+        using var _ = fixture;
+
+        var phones = await sut.GetProductsAsync(categorySlug: "iphone", band: PriceBand.From20MTo40M, sort: ProductSort.PriceDescending);
+        var searched = await sut.GetProductsAsync(query: "laptop", band: PriceBand.From20MTo40M);
+
+        Assert.Equal(new[] { "retired", "split" }, phones.Select(p => p.Slug));
+        Assert.Equal(new[] { "laptop" }, searched.Select(p => p.Slug));
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_an_unknown_band_value_means_no_filter()
+    {
+        var (sut, fixture) = await BandShopAsync();
+        using var _ = fixture;
+
+        var result = await sut.GetProductsAsync(band: (PriceBand)99);
+
+        Assert.Equal(6, result.Count);
+    }
+
+    [Fact]
+    public async Task GetProductsAsync_newest_puts_the_latest_added_first()
+    {
+        var (sut, fixture) = CreateSut();
+        using var _ = fixture;
+        var iphone = NewCategory("iPhone", "iphone");
+        var old = NewProduct(iphone, "Old", "old", 0m, sortOrder: 0);
+        var latest = NewProduct(iphone, "Latest", "latest", 0m, sortOrder: 2);
+        var middle = NewProduct(iphone, "Middle", "middle", 0m, sortOrder: 1);
+        var sameDayLater = NewProduct(iphone, "Same day later", "same-day-later", 0m, sortOrder: 3);
+        old.CreatedAt = new DateTime(2026, 1, 1);
+        latest.CreatedAt = new DateTime(2026, 9, 1);
+        middle.CreatedAt = new DateTime(2026, 5, 1);
+        sameDayLater.CreatedAt = new DateTime(2026, 5, 1);
+        fixture.Context.AddRange(old, latest, middle, sameDayLater);
+        await fixture.Context.SaveChangesAsync();
+
+        var result = await sut.GetProductsAsync(sort: ProductSort.Newest);
+
+        // A tie on CreatedAt goes to the one added later (higher Id).
+        Assert.Equal(new[] { "latest", "same-day-later", "middle", "old" }, result.Select(p => p.Slug));
+    }
+
     // rauvang.com's model page: one card per configuration, in the order the
     // store lists them, each "From" its cheapest colour.
     [Fact]

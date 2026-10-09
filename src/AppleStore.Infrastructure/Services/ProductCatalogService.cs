@@ -12,7 +12,8 @@ public class ProductCatalogService : IProductCatalogService
         _db = db;
     }
 
-    public async Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured, CancellationToken ct = default)
+    public async Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured,
+        PriceBand band = PriceBand.Any, CancellationToken ct = default)
     {
         var products = _db.Products
             .Include(p => p.Category)

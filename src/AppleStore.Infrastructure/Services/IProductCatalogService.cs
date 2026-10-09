@@ -5,14 +5,18 @@ public enum ProductSort
     Featured,
     PriceAscending,
     PriceDescending,
+    // Most recently added first (Product.CreatedAt), the report's "newest".
+    Newest,
 }
 
 public interface IProductCatalogService
 {
     // Active products only (Product.Status && at least reflects catalog
     // visibility). categorySlug and query are both optional and combine
-    // with AND when both are given.
-    Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured, CancellationToken ct = default);
+    // with AND when both are given. With a price band, only products with an
+    // active variant priced inside it, and FromPrice is the lowest such price.
+    Task<IReadOnlyList<ProductSummary>> GetProductsAsync(string? categorySlug = null, string? query = null, ProductSort sort = ProductSort.Featured,
+        PriceBand band = PriceBand.Any, CancellationToken ct = default);
 
     // Null for an unknown slug or an inactive product, same "not found"
     // either way: an inactive product isn't reachable by direct link.

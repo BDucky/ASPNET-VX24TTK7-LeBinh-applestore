@@ -20,7 +20,7 @@ public class ProductsController : Controller
     [HttpGet("")]
     public async Task<IActionResult> Index(string? category, string? q, ProductSort sort = ProductSort.Featured, CancellationToken ct = default)
     {
-        var products = await _catalog.GetProductsAsync(category, q, sort, ct);
+        var products = await _catalog.GetProductsAsync(category, q, sort, ct: ct);
         return View(new ProductListViewModel(products, category, q, sort));
     }
 
