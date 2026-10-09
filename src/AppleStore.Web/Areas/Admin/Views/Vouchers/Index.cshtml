@@ -21,8 +21,8 @@
             {
                 <li>
                     <a class="order-list-link" asp-action="Edit" asp-route-id="@v.Id">
-                        <span class="order-list-id">@(v.Kind == VoucherKind.Automatic ? v.Name : v.Code)</span>
-                        <span class="order-list-meta">@(v.Type == VoucherDiscountType.Percent ? $"{v.Value:0.##}% off" : $"{PriceText.Vnd(v.Value)} off")@(v.MinOrderAmount is { } min ? $" from {PriceText.Vnd(min)}" : "") · until @DateTime.SpecifyKind(v.EndsAt, DateTimeKind.Utc).ToLocalTime().ToString("dd/MM/yyyy")@(v.Kind == VoucherKind.Automatic ? "" : $" · used {v.UsedCount}{(v.UsageLimit is { } limit ? $" of {limit}" : "")}")</span>
+                        <span class="order-list-id">@text.Rules.Label(v.Code, v.Name)</span>
+                        <span class="order-list-meta">@(v.Type == VoucherDiscountType.Percent ? $"{v.Value:0.##}% off" : $"{PriceText.Vnd(v.Value)} off")@(v.MinOrderAmount is { } min ? $" from {PriceText.Vnd(min)}" : "") · until @DateTime.SpecifyKind(v.EndsAt, DateTimeKind.Utc).ToLocalTime().ToString("dd/MM/yyyy")@(text.Rules.HasLimits ? $" · used {v.UsedCount}{(v.UsageLimit is { } limit ? $" of {limit}" : "")}" : "")</span>
                         <span class="order-list-status">@(v.IsActive ? "Active" : "Inactive")</span>
                     </a>
                 </li>

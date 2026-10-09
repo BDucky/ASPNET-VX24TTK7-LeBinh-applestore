@@ -8,9 +8,9 @@ public interface IAdminVoucherService
 {
     // Every call names the kind of row it may see or change: the promotions
     // page (open to employees) can never reach a code voucher, nor the other way.
-    Task<IReadOnlyList<VoucherAdminRow>> ListAsync(VoucherKind kind = VoucherKind.Code, CancellationToken ct = default);
-    Task<VoucherAdminRow?> GetAsync(int voucherId, VoucherKind kind = VoucherKind.Code, CancellationToken ct = default);
+    Task<IReadOnlyList<VoucherAdminRow>> ListAsync(VoucherKind kind, CancellationToken ct = default);
+    Task<VoucherAdminRow?> GetAsync(int voucherId, VoucherKind kind, CancellationToken ct = default);
     Task<VoucherAdminResult> CreateAsync(VoucherInput input, CancellationToken ct = default);
     Task<VoucherAdminResult> UpdateAsync(int voucherId, VoucherInput input, long version, CancellationToken ct = default);
-    Task<VoucherAdminResult> DeleteAsync(int voucherId, VoucherKind kind = VoucherKind.Code, CancellationToken ct = default);
+    Task<VoucherAdminResult> DeleteAsync(int voucherId, VoucherKind kind, CancellationToken ct = default);
 }

@@ -21,11 +21,11 @@ public class AdminVoucherService : IAdminVoucherService
         _time = time;
     }
 
-    public async Task<IReadOnlyList<VoucherAdminRow>> ListAsync(VoucherKind kind = VoucherKind.Code, CancellationToken ct = default) =>
+    public async Task<IReadOnlyList<VoucherAdminRow>> ListAsync(VoucherKind kind, CancellationToken ct = default) =>
         (await _db.Vouchers.AsNoTracking().Where(v => v.Kind == kind).OrderByDescending(v => v.Id).ToListAsync(ct))
             .Select(v => Row(v, [])).ToList();
 
-    public async Task<VoucherAdminRow?> GetAsync(int voucherId, VoucherKind kind = VoucherKind.Code, CancellationToken ct = default)
+    public async Task<VoucherAdminRow?> GetAsync(int voucherId, VoucherKind kind, CancellationToken ct = default)
     {
         var voucher = await _db.Vouchers.AsNoTracking().FirstOrDefaultAsync(v => v.Id == voucherId && v.Kind == kind, ct);
         if (voucher is null)
@@ -99,7 +99,7 @@ public class AdminVoucherService : IAdminVoucherService
         return new VoucherAdminResult(VoucherAdminOutcome.Done, voucherId);
     }
 
-    public async Task<VoucherAdminResult> DeleteAsync(int voucherId, VoucherKind kind = VoucherKind.Code, CancellationToken ct = default)
+    public async Task<VoucherAdminResult> DeleteAsync(int voucherId, VoucherKind kind, CancellationToken ct = default)
     {
         var deleted = await _db.Vouchers.Where(v => v.Id == voucherId && v.Kind == kind).ExecuteDeleteAsync(ct);
         return new VoucherAdminResult(deleted == 1 ? VoucherAdminOutcome.Done : VoucherAdminOutcome.NotFound);
@@ -109,9 +109,9 @@ public class AdminVoucherService : IAdminVoucherService
     {
         var code = CodeFor(input);
         var percent = input.Type == VoucherDiscountType.Percent;
-        // The one place the rules differ by kind. A promotion's percent stays
-        // below 100 so it never gives a product away (Claude's rule, the same
-        // one SalePrices applies to fixed amounts).
+        // The one switch over the checks that differ by kind. A promotion's
+        // percent stays below 100 so it never gives a product away (Claude's
+        // rule, the same one SalePrices applies to fixed amounts).
         VoucherAdminOutcome? refusal = input.Kind switch
         {
             VoucherKind.Automatic =>
@@ -137,17 +137,17 @@ public class AdminVoucherService : IAdminVoucherService
         return null;
     }
 
-    // Codes are matched without regard to case at checkout, so they are stored
-    // upper case. A promotion has no code and only it has a name, whatever was posted.
+    // Which fields a kind keeps is VoucherKindRules'; whatever else was posted
+    // is dropped. Codes are matched without regard to case at checkout, so
+    // they are stored upper case.
     private static string? CodeFor(VoucherInput input) =>
-        input.Kind == VoucherKind.Automatic || string.IsNullOrWhiteSpace(input.Code) ? null : input.Code.Trim().ToUpperInvariant();
+        VoucherKindRules.For(input.Kind).HasCode && !string.IsNullOrWhiteSpace(input.Code) ? input.Code.Trim().ToUpperInvariant() : null;
 
-    // A minimum order and a usage limit belong to code vouchers only.
     private static (decimal? Minimum, int? Limit) VoucherOnly(VoucherInput input) =>
-        input.Kind == VoucherKind.Automatic ? (null, null) : (input.MinOrderAmount, input.UsageLimit);
+        VoucherKindRules.For(input.Kind).HasLimits ? (input.MinOrderAmount, input.UsageLimit) : (null, null);
 
     private static string? NameFor(VoucherInput input) =>
-        input.Kind == VoucherKind.Automatic && !string.IsNullOrWhiteSpace(input.Name) ? input.Name.Trim() : null;
+        VoucherKindRules.For(input.Kind).HasName && !string.IsNullOrWhiteSpace(input.Name) ? input.Name.Trim() : null;
 
     private static void Apply(Voucher voucher, VoucherInput input, DateTime now)
     {

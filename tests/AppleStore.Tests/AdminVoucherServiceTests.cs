@@ -40,7 +40,7 @@ public sealed class AdminVoucherServiceTests : IDisposable
 
     private VoucherInput Input(string? code = "SALE10", VoucherDiscountType type = VoucherDiscountType.Percent, decimal value = 10m,
         decimal? min = null, int? limit = 100, bool active = true, int startDays = -1, int endDays = 30, params int[] products) =>
-        new(code, type, value, min, Now.UtcDateTime.AddDays(startDays), Now.UtcDateTime.AddDays(endDays), limit, active, products);
+        new(code, type, value, min, Now.UtcDateTime.AddDays(startDays), Now.UtcDateTime.AddDays(endDays), limit, active, products, VoucherKind.Code);
 
     private async Task<CheckoutQuote> QuoteAsync(string code)
     {
@@ -56,7 +56,7 @@ public sealed class AdminVoucherServiceTests : IDisposable
         var result = await _sut.CreateAsync(Input(code: "  sale10 "));
 
         Assert.Equal(VoucherAdminOutcome.Done, result.Outcome);
-        Assert.Equal("SALE10", (await _sut.GetAsync(result.Id!.Value))!.Code);
+        Assert.Equal("SALE10", (await _sut.GetAsync(result.Id!.Value, VoucherKind.Code))!.Code);
         Assert.Equal((VoucherProblem.None, 2_000_000m), ((await QuoteAsync("sale10")).VoucherProblem, (await QuoteAsync("sale10")).Discount));
     }
 
@@ -65,7 +65,7 @@ public sealed class AdminVoucherServiceTests : IDisposable
     {
         var result = await _sut.CreateAsync(Input(products: _phoneProduct));
 
-        Assert.Equal([_phoneProduct], (await _sut.GetAsync(result.Id!.Value))!.ProductIds);
+        Assert.Equal([_phoneProduct], (await _sut.GetAsync(result.Id!.Value, VoucherKind.Code))!.ProductIds);
     }
 
     [Theory]
@@ -109,12 +109,12 @@ public sealed class AdminVoucherServiceTests : IDisposable
         await QuoteAsync("SALE10");
         await new CheckoutService(_db, new CartService(_db), new FixedTime(Now))
             .PlaceOrderAsync(_alice, new DeliveryInput("A", "0900000000", "1 Street", null, null, null, null), "SALE10", (await QuoteAsync("SALE10")).Total);
-        var seen = (await _sut.GetAsync(id))!;
+        var seen = (await _sut.GetAsync(id, VoucherKind.Code))!;
 
         var result = await _sut.UpdateAsync(id, Input(value: 20m), seen.Version);
 
         Assert.Equal(VoucherAdminOutcome.Done, result.Outcome);
-        var after = (await _sut.GetAsync(id))!;
+        var after = (await _sut.GetAsync(id, VoucherKind.Code))!;
         Assert.Equal(("SALE10", 20m, 1), (after.Code, after.Value, after.UsedCount));
     }
 
@@ -124,11 +124,11 @@ public sealed class AdminVoucherServiceTests : IDisposable
         var id = (await _sut.CreateAsync(Input())).Id!.Value;
         await new CheckoutService(_db, new CartService(_db), new FixedTime(Now))
             .PlaceOrderAsync(_alice, new DeliveryInput("A", "0900000000", "1 Street", null, null, null, null), "SALE10", (await QuoteAsync("SALE10")).Total);
-        var seen = (await _sut.GetAsync(id))!.Version;
+        var seen = (await _sut.GetAsync(id, VoucherKind.Code))!.Version;
 
         Assert.Equal(VoucherAdminOutcome.CodeLocked, (await _sut.UpdateAsync(id, Input(code: "RENAMED"), seen)).Outcome);
         Assert.Equal(VoucherAdminOutcome.Done, (await _sut.UpdateAsync(id, Input(code: "sale10", value: 12m), seen)).Outcome);
-        Assert.Equal(("SALE10", 12m), ((await _sut.GetAsync(id))!.Code, (await _sut.GetAsync(id))!.Value));
+        Assert.Equal(("SALE10", 12m), ((await _sut.GetAsync(id, VoucherKind.Code))!.Code, (await _sut.GetAsync(id, VoucherKind.Code))!.Value));
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public sealed class AdminVoucherServiceTests : IDisposable
     {
         var id = (await _sut.CreateAsync(Input())).Id!.Value;
         _db.Database.ExecuteSql($"UPDATE Vouchers SET UsedCount = 3 WHERE Id = {id}");
-        var seen = (await _sut.GetAsync(id))!;
+        var seen = (await _sut.GetAsync(id, VoucherKind.Code))!;
 
         Assert.Equal(VoucherAdminOutcome.LimitBelowUsed, (await _sut.UpdateAsync(id, Input(limit: 2), seen.Version)).Outcome);
         Assert.Equal(VoucherAdminOutcome.Done, (await _sut.UpdateAsync(id, Input(limit: 3), seen.Version)).Outcome);
@@ -146,11 +146,11 @@ public sealed class AdminVoucherServiceTests : IDisposable
     public async Task An_edit_made_meanwhile_is_not_overwritten()
     {
         var id = (await _sut.CreateAsync(Input())).Id!.Value;
-        var seen = (await _sut.GetAsync(id))!.Version;
+        var seen = (await _sut.GetAsync(id, VoucherKind.Code))!.Version;
         await _sut.UpdateAsync(id, Input(value: 15m), seen);
 
         Assert.Equal(VoucherAdminOutcome.Changed, (await _sut.UpdateAsync(id, Input(value: 30m), seen)).Outcome);
-        Assert.Equal(15m, (await _sut.GetAsync(id))!.Value);
+        Assert.Equal(15m, (await _sut.GetAsync(id, VoucherKind.Code))!.Value);
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public sealed class AdminVoucherServiceTests : IDisposable
         await _sut.CreateAsync(Input(code: "OTHER"));
         var id = (await _sut.CreateAsync(Input())).Id!.Value;
 
-        Assert.Equal(VoucherAdminOutcome.CodeTaken, (await _sut.UpdateAsync(id, Input(code: "other"), (await _sut.GetAsync(id))!.Version)).Outcome);
+        Assert.Equal(VoucherAdminOutcome.CodeTaken, (await _sut.UpdateAsync(id, Input(code: "other"), (await _sut.GetAsync(id, VoucherKind.Code))!.Version)).Outcome);
     }
 
     [Fact]
@@ -169,13 +169,13 @@ public sealed class AdminVoucherServiceTests : IDisposable
         var placed = await new CheckoutService(_db, new CartService(_db), new FixedTime(Now))
             .PlaceOrderAsync(_alice, new DeliveryInput("A", "0900000000", "1 Street", null, null, null, null), "SALE10", (await QuoteAsync("SALE10")).Total);
 
-        Assert.Equal(VoucherAdminOutcome.Done, (await _sut.DeleteAsync(id)).Outcome);
+        Assert.Equal(VoucherAdminOutcome.Done, (await _sut.DeleteAsync(id, VoucherKind.Code)).Outcome);
 
-        Assert.Null(await _sut.GetAsync(id));
+        Assert.Null(await _sut.GetAsync(id, VoucherKind.Code));
         Assert.Equal(VoucherProblem.NotFound, (await QuoteAsync("SALE10")).VoucherProblem);
         await using var db = _shop.Context();
         Assert.Equal("SALE10", (await db.Orders.SingleAsync(o => o.Id == placed.OrderId)).VoucherCode);
-        Assert.Equal(VoucherAdminOutcome.NotFound, (await _sut.DeleteAsync(id)).Outcome);
+        Assert.Equal(VoucherAdminOutcome.NotFound, (await _sut.DeleteAsync(id, VoucherKind.Code)).Outcome);
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public sealed class AdminVoucherServiceTests : IDisposable
         await _sut.CreateAsync(Input(code: "FIRST"));
         await _sut.CreateAsync(Input(code: "SECOND"));
 
-        Assert.Equal(["SECOND", "FIRST"], (await _sut.ListAsync()).Select(v => v.Code));
+        Assert.Equal(["SECOND", "FIRST"], (await _sut.ListAsync(VoucherKind.Code)).Select(v => v.Code));
     }
 
     // ---------- Promotions (use case 28) ----------
@@ -244,13 +244,13 @@ public sealed class AdminVoucherServiceTests : IDisposable
     [Fact]
     public async Task The_promotions_side_cannot_change_or_delete_a_voucher()
     {
-        var voucher = (await _sut.GetAsync((await _sut.CreateAsync(Input())).Id!.Value))!;
+        var voucher = (await _sut.GetAsync((await _sut.CreateAsync(Input())).Id!.Value, VoucherKind.Code))!;
 
         var update = await _sut.UpdateAsync(voucher.Id, Promotion("Hijack", value: 90m), voucher.Version);
         var delete = await _sut.DeleteAsync(voucher.Id, VoucherKind.Automatic);
 
         Assert.Equal((VoucherAdminOutcome.NotFound, VoucherAdminOutcome.NotFound), (update.Outcome, delete.Outcome));
-        var after = (await _sut.GetAsync(voucher.Id))!;
+        var after = (await _sut.GetAsync(voucher.Id, VoucherKind.Code))!;
         Assert.Equal(("SALE10", 10m, VoucherKind.Code), (after.Code, after.Value, after.Kind));
     }
 

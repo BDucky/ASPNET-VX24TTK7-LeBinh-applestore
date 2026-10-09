@@ -6,9 +6,9 @@
     var isNew = Model.Id is null;
     var form = Model.Form;
     var text = Model.Text;
-    var isPromotion = Model.Kind == VoucherKind.Automatic;
-    var heading = isPromotion ? form.Name : form.Code;
-    ViewData["Title"] = isNew ? $"Add a {text.Noun}" : $"{(isPromotion ? "Promotion" : "Voucher")} {heading}";
+    var rules = text.Rules;
+    var heading = rules.Label(form.Code, form.Name);
+    ViewData["Title"] = isNew ? $"Add a {text.Noun}" : $"{text.Heading} {heading}";
 }
 
 <section class="statement is-compact account-page">
@@ -16,9 +16,9 @@
         <div class="hero-eyebrow">Admin</div>
         <h1 class="account-title">@(isNew ? $"Add a {text.Noun}" : heading)</h1>
         <partial name="_AdminNav" />
-        @if (isPromotion)
+        @if (text.Explainer is not null)
         {
-            <p class="account-hint">While it runs, the products it covers show and charge the lower price, with the old one crossed out. When two cover a product, the larger discount wins; a voucher is then taken from the lower price.</p>
+            <p class="account-hint">@text.Explainer</p>
         }
         else if (!isNew)
         {
@@ -31,12 +31,12 @@
 
         <form method="post" asp-antiforgery="true" action="@(isNew ? Url.Action("New") : Url.Action("Edit", new { id = Model.Id }))" class="account-form admin-form" novalidate>
             <input type="hidden" name="Version" value="@form.Version" />
-            @if (isPromotion)
+            @if (rules.HasName)
             {
                 <label for="Name">Name, shown next to the sale price</label>
                 <input id="Name" name="Name" value="@form.Name" maxlength="120" />
             }
-            else
+            @if (rules.HasCode)
             {
                 <label for="Code">Code (stored upper case)</label>
                 <input id="Code" name="Code" value="@form.Code" maxlength="40" />
@@ -51,7 +51,7 @@
             <label for="Value">Discount</label>
             <input id="Value" name="Value" value="@form.Value.ToString("0.##")" inputmode="decimal" />
 
-            @if (!isPromotion)
+            @if (rules.HasLimits)
             {
                 <label for="MinOrderAmount">Minimum order (VND), empty for none</label>
                 <input id="MinOrderAmount" name="MinOrderAmount" value="@form.MinOrderAmount?.ToString("0.##")" inputmode="numeric" />
@@ -62,7 +62,7 @@
             <label for="EndsAt">Ends</label>
             <input id="EndsAt" name="EndsAt" type="datetime-local" value="@form.EndsAt.ToString("yyyy-MM-ddTHH:mm")" />
 
-            @if (!isPromotion)
+            @if (rules.HasLimits)
             {
                 <label for="UsageLimit">Usage limit, empty for no limit</label>
                 <input id="UsageLimit" name="UsageLimit" value="@form.UsageLimit" inputmode="numeric" />

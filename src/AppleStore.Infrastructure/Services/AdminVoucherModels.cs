@@ -4,12 +4,12 @@ namespace AppleStore.Infrastructure.Services;
 
 public sealed record VoucherAdminRow(int Id, string? Code, VoucherDiscountType Type, decimal Value, decimal? MinOrderAmount,
     DateTime StartsAt, DateTime EndsAt, int? UsageLimit, int UsedCount, bool IsActive, IReadOnlyList<int> ProductIds, long Version,
-    VoucherKind Kind = VoucherKind.Code, string? Name = null);
+    VoucherKind Kind, string? Name);
 
 // Kind comes from the page (Vouchers or Promotions), never from the posted form.
 public sealed record VoucherInput(string? Code, VoucherDiscountType Type, decimal Value, decimal? MinOrderAmount,
     DateTime StartsAt, DateTime EndsAt, int? UsageLimit, bool IsActive, IReadOnlyList<int> ProductIds,
-    VoucherKind Kind = VoucherKind.Code, string? Name = null);
+    VoucherKind Kind, string? Name = null);
 
 public enum VoucherAdminOutcome
 {
