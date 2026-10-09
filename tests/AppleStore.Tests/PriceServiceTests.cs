@@ -129,6 +129,45 @@ public sealed class PriceServiceTests : IDisposable
         Assert.Empty(Log());
     }
 
+    // Review 2026-10-09: a huge number must be refused, not crash the page or
+    // store a price the decimal(12,2) column cannot hold.
+    [Theory]
+    [InlineData(PriceBatchMode.Percent, "1000000000000000000000000000")]
+    [InlineData(PriceBatchMode.Amount, "10000000000000")]
+    public async Task A_price_beyond_what_the_shop_stores_is_refused(PriceBatchMode mode, string value)
+    {
+        var before = Prices();
+
+        var result = await BatchAsync(mode, decimal.Parse(value), products: _phone);
+
+        Assert.Equal(PriceBatchOutcome.PriceTooHigh, result.Outcome);
+        Assert.Equal(before, Prices());
+        Assert.Empty(Log());
+    }
+
+    [Fact]
+    public async Task A_mode_that_does_not_exist_is_refused()
+    {
+        Assert.Equal(PriceBatchOutcome.InvalidValue, (await BatchAsync((PriceBatchMode)5, 1.5m, products: _phone)).Outcome);
+        Assert.Empty(Log());
+    }
+
+    // A sale takes stock while the batch runs: stock moves, the version does
+    // not, so the batch still goes through and the sale's stock stays taken.
+    [Fact]
+    public async Task A_sale_during_the_batch_neither_stops_it_nor_loses_its_stock()
+    {
+        _race.Arm("UPDATE \"ProductVariants\"", $"UPDATE ProductVariants SET StockQty = StockQty - 1 WHERE Id = {_black}");
+
+        var result = await BatchAsync(PriceBatchMode.Percent, 3m, products: _phone);
+
+        Assert.True(_race.Ran);
+        Assert.Equal(PriceBatchOutcome.Done, result.Outcome);
+        using var db = _shop.Context();
+        var black = db.ProductVariants.Single(v => v.Id == _black);
+        Assert.Equal((26_255_000m, 2), (black.Price, black.StockQty));
+    }
+
     [Fact]
     public async Task Nothing_picked_is_refused()
     {

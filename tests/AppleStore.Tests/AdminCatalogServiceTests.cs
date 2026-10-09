@@ -303,6 +303,19 @@ public sealed class AdminCatalogServiceTests : IDisposable
         return db.PriceChanges.OrderBy(c => c.Id).ToList();
     }
 
+    // The largest price decimal(12,2) holds; one dong more is refused (review 2026-10-09).
+    [Theory]
+    [InlineData("9999999999.99", AdminCatalogOutcome.Done)]
+    [InlineData("10000000000", AdminCatalogOutcome.InvalidPrice)]
+    public async Task A_price_beyond_the_column_is_refused(string price, AdminCatalogOutcome expected)
+    {
+        var seen = (await _sut.GetAsync(_phone))!.Variants.Single(v => v.Id == _blue);
+
+        var result = await _sut.UpdateVariantAsync(_blue, new VariantChange(decimal.Parse(price), seen.StockQty, true, seen.StockQty, seen.Version));
+
+        Assert.Equal(expected, result.Outcome);
+    }
+
     [Fact]
     public async Task Saving_a_new_price_logs_it_with_who_changed_it()
     {

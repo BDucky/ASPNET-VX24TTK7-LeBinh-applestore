@@ -20,6 +20,8 @@ public enum PriceBatchOutcome
     InvalidValue,
     // Some new price would be 0 or less; nothing was changed. Sku names it.
     PriceTooLow,
+    // Some new price would be more than the shop stores (decimal(12,2)); nothing was changed.
+    PriceTooHigh,
     // No variant's price would change (none has a price, or rounding kept them).
     NothingToChange,
     // Someone changed one of these prices while the batch ran; nothing was changed.
