@@ -2460,3 +2460,21 @@ a.btn-store-primary {
     grid-template-columns: 1fr;
   }
 }
+
+/* Counter sale: the customer and payment groups stack like the rest of the form. */
+.sale-customer,
+.sale-method {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.sale-customer legend,
+.sale-method legend {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}

@@ -32,7 +32,7 @@
                         {
                             <tr data-stock-sku="@v.Sku">
                                 <td>@v.Sku</td>
-                                <td>@v.ProductName @VariantText.Options(v.Configuration, v.Color, v.Region)</td>
+                                <td>@VariantText.Label(v.ProductName, v.Configuration, v.Color, v.Region)</td>
                                 <td>@v.StockQty</td>
                                 <td>@(v.OnSale ? "Yes" : "No")</td>
                             </tr>

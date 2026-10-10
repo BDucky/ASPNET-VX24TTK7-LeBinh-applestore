@@ -36,7 +36,7 @@
                                 <option value="">Pick a product</option>
                                 @foreach (var v in Model.Variants)
                                 {
-                                    <option value="@v.VariantId" selected="@(line.VariantId == v.VariantId)">@v.Sku · @v.ProductName @VariantText.Options(v.Configuration, v.Color, v.Region) (stock @v.StockQty)</option>
+                                    <option value="@v.VariantId" selected="@(line.VariantId == v.VariantId)">@v.Sku · @VariantText.Label(v.ProductName, v.Configuration, v.Color, v.Region) (stock @v.StockQty)</option>
                                 }
                             </select>
                         </label>

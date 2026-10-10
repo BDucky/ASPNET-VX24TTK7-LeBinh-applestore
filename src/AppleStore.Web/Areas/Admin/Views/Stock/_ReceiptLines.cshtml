@@ -10,7 +10,7 @@
         {
             <tr data-receipt-line="@l.VariantId">
                 <td>@l.Sku</td>
-                <td>@l.ProductName @VariantText.Options(l.Configuration, l.Color, l.Region)</td>
+                <td>@VariantText.Label(l.ProductName, l.Configuration, l.Color, l.Region)</td>
                 <td>@l.Quantity</td>
                 <td>@PriceText.Vnd(l.UnitCost)</td>
                 <td>@PriceText.Vnd(l.LineCost)</td>
