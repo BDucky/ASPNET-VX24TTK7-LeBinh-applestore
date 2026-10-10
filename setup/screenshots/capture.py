@@ -176,6 +176,7 @@ def main():
   await page.fill('input[name="Lines[1].Quantity"]', '2');
   await page.fill('#CustomerName', 'Trần Thị Lan');
   await press(page, 'button[value=quote]');
+  await page.addStyleTag({ content: '.cursor-ring, .cursor-dot { display: none !important; }' });
   await page.locator('.account-card').screenshot({ path: '__QUOTE__' });
   await press(page, 'button[value=sell]');
   const sale = page.url().replace(APP, '');
