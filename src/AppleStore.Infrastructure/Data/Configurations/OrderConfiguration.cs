@@ -28,5 +28,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .WithMany()
             .HasForeignKey(o => o.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.Property(o => o.Channel).HasConversion<int>();
+        builder.HasOne(o => o.SoldBy)
+            .WithMany()
+            .HasForeignKey(o => o.SoldByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+        builder.HasIndex(o => o.FormKey).IsUnique();
     }
 }

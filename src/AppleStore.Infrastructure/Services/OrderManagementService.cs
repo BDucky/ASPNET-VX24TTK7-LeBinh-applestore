@@ -20,7 +20,7 @@ public class OrderManagementService : IOrderManagementService
         _time = time;
     }
 
-    private sealed record Snapshot(int Id, int UserId, OrderStatus Status, OrderPaymentStatus PaymentStatus, PaymentMethod Method,
+    private sealed record Snapshot(int Id, int? UserId, OrderStatus Status, OrderPaymentStatus PaymentStatus, PaymentMethod Method,
         decimal Total, decimal ShippingFee, string? VoucherCode);
 
     private Task<Snapshot?> SnapshotAsync(int orderId, CancellationToken ct) =>

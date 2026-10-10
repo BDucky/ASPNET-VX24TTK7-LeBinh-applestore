@@ -42,8 +42,8 @@ public class OrderNotifier : IOrderNotifier
     private async Task PlacedAsync(int orderId, string link, CancellationToken ct)
     {
         var order = await _db.Orders.AsNoTracking()
-            .Where(o => o.Id == orderId)
-            .Select(o => new { o.Id, o.User.Email, o.User.FullName, o.TotalAmount })
+            .Where(o => o.Id == orderId && o.UserId != null) // a walk-in sale has no one to email
+            .Select(o => new { o.Id, o.User!.Email, o.User.FullName, o.TotalAmount })
             .FirstOrDefaultAsync(ct);
         if (order is null)
             return;
@@ -58,11 +58,11 @@ public class OrderNotifier : IOrderNotifier
     private async Task ShippedAsync(int orderId, string link, CancellationToken ct)
     {
         var order = await _db.Orders.AsNoTracking()
-            .Where(o => o.Id == orderId)
+            .Where(o => o.Id == orderId && o.UserId != null) // a walk-in sale has no one to email
             .Select(o => new
             {
                 o.Id,
-                o.User.Email,
+                o.User!.Email,
                 o.User.FullName,
                 Shipment = _db.Shipments.Where(s => s.OrderId == o.Id).OrderByDescending(s => s.Id).Select(s => new { s.Carrier, s.TrackingNo }).FirstOrDefault(),
             })

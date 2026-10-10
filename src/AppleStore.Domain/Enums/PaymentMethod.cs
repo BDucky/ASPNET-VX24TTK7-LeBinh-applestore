@@ -7,4 +7,7 @@ public enum PaymentMethod
     Cod = 0,
     VnPay = 1,
     MoMo = 2,
+    // At the counter (use case 21, added 2026-10-10): paid on the spot.
+    Cash = 3,
+    BankTransfer = 4,
 }
