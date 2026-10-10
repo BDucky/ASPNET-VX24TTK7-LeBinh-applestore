@@ -53,12 +53,15 @@ public class SaleFlowTests : WebFlowTestBase
     }
 
     // Price, then complete at the shown total, as a staff member does.
+    // The form token comes from a fresh sale form: a used key's address
+    // redirects to its sale, which is what Back must do.
     private async Task<HttpResponseMessage> SellAsync(string formUrl, string? email = null, params (int Variant, int Quantity)[] lines)
     {
         var key = formUrl.Split('=')[1];
-        var quote = await PostFormAsync("/Admin/Sales/New", Sale(key, "quote", email: email, lines: lines), formPage: formUrl);
+        var tokenPage = await FormUrlAsync();
+        var quote = await PostFormAsync("/Admin/Sales/New", Sale(key, "quote", email: email, lines: lines), formPage: tokenPage);
         var expected = Field(WebUtility.HtmlDecode(await quote.Content.ReadAsStringAsync()), "ExpectedTotal");
-        return await PostFormAsync("/Admin/Sales/New", Sale(key, "sell", expected, email, lines), formPage: formUrl);
+        return await PostFormAsync("/Admin/Sales/New", Sale(key, "sell", expected, email, lines), formPage: tokenPage);
     }
 
     [Fact]

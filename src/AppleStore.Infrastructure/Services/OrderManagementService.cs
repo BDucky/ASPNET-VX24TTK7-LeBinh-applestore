@@ -48,7 +48,8 @@ public class OrderManagementService : IOrderManagementService
                 _db.Payments.Where(p => p.OrderId == o.Id).OrderBy(p => p.Id).Select(p => p.Method).FirstOrDefault(),
                 o.TotalAmount,
                 o.ReceiverName,
-                _db.OrderItems.Where(i => i.OrderId == o.Id).Sum(i => i.Quantity)))
+                _db.OrderItems.Where(i => i.OrderId == o.Id).Sum(i => i.Quantity),
+                o.Channel))
             .ToListAsync(ct);
 
     public Task<OrderChangeResult> ConfirmAsync(int orderId, CancellationToken ct = default) =>

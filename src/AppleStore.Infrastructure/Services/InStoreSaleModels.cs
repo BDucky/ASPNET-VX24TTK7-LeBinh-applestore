@@ -47,6 +47,9 @@ public interface IInStoreSaleService
     // Prices the lines the way the shop does online (sale prices, voucher).
     Task<SaleQuote> QuoteAsync(IReadOnlyList<SaleLineInput> lines, string? voucherCode, CancellationToken ct = default);
 
+    // The sale a form key already made, if any.
+    Task<int?> OrderForKeyAsync(Guid formKey, CancellationToken ct = default);
+
     // Sells only at the total the staff member saw.
     Task<SaleResult> SellAsync(SaleInput input, decimal expectedTotal, int staffId, CancellationToken ct = default);
 }

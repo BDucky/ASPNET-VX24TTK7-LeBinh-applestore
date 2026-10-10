@@ -40,6 +40,20 @@ public class OrdersController : Controller
         return order is null ? NotFound() : View(OrderPage.For(order, byStaff: true));
     }
 
+    // BM_INVOICE_01's batch printing: the orders ticked on the list, in that
+    // order; unknown ids are left out.
+    [HttpGet("Invoices")]
+    public async Task<IActionResult> Invoices([FromQuery] int[] ids, CancellationToken ct)
+    {
+        var orders = new List<OrderSummary>();
+        foreach (var id in ids.Distinct())
+        {
+            if (await _checkout.GetOrderForStaffAsync(id, ct) is { } order)
+                orders.Add(order);
+        }
+        return View(orders);
+    }
+
     [HttpGet("{id:int}/Invoice")]
     public async Task<IActionResult> Invoice(int id, CancellationToken ct)
     {

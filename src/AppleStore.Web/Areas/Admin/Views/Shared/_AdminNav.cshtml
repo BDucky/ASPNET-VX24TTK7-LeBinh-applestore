@@ -1,6 +1,6 @@
 @using AppleStore.Domain.Enums
-@* Links between staff pages. Orders, reports, reviews, promotions, prices and
-   stock are for every staff role; the rest for admins (agreed 2026-10-08;
+@* Links between staff pages. Orders, reports, reviews, promotions, prices,
+   stock and counter sales are for every staff role; the rest for admins (agreed 2026-10-08;
    promotions and prices 2026-10-09, the report gives them to employees too). *@
 @{
     var current = ViewContext.RouteData.Values["controller"] as string;
@@ -14,6 +14,7 @@
         ("Promotions", "Promotions", true),
         ("Prices", "Prices", true),
         ("Stock", "Stock", true),
+        ("Sales", "Sell", true),
         ("Products", "Products", isAdmin),
         ("Vouchers", "Vouchers", isAdmin),
         ("Users", "Accounts", isAdmin),

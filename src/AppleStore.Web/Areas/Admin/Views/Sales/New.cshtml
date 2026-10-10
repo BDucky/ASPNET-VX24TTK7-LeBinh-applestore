@@ -1,0 +1,104 @@
+@model AppleStore.Web.Models.Admin.SalePage
+@using AppleStore.Domain.Enums
+@using AppleStore.Infrastructure.Formatting
+@{
+    ViewData["Title"] = "Counter sale";
+    var form = Model.Form;
+    var quote = Model.Quote;
+}
+
+@* Use case 21. Price first ("Price the sale"), then "Complete sale" sells at
+   that total; a price or promotion change in between is shown, not charged.
+   Prices include VAT. "Add a line" copies the last line (effects.js). *@
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Counter sale</h1>
+        <partial name="_AdminNav" />
+        @if (Model.Error is not null)
+        {
+            <p class="account-error" role="alert">@Model.Error</p>
+        }
+        <form method="post" asp-action="New" asp-route-key="" class="account-form admin-form" novalidate>
+            <input type="hidden" name="FormKey" value="@form.FormKey" />
+            <div class="stock-lines" data-receipt-lines>
+                @for (var i = 0; i < form.Lines.Count; i++)
+                {
+                    var line = form.Lines[i];
+                    <fieldset class="stock-line" data-receipt-line>
+                        <legend class="visually-hidden">Line</legend>
+                        <label>Product
+                            <select name="Lines[@i].VariantId">
+                                <option value="">Pick a product</option>
+                                @foreach (var v in Model.Variants)
+                                {
+                                    <option value="@v.VariantId" selected="@(line.VariantId == v.VariantId)">@v.Sku · @v.ProductName @VariantText.Options(v.Configuration, v.Color, v.Region) (stock @v.StockQty)</option>
+                                }
+                            </select>
+                        </label>
+                        <label>Quantity <input name="Lines[@i].Quantity" value="@line.Quantity" inputmode="numeric" /></label>
+                    </fieldset>
+                }
+            </div>
+            <button type="button" class="btn-store-ghost" data-add-line>Add a line</button>
+
+            <label for="VoucherCode">Voucher code (optional)</label>
+            <input id="VoucherCode" name="VoucherCode" value="@form.VoucherCode" maxlength="40" autocomplete="off" />
+
+            <fieldset class="sale-customer">
+                <legend>Customer (optional)</legend>
+                <label for="CustomerName">Name</label>
+                <input id="CustomerName" name="CustomerName" value="@form.CustomerName" maxlength="100" />
+                <label for="CustomerPhone">Phone</label>
+                <input id="CustomerPhone" name="CustomerPhone" value="@form.CustomerPhone" maxlength="20" inputmode="tel" />
+                <label for="CustomerEmail">Email of their account, to add the sale to their orders</label>
+                <input id="CustomerEmail" name="CustomerEmail" value="@form.CustomerEmail" maxlength="256" inputmode="email" />
+            </fieldset>
+
+            <fieldset class="sale-method">
+                <legend>Payment</legend>
+                <label class="account-check"><input type="radio" name="Method" value="Cash" checked="@(form.Method != PaymentMethod.BankTransfer)" /> <span>Cash</span></label>
+                <label class="account-check"><input type="radio" name="Method" value="BankTransfer" checked="@(form.Method == PaymentMethod.BankTransfer)" /> <span>Bank transfer</span></label>
+            </fieldset>
+
+            @if (quote is not null && quote.Lines.Count > 0)
+            {
+                <div class="compare-scroll">
+                    <table class="report-table" data-sale-quote>
+                        <thead>
+                            <tr><th scope="col">Product</th><th scope="col">Price</th><th scope="col">Quantity</th><th scope="col">Line</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var l in quote.Lines)
+                            {
+                                <tr>
+                                    <td>@l.Sku · @l.ProductName @l.Options</td>
+                                    <td>@PriceText.Vnd(l.UnitPrice)@if (l.WasPrice is not null)
+                                        {
+                                            <s class="price-was">@PriceText.Vnd(l.WasPrice)</s>
+                                        }
+                                    </td>
+                                    <td>@l.Quantity</td>
+                                    <td>@PriceText.Vnd(l.LineTotal)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <p>Subtotal @PriceText.Vnd(quote.Subtotal)@(quote.Discount > 0 ? $" · voucher -{PriceText.Vnd(quote.Discount)}" : "")</p>
+                <p class="sale-total"><strong data-sale-total>Total @PriceText.Vnd(quote.Total)</strong> (prices include VAT)</p>
+            }
+            @if (form.ExpectedTotal is { } expected)
+            {
+                <input type="hidden" name="ExpectedTotal" value="@expected.ToString("0.##")" />
+            }
+            <div class="cart-actions">
+                <button type="submit" name="Intent" value="quote" class="btn-store-ghost" formnovalidate>Price the sale</button>
+                @if (form.ExpectedTotal is not null)
+                {
+                    <button type="submit" name="Intent" value="sell" class="btn-store-primary">Complete sale</button>
+                }
+            </div>
+        </form>
+    </div>
+</section>

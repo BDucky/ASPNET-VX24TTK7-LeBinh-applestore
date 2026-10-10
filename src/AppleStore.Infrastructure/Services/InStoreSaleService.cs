@@ -165,6 +165,8 @@ public class InStoreSaleService : IInStoreSaleService
         return new SaleResult(SaleOutcome.Done, order.Id);
     }
 
+    public Task<int?> OrderForKeyAsync(Guid formKey, CancellationToken ct = default) => SoldWithAsync(formKey, ct);
+
     private Task<int?> SoldWithAsync(Guid formKey, CancellationToken ct) =>
         _db.Orders.Where(o => o.FormKey == formKey).Select(o => (int?)o.Id).FirstOrDefaultAsync(ct);
 }
