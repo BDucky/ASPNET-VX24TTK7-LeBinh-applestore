@@ -34,7 +34,8 @@ public class StockController : Controller
     [HttpGet("New")]
     public async Task<IActionResult> New(Guid? key, CancellationToken ct)
     {
-        if (key is not { } formKey)
+        // An empty key is never used (review 2026-10-10).
+        if (key is not { } formKey || formKey == Guid.Empty)
             return RedirectToAction(nameof(New), new { key = Guid.NewGuid() });
         if (await _stock.ReceiptForKeyAsync(formKey, ct) is { } saved)
         {
@@ -47,6 +48,8 @@ public class StockController : Controller
     [HttpPost("New"), ValidateAntiForgeryToken]
     public async Task<IActionResult> New(StockReceiptForm form, CancellationToken ct)
     {
+        if (form.FormKey == Guid.Empty)
+            return RedirectToAction(nameof(New));
         if (!ModelState.IsValid || !form.CostsAreWhole)
             return View(await PageAsync(form, AdminMessages.UnreadableNumber, ct));
         StockReceiptResult result;

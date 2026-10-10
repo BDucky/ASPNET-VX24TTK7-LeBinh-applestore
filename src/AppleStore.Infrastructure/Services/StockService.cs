@@ -55,7 +55,8 @@ public class StockService : IStockService
             CreatedByUserId = userId,
             CreatedAt = _time.GetUtcNow().UtcDateTime,
         };
-        foreach (var line in input.Lines)
+        // In variant order, so two receipts never lock the same rows in opposite orders.
+        foreach (var line in input.Lines.OrderBy(l => l.VariantId))
         {
             var current = await _db.ProductVariants.Where(v => v.Id == line.VariantId).Select(v => v.StockQty).SingleAsync(ct);
             if ((long)current + line.Quantity > int.MaxValue)
@@ -103,7 +104,7 @@ public class StockService : IStockService
             .OrderByDescending(r => r.CreatedAt).ThenByDescending(r => r.Id)
             .Select(r => new { r.Id, r.Supplier, CreatedBy = r.CreatedBy == null ? null : r.CreatedBy.FullName, r.CreatedAt, Lines = r.Lines.Select(l => new { l.Quantity, l.UnitCost }).ToList() })
             .ToListAsync(ct))
-        .Select(r => new StockReceiptSummary(r.Id, r.Supplier, r.CreatedBy, r.CreatedAt, r.Lines.Count, r.Lines.Sum(l => l.Quantity), r.Lines.Sum(l => l.Quantity * l.UnitCost)))
+        .Select(r => new StockReceiptSummary(r.Id, r.Supplier, r.CreatedBy, r.CreatedAt, r.Lines.Count, r.Lines.Sum(l => (long)l.Quantity), r.Lines.Sum(l => l.Quantity * l.UnitCost)))
         .ToList();
 
     public async Task<StockReceiptView?> ReceiptAsync(int id, CancellationToken ct = default)

@@ -30,10 +30,11 @@ public sealed record StockReceiptLineRow(int VariantId, string Sku, string Produ
 public sealed record StockReceiptView(int Id, string Supplier, string? Note, string? CreatedBy, DateTime CreatedAt, IReadOnlyList<StockReceiptLineRow> Lines)
 {
     public decimal TotalCost => Lines.Sum(l => l.LineCost);
-    public int TotalQuantity => Lines.Sum(l => l.Quantity);
+    // long: lines just under int.MaxValue each would overflow an int sum (review 2026-10-10).
+    public long TotalQuantity => Lines.Sum(l => (long)l.Quantity);
 }
 
-public sealed record StockReceiptSummary(int Id, string Supplier, string? CreatedBy, DateTime CreatedAt, int Lines, int Quantity, decimal TotalCost);
+public sealed record StockReceiptSummary(int Id, string Supplier, string? CreatedBy, DateTime CreatedAt, int Lines, long Quantity, decimal TotalCost);
 
 public sealed record StockLevelRow(int VariantId, string Sku, int ProductId, string ProductName, string? Configuration, string? Color, string? Region,
     int StockQty, bool OnSale);

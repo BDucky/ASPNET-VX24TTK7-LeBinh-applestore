@@ -86,7 +86,7 @@ def main():
         saved = rows(db, "select VariantId, Quantity, OpeningStock, ClosingStock from StockReceiptLines where ReceiptId = ? order by VariantId", receipt_id)
         check("the stored lines agree: closing = opening + quantity", all(c == o + q for _, q, o, c in saved) and len(saved) == 2, str(saved))
         check("Back to the saved form adds nothing and shows the receipt",
-              r["again"]["url"] == r["url"] and r["again"]["status"] == ["This receipt was already saved. The stock was not added again."]
+              r["again"]["url"] == r["url"] and r["again"]["status"] == ["This form was already saved as a receipt, so nothing was added. To receive other goods, start a new receipt."]
               and stock(db, a) == a0 + 10 and rows(db, "select count(*) from StockReceipts")[0][0] == 1, str(r["again"]))
         check("at 390px the receipt form does not scroll sideways", r["scroll"] <= 390, str(r["scroll"]))
         check("no console errors", r["consoleErrors"] == [], str(r["consoleErrors"]))

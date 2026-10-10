@@ -70,7 +70,8 @@ public static class AdminMessages
     };
 
     public const string ReceiptSaved = "Receipt saved. The stock is updated.";
-    public const string ReceiptAlreadySaved = "This receipt was already saved. The stock was not added again.";
+    // Covers a second press and a duplicated tab alike: nothing new was received.
+    public const string ReceiptAlreadySaved = "This form was already saved as a receipt, so nothing was added. To receive other goods, start a new receipt.";
 
     public static string For(StockReceiptResult result) => result.Outcome switch
     {

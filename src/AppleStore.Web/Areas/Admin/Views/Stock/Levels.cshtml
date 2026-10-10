@@ -1,4 +1,5 @@
 @model IReadOnlyList<AppleStore.Infrastructure.Services.StockLevelRow>
+@using AppleStore.Infrastructure.Formatting
 @{
     ViewData["Title"] = "Stock levels";
     var search = ViewData["Search"] as string;
@@ -31,7 +32,7 @@
                         {
                             <tr data-stock-sku="@v.Sku">
                                 <td>@v.Sku</td>
-                                <td>@v.ProductName @string.Join(" ", new[] { v.Configuration, v.Color, v.Region }.OfType<string>())</td>
+                                <td>@v.ProductName @VariantText.Options(v.Configuration, v.Color, v.Region)</td>
                                 <td>@v.StockQty</td>
                                 <td>@(v.OnSale ? "Yes" : "No")</td>
                             </tr>

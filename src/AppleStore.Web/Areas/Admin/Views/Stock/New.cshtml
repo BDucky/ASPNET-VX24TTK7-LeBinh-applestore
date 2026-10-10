@@ -1,4 +1,5 @@
 @model AppleStore.Web.Models.Admin.StockNewPage
+@using AppleStore.Infrastructure.Formatting
 @{
     ViewData["Title"] = "Receive goods";
     var form = Model.Form;
@@ -35,7 +36,7 @@
                                 <option value="">Pick a product</option>
                                 @foreach (var v in Model.Variants)
                                 {
-                                    <option value="@v.VariantId" selected="@(line.VariantId == v.VariantId)">@v.Sku · @v.ProductName @(string.Join(" ", new[] { v.Configuration, v.Color, v.Region }.OfType<string>())) (stock @v.StockQty)</option>
+                                    <option value="@v.VariantId" selected="@(line.VariantId == v.VariantId)">@v.Sku · @v.ProductName @VariantText.Options(v.Configuration, v.Color, v.Region) (stock @v.StockQty)</option>
                                 }
                             </select>
                         </label>
