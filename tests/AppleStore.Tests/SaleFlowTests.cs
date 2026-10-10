@@ -60,8 +60,10 @@ public class SaleFlowTests : WebFlowTestBase
         var key = formUrl.Split('=')[1];
         var tokenPage = await FormUrlAsync();
         var quote = await PostFormAsync("/Admin/Sales/New", Sale(key, "quote", email: email, lines: lines), formPage: tokenPage);
-        var expected = Field(WebUtility.HtmlDecode(await quote.Content.ReadAsStringAsync()), "ExpectedTotal");
-        return await PostFormAsync("/Admin/Sales/New", Sale(key, "sell", expected, email, lines), formPage: tokenPage);
+        var quoted = WebUtility.HtmlDecode(await quote.Content.ReadAsStringAsync());
+        var sell = Sale(key, "sell", Field(quoted, "ExpectedTotal"), email, lines);
+        sell["QuotedFor"] = Field(quoted, "QuotedFor");
+        return await PostFormAsync("/Admin/Sales/New", sell, formPage: tokenPage);
     }
 
     [Fact]
@@ -184,5 +186,43 @@ public class SaleFlowTests : WebFlowTestBase
 
         Assert.StartsWith("/Account/Login", anonymous.Headers.Location!.PathAndQuery);
         Assert.StartsWith("/Account/AccessDenied", customer.Headers.Location!.PathAndQuery);
+    }
+
+    // Review 2026-10-10: a refused voucher must not offer "Complete sale".
+    [Fact]
+    public async Task A_refused_voucher_does_not_offer_to_complete_the_sale()
+    {
+        var (blue, _, _) = Seed();
+        await SignInAsync(UserRole.Employee, "staff@example.com");
+        var formUrl = await FormUrlAsync();
+        var form = Sale(formUrl.Split('=')[1], "quote", lines: [(blue, 1)]);
+        form["VoucherCode"] = "NOPE";
+
+        var page = WebUtility.HtmlDecode(await (await PostFormAsync("/Admin/Sales/New", form, formPage: formUrl)).Content.ReadAsStringAsync());
+
+        Assert.Contains("That voucher code does not exist.", page);
+        Assert.DoesNotContain("value=\"sell\"", page);
+        Assert.DoesNotContain("name=\"ExpectedTotal\"", page);
+    }
+
+    // Review 2026-10-10: priced for one product, then switched to another at
+    // the same price: the sale must be priced again, not sold unseen.
+    [Fact]
+    public async Task Changing_the_lines_after_pricing_asks_to_price_again()
+    {
+        var (blue, _, pink) = Seed();
+        await SignInAsync(UserRole.Employee, "staff@example.com");
+        var formUrl = await FormUrlAsync();
+        var key = formUrl.Split('=')[1];
+        var quote = await PostFormAsync("/Admin/Sales/New", Sale(key, "quote", lines: [(blue, 1)]), formPage: formUrl);
+        var quoted = WebUtility.HtmlDecode(await quote.Content.ReadAsStringAsync());
+        var sell = Sale(key, "sell", Field(quoted, "ExpectedTotal"), lines: [(blue, 2)]);
+        sell["QuotedFor"] = Field(quoted, "QuotedFor");
+
+        var response = await PostFormAsync("/Admin/Sales/New", sell, formPage: formUrl);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("The sale changed after it was priced. Check the new total and complete the sale again.", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
+        Assert.Equal(3, Stock(blue));
     }
 }

@@ -240,4 +240,56 @@ public sealed class InStoreSaleServiceTests : IDisposable
         Assert.Equal((SaleOutcome.OutOfStock, "PODS"), (quote.Problem, quote.ProblemSku));
         Assert.Equal(VoucherProblem.NotFound, quote.VoucherProblem);
     }
+
+    // ---------- Review 2026-10-10 ----------
+
+    // A save failure that is not the same form selling twice must reach the
+    // controller as a database failure (logged, "could not save"), not as a
+    // made-up error. Here the seller's account does not exist.
+    [Fact]
+    public async Task A_save_failure_other_than_a_repeated_form_is_reported_as_a_database_failure()
+    {
+        var input = Sale(lines: [new(_pods, 1)]);
+        var total = (await _sut.QuoteAsync(input.Lines, null)).Total;
+
+        await Assert.ThrowsAsync<Microsoft.EntityFrameworkCore.DbUpdateException>(() => _sut.SellAsync(input, total, staffId: 999_999));
+        Assert.Equal((5, 0), (Stock(_pods), Orders()));
+    }
+
+    // The voucher's last use is taken by an online order just as the counter
+    // sells: nothing is sold and the stock already taken comes back.
+    [Fact]
+    public async Task A_voucher_used_up_during_the_sale_sells_nothing()
+    {
+        _db.Vouchers.Add(new Voucher { Code = "LAST", DiscountValue = 10, UsageLimit = 1, StartsAt = Now.UtcDateTime.AddDays(-1), EndsAt = Now.UtcDateTime.AddDays(1), IsActive = true, CreatedAt = Now.UtcDateTime, UpdatedAt = Now.UtcDateTime });
+        _db.SaveChanges();
+        var input = Sale(voucher: "LAST", lines: [new(_pods, 1)]);
+        var total = (await _sut.QuoteAsync(input.Lines, "LAST")).Total;
+        _race.Arm("UPDATE \"ProductVariants\"", "UPDATE Vouchers SET UsedCount = 1 WHERE Code = 'LAST'");
+
+        var result = await _sut.SellAsync(input, total, _staff);
+
+        Assert.True(_race.Ran);
+        Assert.Equal((SaleOutcome.VoucherRefused, VoucherProblem.UsedUp), (result.Outcome, result.VoucherProblem));
+        Assert.Equal((5, 0), (Stock(_pods), Orders()));
+    }
+
+    // A counter sale is completed and paid: nobody can cancel it (no restock)
+    // or pay for it again.
+    [Fact]
+    public async Task A_counter_sale_cannot_be_cancelled_or_paid_again()
+    {
+        var input = Sale(email: "alice@example.com", lines: [new(_pods, 1)]);
+        var sold = await SellAsync(input);
+        var orders = new OrderManagementService(_db, new FixedTime(Now));
+
+        var byStaff = await orders.CancelAsync(sold.OrderId!.Value, null);
+        var byCustomer = await orders.CancelAsync(sold.OrderId!.Value, _alice);
+        var pay = await new AppleStore.Infrastructure.Payments.PaymentService(_db, new FixedTime(Now), Microsoft.Extensions.Logging.Abstractions.NullLogger<AppleStore.Infrastructure.Payments.PaymentService>.Instance)
+            .StartAsync(_alice, sold.OrderId!.Value);
+
+        Assert.Equal((OrderChangeOutcome.NotAllowed, OrderChangeOutcome.NotAllowed), (byStaff.Outcome, byCustomer.Outcome));
+        Assert.NotEqual(AppleStore.Infrastructure.Payments.PayStartOutcome.Ready, pay.Outcome);
+        Assert.Equal(4, Stock(_pods));
+    }
 }
