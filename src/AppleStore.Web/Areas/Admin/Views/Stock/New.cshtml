@@ -17,7 +17,7 @@
         {
             <p class="account-error" role="alert">@Model.Error</p>
         }
-        <form method="post" asp-action="New" class="account-form admin-form" novalidate>
+        <form method="post" asp-action="New" asp-route-key="" class="account-form admin-form" novalidate>
             <input type="hidden" name="FormKey" value="@form.FormKey" />
             <label for="Supplier">Supplier</label>
             <input id="Supplier" name="Supplier" value="@form.Supplier" maxlength="200" />

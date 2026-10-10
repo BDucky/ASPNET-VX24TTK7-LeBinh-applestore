@@ -41,6 +41,9 @@ public sealed record StockLevelRow(int VariantId, string Sku, int ProductId, str
 public interface IStockService
 {
     Task<StockReceiptResult> ReceiveAsync(StockReceiptInput input, int? userId, CancellationToken ct = default);
+
+    // The receipt a form key already saved, if any.
+    Task<int?> ReceiptForKeyAsync(Guid formKey, CancellationToken ct = default);
     Task<IReadOnlyList<StockReceiptSummary>> ReceiptsAsync(CancellationToken ct = default);
     Task<StockReceiptView?> ReceiptAsync(int id, CancellationToken ct = default);
 

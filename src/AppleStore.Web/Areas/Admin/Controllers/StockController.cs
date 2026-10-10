@@ -27,9 +27,22 @@ public class StockController : Controller
     [HttpGet("")]
     public async Task<IActionResult> Index(CancellationToken ct) => View(await _stock.ReceiptsAsync(ct));
 
+    // The form's key is in the address (found 2026-10-10: the browser's Back
+    // fetched the form again, and a fresh key let the same goods be received
+    // twice). Back returns to the same key; a key already used shows its
+    // receipt instead of the form.
     [HttpGet("New")]
-    public async Task<IActionResult> New(CancellationToken ct) =>
-        View(await PageAsync(new StockReceiptForm { FormKey = Guid.NewGuid(), Lines = [new()] }, null, ct));
+    public async Task<IActionResult> New(Guid? key, CancellationToken ct)
+    {
+        if (key is not { } formKey)
+            return RedirectToAction(nameof(New), new { key = Guid.NewGuid() });
+        if (await _stock.ReceiptForKeyAsync(formKey, ct) is { } saved)
+        {
+            TempData[CartMessages.StatusKey] = AdminMessages.ReceiptAlreadySaved;
+            return RedirectToAction(nameof(Receipt), new { id = saved });
+        }
+        return View(await PageAsync(new StockReceiptForm { FormKey = formKey, Lines = [new()] }, null, ct));
+    }
 
     [HttpPost("New"), ValidateAntiForgeryToken]
     public async Task<IActionResult> New(StockReceiptForm form, CancellationToken ct)

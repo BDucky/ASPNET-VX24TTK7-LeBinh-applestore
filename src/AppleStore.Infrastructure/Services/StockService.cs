@@ -93,6 +93,8 @@ public class StockService : IStockService
         return new StockReceiptResult(StockReceiptOutcome.Done, receipt.Id);
     }
 
+    public Task<int?> ReceiptForKeyAsync(Guid formKey, CancellationToken ct = default) => SavedWithAsync(formKey, ct);
+
     private Task<int?> SavedWithAsync(Guid formKey, CancellationToken ct) =>
         _db.StockReceipts.Where(r => r.FormKey == formKey).Select(r => (int?)r.Id).FirstOrDefaultAsync(ct);
 
