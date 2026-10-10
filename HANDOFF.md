@@ -5,6 +5,29 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-10 (night): report and slides final pass, in progress
+
+**Done on `docs/thesis-report`:** screenshots retaken cropped at 2x (31
+files), the Word report rebuilt for 37/37 use cases (31 figures, 14 tables),
+`verifylib` shuts the build server down before building (false Razor errors
+appeared after git changed files under a warm server).
+
+**Found, not fixed yet (next task, on its own `fix/` branch from `dev`):**
+the seed holds about 40 retired variants with old USD-style prices (29 to
+1.399 dong); a batch price change includes off-sale variants, so +2% on
+Watch rounds AWS11-41 (399 dong) to 0 and the whole batch is refused.
+Owner's decision 2026-10-10: **a batch changes only variants on sale**.
+Write the RED test (a retired variant at 399 dong in the category), fix
+`PriceService` (filter `v.Status && v.Product.Status`), update the page hint.
+
+**Then:** rerun `setup/screenshots/capture.py` (its price step must show
+"Changed N prices"), rebuild the report (`cd setup/report && npm install &&
+node build.js ../..`), redo the slides with one large cropped image each
+(deck https://claude.ai/artifact/JNrn7bidSq78ZbvTEhnfxv, source
+`thesis/abs/slides-src/`; numbers now 636 tests, 15 scripts, 301 checks,
+PRs #12 to #35, 37/37), export PDF and .pptx, merge PR #31. The report does
+not yet mention the cart printing Razor code (found 2026-10-09).
+
 ## 2026-10-10 (later): in-person sale (use case 21): all 37 use cases done
 
 **What landed.** PR #34: `/Admin/Sales/New` (price, then complete at that

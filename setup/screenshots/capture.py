@@ -198,14 +198,15 @@ def main():
                            ("17-admin-voucher", "/Admin/Vouchers"), ("18-admin-khuyen-mai", "/Admin/Promotions"),
                            ("20-admin-bao-cao", "/Admin/Reports"), ("22-admin-tai-khoan", "/Admin/Users")]:
             shot(name, path, ".account-card")
-        step(r"""
+        r = step(r"""
   await page.goto(APP + '/Admin/Prices');
-  await page.selectOption('#ProductIds', { index: 1 });
+  await page.selectOption('#CategoryId', { label: 'Watch' });
   await page.selectOption('#Mode', 'Percent');
   await page.fill('#Value', '2');
   await press(page, 'button:has-text("Change prices")');
-  return JSON.stringify({});
+  return JSON.stringify({ status: await text(page, '.cart-status'), error: await text(page, '.account-error') });
 """)
+        print("price batch:", r)
         shot("19-admin-gia", "/Admin/Prices", ".account-card")
 
         # 3. The customer reviews what was delivered; staff see it.
