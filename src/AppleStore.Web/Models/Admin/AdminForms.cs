@@ -175,3 +175,49 @@ public sealed class StockLineForm
 }
 
 public sealed record StockNewPage(StockReceiptForm Form, IReadOnlyList<StockLevelRow> Variants, string? Error);
+
+// Use case 21. Intent "quote" prices the sale; "sell" completes it at
+// ExpectedTotal, the total the staff member was shown.
+public sealed class SaleForm
+{
+    public Guid FormKey { get; set; }
+    public List<SaleLineForm> Lines { get; set; } = [];
+
+    [StringLength(40)]
+    public string? VoucherCode { get; set; }
+
+    public PaymentMethod Method { get; set; } = PaymentMethod.Cash;
+
+    [StringLength(100)]
+    public string? CustomerName { get; set; }
+
+    [StringLength(20)]
+    public string? CustomerPhone { get; set; }
+
+    [StringLength(256)]
+    public string? CustomerEmail { get; set; }
+
+    public decimal? ExpectedTotal { get; set; }
+    public string? Intent { get; set; }
+
+    // What was priced (lines and voucher), sent back with "Complete sale": a
+    // sale changed after pricing is priced again, never sold unseen
+    // (review 2026-10-10: a product switched for one at the same price).
+    public string? QuotedFor { get; set; }
+
+    public string Signature() =>
+        string.Join(",", FilledLines.Select(l => $"{l.VariantId}x{l.Quantity}")) + "|" + (VoucherCode?.Trim().ToUpperInvariant() ?? "");
+
+    public IReadOnlyList<SaleLineInput> FilledLines =>
+        Lines.Where(l => l.VariantId is not null || l.Quantity is not null).Select(l => new SaleLineInput(l.VariantId ?? 0, l.Quantity ?? 0)).ToList();
+
+    public SaleInput ToInput() => new(FormKey, FilledLines, VoucherCode, Method, CustomerName, CustomerPhone, CustomerEmail);
+}
+
+public sealed class SaleLineForm
+{
+    public int? VariantId { get; set; }
+    public int? Quantity { get; set; }
+}
+
+public sealed record SalePage(SaleForm Form, IReadOnlyList<StockLevelRow> Variants, SaleQuote? Quote, string? Error);

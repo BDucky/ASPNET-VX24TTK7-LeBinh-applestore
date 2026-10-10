@@ -275,6 +275,17 @@ edit never unhides a review staff hid), and lets staff reply and hide. The
 `ProductReviews` view component puts the block on a product's model and
 configuration pages; `/Admin/Reviews` is for Admin and Employee.
 
+## In-person sales
+
+Added 2026-10-10, use case 21. `/Admin/Sales/New` (Admin and Employee):
+staff price the sale, then complete it at that total, for exactly what was
+priced. `InStoreSaleService` records an `Orders` row with `Channel =
+InStore`, completed and paid, with its payment and the seller; prices come
+from `SalePrices`, the voucher, stock take and voucher use from `SaleRules`,
+the same code the online checkout uses. Invoices note that prices include
+VAT and several print at once from the staff orders list. `FormKeys` holds
+the key-in-the-address steps shared with the stock form.
+
 ## Stock intake
 
 Added 2026-10-10, use case 20. `/Admin/Stock` (Admin and Employee) lists

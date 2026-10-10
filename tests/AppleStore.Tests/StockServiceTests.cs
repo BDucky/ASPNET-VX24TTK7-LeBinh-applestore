@@ -165,6 +165,15 @@ public sealed class StockServiceTests : IDisposable
         Assert.Equal(2_400_000_000L, (await _sut.ReceiptsAsync())[0].Quantity);
     }
 
+    // Review 2026-10-10: a save failure other than the same form twice is a
+    // database failure for the controller to log, not a made-up error.
+    [Fact]
+    public async Task A_save_failure_other_than_a_repeated_form_is_reported_as_a_database_failure()
+    {
+        await Assert.ThrowsAsync<DbUpdateException>(() => _sut.ReceiveAsync(Input(new StockReceiptLineInput(_blue, 1, 1m)), userId: 999_999));
+        Assert.Equal((3, 0), (Stock(_blue), Receipts()));
+    }
+
     [Fact]
     public async Task Receipts_list_newest_first_with_totals()
     {

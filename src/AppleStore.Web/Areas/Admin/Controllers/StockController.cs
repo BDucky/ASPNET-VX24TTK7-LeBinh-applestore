@@ -34,15 +34,13 @@ public class StockController : Controller
     [HttpGet("New")]
     public async Task<IActionResult> New(Guid? key, CancellationToken ct)
     {
-        // An empty key is never used (review 2026-10-10).
-        if (key is not { } formKey || formKey == Guid.Empty)
-            return RedirectToAction(nameof(New), new { key = Guid.NewGuid() });
-        if (await _stock.ReceiptForKeyAsync(formKey, ct) is { } saved)
-        {
-            TempData[CartMessages.StatusKey] = AdminMessages.ReceiptAlreadySaved;
-            return RedirectToAction(nameof(Receipt), new { id = saved });
-        }
-        return View(await PageAsync(new StockReceiptForm { FormKey = formKey, Lines = [new()] }, null, ct));
+        if (await this.FreshOrUsedAsync(key, k => _stock.ReceiptForKeyAsync(k, ct), saved =>
+            {
+                TempData[CartMessages.StatusKey] = AdminMessages.ReceiptAlreadySaved;
+                return RedirectToAction(nameof(Receipt), new { id = saved });
+            }) is { } elsewhere)
+            return elsewhere;
+        return View(await PageAsync(new StockReceiptForm { FormKey = key!.Value, Lines = [new()] }, null, ct));
     }
 
     [HttpPost("New"), ValidateAntiForgeryToken]

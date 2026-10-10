@@ -35,7 +35,8 @@ public sealed record OrderListItem(
     PaymentMethod PaymentMethod,
     decimal Total,
     string ReceiverName,
-    int ItemCount);
+    int ItemCount,
+    OrderChannel Channel = OrderChannel.Online);
 
 // What anyone with the order number and the receiver's phone may see: no
 // address, no prices.

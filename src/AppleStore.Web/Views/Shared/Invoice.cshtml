@@ -1,11 +1,8 @@
 @model AppleStore.Infrastructure.Services.OrderSummary
-@using AppleStore.Web.Models.Checkout
 @* Use case 36: one invoice page for the customer and for staff. *@
 @{
     Layout = "/Views/Shared/_PrintLayout.cshtml";
     ViewData["Title"] = $"Invoice #{Model.Id}";
 }
 
-<h1>Invoice for order #@Model.Id</h1>
-<p>Apple Store. Placed @Model.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm") (Vietnam time). @CheckoutMessages.Status(Model.Status).</p>
-<partial name="_OrderSummary" model="Model" />
+<partial name="_InvoiceBody" model="Model" />

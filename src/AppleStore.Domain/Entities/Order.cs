@@ -5,7 +5,13 @@ namespace AppleStore.Domain.Entities;
 public class Order
 {
     public int Id { get; set; }
-    public int UserId { get; set; }
+    // Null for a walk-in customer at the counter (use case 21, 2026-10-10).
+    public int? UserId { get; set; }
+    public OrderChannel Channel { get; set; }
+    // In-person sales: the staff member who sold, and the sale form's key,
+    // unique, so one form never sells twice.
+    public int? SoldByUserId { get; set; }
+    public Guid? FormKey { get; set; }
     public OrderStatus Status { get; set; }
     public OrderPaymentStatus PaymentStatus { get; set; }
     public decimal Subtotal { get; set; }
@@ -23,5 +29,6 @@ public class Order
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public User User { get; set; } = null!;
+    public User? User { get; set; }
+    public User? SoldBy { get; set; }
 }

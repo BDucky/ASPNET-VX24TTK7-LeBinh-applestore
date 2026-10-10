@@ -48,6 +48,8 @@ public static class CheckoutMessages
         PaymentMethod.Cod => "Cash on delivery",
         PaymentMethod.VnPay => "VNPay",
         PaymentMethod.MoMo => "MoMo",
+        PaymentMethod.Cash => "Cash at the counter",
+        PaymentMethod.BankTransfer => "Bank transfer at the counter",
         _ => method.ToString(),
     };
 
@@ -75,4 +77,6 @@ public static class CheckoutMessages
     };
 
     public static string Payment(OrderPaymentStatus status) => status == OrderPaymentStatus.Paid ? "Paid" : "Not paid yet";
+
+    public static string Channel(OrderChannel channel) => channel == OrderChannel.InStore ? "In store" : "Online";
 }

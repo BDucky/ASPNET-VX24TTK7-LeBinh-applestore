@@ -49,33 +49,12 @@ public class CheckoutService : ICheckoutService
             voucherId);
     }
 
-    // BM_VOUCHER_01. Both ends of the window count as valid; the amount comes
-    // from DiscountMath, taken from the lines the voucher applies to.
     private async Task<(decimal Discount, VoucherProblem Problem, decimal? Minimum, int? VoucherId)> DiscountAsync(
         string code, CartView cart, decimal subtotal, CancellationToken ct)
     {
-        var voucher = await _db.Vouchers.AsNoTracking().FirstOrDefaultAsync(v => v.Code == code && v.Kind == VoucherKind.Code, ct);
-        if (voucher is null)
-            return (0m, VoucherProblem.NotFound, null, null);
-
-        var now = _time.GetUtcNow().UtcDateTime;
-        var refusal = !voucher.IsActive ? VoucherProblem.Inactive
-            : now < voucher.StartsAt ? VoucherProblem.NotStarted
-            : now > voucher.EndsAt ? VoucherProblem.Expired
-            : voucher.UsageLimit is { } limit && voucher.UsedCount >= limit ? VoucherProblem.UsedUp
-            : voucher.MinOrderAmount is { } min && subtotal < min ? VoucherProblem.BelowMinimum
-            : VoucherProblem.None;
-        if (refusal != VoucherProblem.None)
-            return (0m, refusal, refusal == VoucherProblem.BelowMinimum ? voucher.MinOrderAmount : null, voucher.Id);
-
-        var scope = await _db.VoucherProducts.Where(vp => vp.VoucherId == voucher.Id).Select(vp => vp.ProductId).ToListAsync(ct);
-        var eligible = scope.Count == 0
-            ? subtotal
-            : cart.Lines.Where(l => scope.Contains(l.ProductId)).Sum(l => l.LineTotal ?? 0m);
-        if (eligible == 0m)
-            return (0m, VoucherProblem.NoEligibleProducts, null, voucher.Id);
-
-        return (DiscountMath.Amount(voucher.DiscountType, voucher.DiscountValue, eligible), VoucherProblem.None, null, voucher.Id);
+        var check = await SaleRules.CheckVoucherAsync(_db, _time.GetUtcNow().UtcDateTime, code,
+            cart.Lines.Select(l => (l.ProductId, l.LineTotal ?? 0m)).ToList(), subtotal, ct);
+        return (check.Discount, check.Problem, check.Minimum, check.VoucherId);
     }
 
     public async Task<PlaceOrderResult> PlaceOrderAsync(int userId, DeliveryInput delivery, string? voucherCode, decimal expectedTotal,
@@ -95,19 +74,13 @@ public class CheckoutService : ICheckoutService
 
         foreach (var line in quote.Cart.Lines)
         {
-            var taken = await _db.ProductVariants
-                .Where(v => v.Id == line.VariantId && v.StockQty >= line.Quantity && v.Status && v.Product.Status)
-                .ExecuteUpdateAsync(s => s.SetProperty(v => v.StockQty, v => v.StockQty - line.Quantity), ct);
-            if (taken != 1)
+            if (!await SaleRules.TryTakeStockAsync(_db, line.VariantId, line.Quantity, ct))
                 return await RollBackAsync(tx, new PlaceOrderResult(PlaceOrderOutcome.OutOfStock, ProductName: line.ConfigurationName), ct);
         }
 
         if (voucherId is { } id)
         {
-            var used = await _db.Vouchers
-                .Where(v => v.Id == id && v.IsActive && (v.UsageLimit == null || v.UsedCount < v.UsageLimit))
-                .ExecuteUpdateAsync(s => s.SetProperty(v => v.UsedCount, v => v.UsedCount + 1), ct);
-            if (used != 1)
+            if (!await SaleRules.TryUseVoucherAsync(_db, id, ct))
                 return await RollBackAsync(tx, new PlaceOrderResult(PlaceOrderOutcome.VoucherRefused, VoucherProblem: VoucherProblem.UsedUp), ct);
         }
 
@@ -185,7 +158,9 @@ public class CheckoutService : ICheckoutService
             .ToListAsync(ct);
         var options = await VariantOptionLookup.LoadAsync(_db, items.Select(i => i.VariantId).ToList(), ct);
         var method = await _db.Payments.Where(p => p.OrderId == order.Id).OrderBy(p => p.Id).Select(p => p.Method).FirstOrDefaultAsync(ct);
-        var email = await _db.Users.Where(u => u.Id == order.UserId).Select(u => u.Email).FirstAsync(ct);
+        // A walk-in sale has no account (use case 21), so no email.
+        var email = await _db.Users.Where(u => u.Id == order.UserId).Select(u => u.Email).FirstOrDefaultAsync(ct);
+        var soldBy = order.SoldByUserId is { } seller ? await _db.Users.Where(u => u.Id == seller).Select(u => u.FullName).FirstOrDefaultAsync(ct) : null;
         var shipment = await _db.Shipments.AsNoTracking().Where(s => s.OrderId == order.Id).OrderByDescending(s => s.Id)
             .Select(s => new { s.Carrier, s.TrackingNo, s.Status }).FirstOrDefaultAsync(ct);
 
@@ -216,6 +191,8 @@ public class CheckoutService : ICheckoutService
             email,
             shipment?.Carrier,
             shipment?.TrackingNo,
-            shipment?.Status);
+            shipment?.Status,
+            order.Channel,
+            soldBy);
     }
 }
