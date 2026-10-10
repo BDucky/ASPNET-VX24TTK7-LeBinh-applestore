@@ -56,7 +56,7 @@ public class InStoreSaleService : IInStoreSaleService
             var v = variants[l.VariantId];
             var sale = prices.For(v.ProductId, v.Price);
             return (Line: new SaleQuoteLine(v.Id, v.SKU, v.ProductName,
-                VariantText.Options(options.Get(v.Id, "config"), options.Get(v.Id, "color"), options.Get(v.Id, "region")),
+                VariantText.Label(v.ProductName, options.Get(v.Id, "config"), options.Get(v.Id, "color"), options.Get(v.Id, "region")),
                 sale.Price, sale.WasPrice, l.Quantity, v.StockQty), v.ProductId, v.OnSale);
         }).ToList();
         var shown = quoted.Select(q => q.Line).ToList();
