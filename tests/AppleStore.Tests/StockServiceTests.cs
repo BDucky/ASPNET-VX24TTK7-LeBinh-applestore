@@ -148,7 +148,7 @@ public sealed class StockServiceTests : IDisposable
     [Fact]
     public async Task Stock_that_would_overflow_is_refused()
     {
-        _db.Database.ExecuteSqlRaw($"UPDATE ProductVariants SET StockQty = {int.MaxValue - 1} WHERE Id = {_blue}");
+        _db.Database.ExecuteSql($"UPDATE ProductVariants SET StockQty = {int.MaxValue - 1} WHERE Id = {_blue}");
 
         Assert.Equal(StockReceiptOutcome.InvalidQuantity, (await _sut.ReceiveAsync(Input(new StockReceiptLineInput(_blue, 5, 1m)), _staff)).Outcome);
         Assert.Equal(int.MaxValue - 1, Stock(_blue));
