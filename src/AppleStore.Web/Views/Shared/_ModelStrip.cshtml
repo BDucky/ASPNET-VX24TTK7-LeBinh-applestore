@@ -1,4 +1,5 @@
 @model AppleStore.Web.Models.Products.ModelStripViewModel
+@using AppleStore.Web.Models.Products
 @* rauvang.com repeats this row on its category, model, and variant pages:
    one tile per model in the current category, the viewed one marked. It
    uses line icons per model; we use each model's own photo. *@
@@ -8,6 +9,7 @@
         @foreach (var m in Model.Models)
         {
             var isActive = m.Slug == Model.ActiveSlug;
+            var placeholder = NoPhoto.For(m.CategorySlug, "is-compact");
             <a asp-controller="Products" asp-action="Details" asp-route-slug="@m.Slug"
                class="model-tile @(isActive ? "is-active" : "")"
                aria-current="@(isActive ? "page" : null)">
@@ -18,7 +20,7 @@
                     }
                     else
                     {
-                        <partial name="_NoPhoto" model="@("is-compact")" />
+                        <partial name="_NoPhoto" model="placeholder" />
                     }
                 </span>
                 <span class="model-tile-name">@m.Name</span>

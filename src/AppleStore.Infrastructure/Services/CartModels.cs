@@ -43,7 +43,8 @@ public sealed record CartLine(
     int StockQty,
     CartLineProblem Problem,
     // The variant's own price while a promotion lowers UnitPrice.
-    decimal? WasUnitPrice = null)
+    decimal? WasUnitPrice = null,
+    string? CategorySlug = null)
 {
     public decimal? LineTotal => UnitPrice * Quantity;
 }

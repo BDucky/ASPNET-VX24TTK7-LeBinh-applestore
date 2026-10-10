@@ -15,7 +15,8 @@ public sealed record CompareColumn(
     IReadOnlyList<string> Colors,
     IReadOnlyList<string> Regions,
     double? AverageRating,
-    int ReviewCount);
+    int ReviewCount,
+    string? CategorySlug = null);
 
 public enum CompareOutcome
 {

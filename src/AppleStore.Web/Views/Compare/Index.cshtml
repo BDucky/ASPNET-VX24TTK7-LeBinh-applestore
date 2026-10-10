@@ -1,4 +1,5 @@
 @model IReadOnlyList<AppleStore.Infrastructure.Services.CompareColumn>
+@using AppleStore.Web.Models.Products
 @using AppleStore.Infrastructure.Formatting
 @{
     ViewData["Title"] = "Compare products";
@@ -39,7 +40,7 @@
                                         }
                                         else
                                         {
-                                            <partial name="_NoPhoto" model="(string?)null" />
+                                            <partial name="_NoPhoto" model="NoPhoto.For(c.CategorySlug)" />
                                         }
                                     </a>
                                     <a class="compare-name" asp-controller="Products" asp-action="Details" asp-route-slug="@c.Slug">@c.Name</a>

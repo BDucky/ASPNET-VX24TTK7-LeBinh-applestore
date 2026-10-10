@@ -29,7 +29,8 @@
                     config.Name,
                     config.InStock ? "In stock" : "Out of stock",
                     config.FromPrice,
-                    config.WasPrice);
+                    config.WasPrice,
+                    Model.CategorySlug);
                 <partial name="_ShopCard" model="card" />
             }
         </div>
