@@ -118,6 +118,7 @@ public class CartService : ICartService
                 i.Variant.ProductId,
                 ProductName = i.Variant.Product.Name,
                 ProductSlug = i.Variant.Product.Slug,
+                CategorySlug = i.Variant.Product.Category.Slug,
                 OnSale = i.Variant.Status && i.Variant.Product.Status,
                 i.Variant.Price,
                 i.Variant.StockQty,
@@ -157,7 +158,8 @@ public class CartService : ICartService
                 r.Quantity,
                 r.StockQty,
                 Problem(r.OnSale, r.Price, r.StockQty, r.Quantity),
-                sale.WasPrice);
+                sale.WasPrice,
+                r.CategorySlug);
         }).ToList());
     }
 

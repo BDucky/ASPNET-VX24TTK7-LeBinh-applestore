@@ -272,6 +272,9 @@ namespace AppleStore.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Channel")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("City")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
@@ -285,6 +288,9 @@ namespace AppleStore.Infrastructure.Migrations
 
                     b.Property<string>("District")
                         .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("FormKey")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Note")
@@ -308,6 +314,9 @@ namespace AppleStore.Infrastructure.Migrations
                         .HasPrecision(12, 2)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("SoldByUserId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
@@ -322,7 +331,7 @@ namespace AppleStore.Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("VoucherCode")
@@ -334,6 +343,11 @@ namespace AppleStore.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FormKey")
+                        .IsUnique();
+
+                    b.HasIndex("SoldByUserId");
 
                     b.HasIndex("UserId");
 
@@ -700,6 +714,77 @@ namespace AppleStore.Infrastructure.Migrations
                     b.ToTable("Shipments");
                 });
 
+            modelBuilder.Entity("AppleStore.Domain.Entities.StockReceipt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("FormKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(400)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Supplier")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("FormKey")
+                        .IsUnique();
+
+                    b.ToTable("StockReceipts");
+                });
+
+            modelBuilder.Entity("AppleStore.Domain.Entities.StockReceiptLine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClosingStock")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OpeningStock")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ReceiptId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("VariantId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VariantId");
+
+                    b.HasIndex("ReceiptId", "VariantId")
+                        .IsUnique();
+
+                    b.ToTable("StockReceiptLines");
+                });
+
             modelBuilder.Entity("AppleStore.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -1026,11 +1111,17 @@ namespace AppleStore.Infrastructure.Migrations
 
             modelBuilder.Entity("AppleStore.Domain.Entities.Order", b =>
                 {
+                    b.HasOne("AppleStore.Domain.Entities.User", "SoldBy")
+                        .WithMany()
+                        .HasForeignKey("SoldByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("AppleStore.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("SoldBy");
 
                     b.Navigation("User");
                 });
@@ -1191,6 +1282,35 @@ namespace AppleStore.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("AppleStore.Domain.Entities.StockReceipt", b =>
+                {
+                    b.HasOne("AppleStore.Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("AppleStore.Domain.Entities.StockReceiptLine", b =>
+                {
+                    b.HasOne("AppleStore.Domain.Entities.StockReceipt", "Receipt")
+                        .WithMany("Lines")
+                        .HasForeignKey("ReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AppleStore.Domain.Entities.ProductVariant", "Variant")
+                        .WithMany()
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Receipt");
+
+                    b.Navigation("Variant");
+                });
+
             modelBuilder.Entity("AppleStore.Domain.Entities.UserToken", b =>
                 {
                     b.HasOne("AppleStore.Domain.Entities.User", "User")
@@ -1251,6 +1371,11 @@ namespace AppleStore.Infrastructure.Migrations
             modelBuilder.Entity("AppleStore.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Children");
+                });
+
+            modelBuilder.Entity("AppleStore.Domain.Entities.StockReceipt", b =>
+                {
+                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }

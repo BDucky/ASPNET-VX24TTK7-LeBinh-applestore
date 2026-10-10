@@ -1,0 +1,52 @@
+@model AppleStore.Web.Models.Admin.StockNewPage
+@using AppleStore.Infrastructure.Formatting
+@{
+    ViewData["Title"] = "Receive goods";
+    var form = Model.Form;
+}
+
+@* Use case 20, BM_STOCK_01. One line per product received; "Add a line"
+   copies the last line (effects.js); without script one line still works.
+   The hidden FormKey makes a second press of this form save nothing new. *@
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Receive goods</h1>
+        <partial name="_AdminNav" />
+        <p class="account-hint">Each line adds its quantity to the product's stock. The receipt keeps the stock before and after each line. Costs are what the shop paid, never shown to customers.</p>
+        @if (Model.Error is not null)
+        {
+            <p class="account-error" role="alert">@Model.Error</p>
+        }
+        <form method="post" asp-action="New" asp-route-key="" class="account-form admin-form" novalidate>
+            <input type="hidden" name="FormKey" value="@form.FormKey" />
+            <label for="Supplier">Supplier</label>
+            <input id="Supplier" name="Supplier" value="@form.Supplier" maxlength="200" />
+            <label for="Note">Note (optional)</label>
+            <input id="Note" name="Note" value="@form.Note" maxlength="400" />
+
+            <div class="stock-lines" data-receipt-lines>
+                @for (var i = 0; i < form.Lines.Count; i++)
+                {
+                    var line = form.Lines[i];
+                    <fieldset class="stock-line" data-receipt-line>
+                        <legend class="visually-hidden">Line</legend>
+                        <label>Product
+                            <select name="Lines[@i].VariantId">
+                                <option value="">Pick a product</option>
+                                @foreach (var v in Model.Variants)
+                                {
+                                    <option value="@v.VariantId" selected="@(line.VariantId == v.VariantId)">@v.Sku · @v.ProductName @VariantText.Options(v.Configuration, v.Color, v.Region) (stock @v.StockQty)</option>
+                                }
+                            </select>
+                        </label>
+                        <label>Quantity <input name="Lines[@i].Quantity" value="@line.Quantity" inputmode="numeric" /></label>
+                        <label>Unit cost (VND) <input name="Lines[@i].UnitCost" value="@line.UnitCost?.ToString("0.##")" inputmode="numeric" /></label>
+                    </fieldset>
+                }
+            </div>
+            <button type="button" class="btn-store-ghost" data-add-line>Add a line</button>
+            <button type="submit" class="btn-store-primary">Save receipt</button>
+        </form>
+    </div>
+</section>

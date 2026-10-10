@@ -2425,3 +2425,38 @@ a.btn-store-primary {
   gap: 8px;
   margin-bottom: 8px;
 }
+
+/* ---------- Stock receipts (use case 20) ---------- */
+
+.stock-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.stock-line {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.stock-line label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.stock-line select {
+  max-width: 100%;
+}
+
+@media (max-width: 575.98px) {
+  .stock-line {
+    grid-template-columns: 1fr;
+  }
+}

@@ -107,7 +107,7 @@ else
             <div class="product-grid">
                 @foreach (var product in Model.Products)
                 {
-                    var card = new ShopCardViewModel(Url.Action("Details", "Products", new { slug = product.Slug })!, product.ImageUrl, product.Name, product.CategoryName, product.FromPrice, product.WasPrice);
+                    var card = new ShopCardViewModel(Url.Action("Details", "Products", new { slug = product.Slug })!, product.ImageUrl, product.Name, product.CategoryName, product.FromPrice, product.WasPrice, product.CategorySlug);
                     <partial name="_ShopCard" model="card" />
                 }
             </div>

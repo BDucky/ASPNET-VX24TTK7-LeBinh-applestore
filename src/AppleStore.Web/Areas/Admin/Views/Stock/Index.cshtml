@@ -1,0 +1,35 @@
+@model IReadOnlyList<AppleStore.Infrastructure.Services.StockReceiptSummary>
+@using AppleStore.Infrastructure.Formatting
+@using AppleStore.Infrastructure.Services
+@{
+    ViewData["Title"] = "Stock";
+}
+
+@* Use case 20: goods intake receipts, newest first. *@
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Stock</h1>
+        <partial name="_AdminNav" />
+        <div class="cart-actions">
+            <a class="btn-store-primary" asp-action="New">Receive goods</a>
+            <a class="btn-store-ghost" asp-action="Levels">Stock levels</a>
+        </div>
+        @if (Model.Count == 0)
+        {
+            <p class="account-lead">No goods received yet.</p>
+        }
+        <ul class="order-list">
+            @foreach (var r in Model)
+            {
+                <li>
+                    <a class="order-list-link" asp-action="Receipt" asp-route-id="@r.Id">
+                        <span class="order-list-id">Receipt #@r.Id</span>
+                        <span class="order-list-meta">@r.Supplier · @((r.CreatedAt + ReportService.ShopOffset).ToString("dd/MM/yyyy HH:mm")) · @r.Quantity item(s) on @r.Lines line(s) · @(r.CreatedBy ?? "Deleted account")</span>
+                        <span class="order-list-status">@PriceText.Vnd(r.TotalCost)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</section>

@@ -1,0 +1,10 @@
+@model AppleStore.Infrastructure.Services.OrderSummary
+@using AppleStore.Web.Models.Checkout
+@* One invoice, for the single invoice page and for printing several at once.
+   Prices include VAT (owner's choice 2026-10-10), so there is no tax line. *@
+<article class="invoice" data-invoice="@Model.Id">
+    <h1>Invoice for order #@Model.Id</h1>
+    <p>Apple Store. @CheckoutMessages.Channel(Model.Channel), placed @Model.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm") (Vietnam time). @CheckoutMessages.Status(Model.Status).@(Model.SoldBy is null ? "" : $" Sold by {Model.SoldBy}.")</p>
+    <partial name="_OrderSummary" model="Model" />
+    <p>Prices include VAT.</p>
+</article>

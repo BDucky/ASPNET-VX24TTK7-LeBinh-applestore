@@ -1,0 +1,23 @@
+@model AppleStore.Infrastructure.Services.StockReceiptView
+@using AppleStore.Infrastructure.Formatting
+@* The lines of a receipt, on its page and its print page. *@
+<table class="report-table">
+    <thead>
+        <tr><th scope="col">SKU</th><th scope="col">Product</th><th scope="col">Quantity</th><th scope="col">Unit cost</th><th scope="col">Line cost</th><th scope="col">Stock before</th><th scope="col">Stock after</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var l in Model.Lines)
+        {
+            <tr data-receipt-line="@l.VariantId">
+                <td>@l.Sku</td>
+                <td>@l.ProductName @VariantText.Options(l.Configuration, l.Color, l.Region)</td>
+                <td>@l.Quantity</td>
+                <td>@PriceText.Vnd(l.UnitCost)</td>
+                <td>@PriceText.Vnd(l.LineCost)</td>
+                <td>@l.OpeningStock</td>
+                <td>@l.ClosingStock</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<p><strong>Total: @Model.TotalQuantity item(s), @PriceText.Vnd(Model.TotalCost)</strong></p>

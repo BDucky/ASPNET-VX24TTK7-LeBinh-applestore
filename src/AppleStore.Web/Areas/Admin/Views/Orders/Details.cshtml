@@ -11,7 +11,7 @@
         <div class="hero-eyebrow">Staff</div>
         <h1 class="account-title">Order #@order.Id</h1>
         <partial name="_AdminNav" />
-        <p class="account-lead">Placed @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") by @order.CustomerEmail. @CheckoutMessages.Status(order.Status).</p>
+        <p class="account-lead">@CheckoutMessages.Channel(order.Channel) · placed @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") by @(order.CustomerEmail ?? order.ReceiverName)@(order.SoldBy is null ? "" : $" · Sold by {order.SoldBy}"). @CheckoutMessages.Status(order.Status).</p>
 
         @* Only the buttons OrderTransitions allows staff in this state. *@
         <section class="order-actions" data-order-actions aria-label="Actions">

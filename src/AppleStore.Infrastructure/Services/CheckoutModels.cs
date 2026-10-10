@@ -86,7 +86,10 @@ public sealed record OrderSummary(
     string? District,
     string? City,
     string? Note,
-    string CustomerEmail,
+    // Null for a walk-in sale at the counter.
+    string? CustomerEmail,
     string? Carrier,
     string? TrackingNo,
-    ShipmentStatus? ShipmentStatus);
+    ShipmentStatus? ShipmentStatus,
+    OrderChannel Channel = OrderChannel.Online,
+    string? SoldBy = null);

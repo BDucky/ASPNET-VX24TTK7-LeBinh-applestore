@@ -5,6 +5,37 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-10 (later): in-person sale (use case 21): all 37 use cases done
+
+**What landed.** PR #34: `/Admin/Sales/New` (price, then complete at that
+total), a sale is a paid, completed `InStore` order (walk-in or linked to an
+account by email), invoices say prices include VAT and print several at
+once from the staff orders list. `SaleRules` now shared with checkout.
+633 tests; `verify-sales` 11 of 11.
+
+**After pulling:** `dotnet ef database update` (migration `InStoreSales`).
+
+**Next:** row 11c: the report and slides final pass on `docs/thesis-report`
+(PR #31, draft): merge `dev` into it, retake screenshots cropped at 2x (add
+stock and counter sale), update chapters 3 to 5 and the slides, export PDF
+and .pptx (needs Word or LibreOffice). Open: batch prices after Back,
+`/Track` limit, the cover line.
+
+## 2026-10-10: stock intake (use case 20), photo placeholder, code attempts
+
+**What landed.** PR #32: products without a photo show a placeholder of
+their kind (owner's choice, not an older model's photo). Five wrong codes
+was already true for both code forms. PR #33: `/Admin/Stock` (receipts,
+receive goods, print, stock levels) for admins and employees; 600 tests;
+`verify-stock` 13 of 13; the live check caught Back receiving goods twice
+(fixed: the form key is in the address).
+
+**After pulling:** `dotnet ef database update` (migration `StockReceipts`).
+
+**Next:** use case 21 (in-person sale): ask the owner tax, numbering and
+walk-in customer first. Then the report and slides final pass on
+`docs/thesis-report` (PR #31, draft; its HANDOFF entry has the new-machine
+setup). Open: batch prices after Back, `/Track` limit, the cover line.
 ## 2026-10-09 (late night): state for resuming on another machine
 
 **Resume from branch `docs/thesis-report`** (PR #31, draft, not merged). It

@@ -31,6 +31,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ReviewMedia> ReviewMedia => Set<ReviewMedia>();
     public DbSet<Voucher> Vouchers => Set<Voucher>();
     public DbSet<PriceChange> PriceChanges => Set<PriceChange>();
+    public DbSet<StockReceipt> StockReceipts => Set<StockReceipt>();
+    public DbSet<StockReceiptLine> StockReceiptLines => Set<StockReceiptLine>();
     public DbSet<VoucherProduct> VoucherProducts => Set<VoucherProduct>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

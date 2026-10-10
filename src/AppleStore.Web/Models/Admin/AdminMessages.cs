@@ -68,4 +68,52 @@ public static class AdminMessages
         Domain.Enums.PriceChangeSource.NewVariant => "New variant",
         _ => "Edited",
     };
+
+    public const string ReceiptSaved = "Receipt saved. The stock is updated.";
+    // Covers a second press and a duplicated tab alike: nothing new was received.
+    public const string ReceiptAlreadySaved = "This form was already saved as a receipt, so nothing was added. To receive other goods, start a new receipt.";
+
+    public static string For(StockReceiptResult result) => result.Outcome switch
+    {
+        StockReceiptOutcome.MissingSupplier => "Enter the supplier.",
+        StockReceiptOutcome.NoLines => "Add at least one line.",
+        StockReceiptOutcome.UnknownVariant => "Pick each product from the list.",
+        StockReceiptOutcome.DuplicateSku => $"{result.Sku} is on the receipt twice. Put it on one line.",
+        StockReceiptOutcome.InvalidQuantity => "A quantity is at least 1.",
+        StockReceiptOutcome.InvalidCost => "A cost is 0 or more, and at most 9.999.999.999.",
+        StockReceiptOutcome.AlreadySaved => ReceiptAlreadySaved,
+        _ => ReceiptSaved,
+    };
+
+    public const string SaleDone = "Sale completed and paid.";
+    public const string SaleChangedAfterPricing = "The sale changed after it was priced. Check the new total and complete the sale again.";
+    public const string SaleAlreadyDone = "This form was already used for a sale, so nothing more was sold. To sell again, start a new sale.";
+
+    // A sale's or a quote's problem as the staff member reads it; null when there is none.
+    public static string? For(SaleOutcome outcome, string? sku, VoucherProblem voucher) => outcome switch
+    {
+        SaleOutcome.Done => null,
+        SaleOutcome.AlreadySold => SaleAlreadyDone,
+        SaleOutcome.NoLines => "Add at least one product.",
+        SaleOutcome.UnknownVariant => "Pick each product from the list.",
+        SaleOutcome.DuplicateSku => $"{sku} is on the sale twice. Put it on one line.",
+        SaleOutcome.InvalidQuantity => "A quantity is at least 1.",
+        SaleOutcome.NotForSale => $"{sku} is not for sale (off sale, or no price yet).",
+        SaleOutcome.OutOfStock => $"Not enough stock of {sku}.",
+        SaleOutcome.VoucherRefused => Voucher(voucher),
+        SaleOutcome.TotalChanged => "The total changed. Check it and complete the sale again.",
+        SaleOutcome.InvalidMethod => "Pick cash or bank transfer.",
+        SaleOutcome.UnknownCustomer => "No account has that email. Leave it empty for a walk-in customer.",
+        _ => SaveFailed,
+    };
+
+    public static string Voucher(VoucherProblem problem) => problem switch
+    {
+        VoucherProblem.NotFound => "That voucher code does not exist.",
+        VoucherProblem.Inactive or VoucherProblem.NotStarted or VoucherProblem.Expired => "That voucher cannot be used now.",
+        VoucherProblem.UsedUp => "That voucher has been used up.",
+        VoucherProblem.BelowMinimum => "The sale is below that voucher's minimum.",
+        VoucherProblem.NoEligibleProducts => "That voucher does not cover these products.",
+        _ => "That voucher cannot be used.",
+    };
 }
