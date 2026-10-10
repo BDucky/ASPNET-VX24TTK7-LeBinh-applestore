@@ -4,6 +4,15 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-10: placeholder of the product's kind (`feat/photo-placeholder`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 571 of 571 (5 new) |
+| live look at the five real products without a photo | watch, tablet and accessory drawings on the category row, the model page cards and search; screenshots checked at 1440px |
+
 ## 2026-10-09: batch prices and price history (`feat/price-history`)
 
 | Command | Result |

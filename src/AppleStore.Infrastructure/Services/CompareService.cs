@@ -52,7 +52,8 @@ public class CompareService : ICompareService
                 choices.Select(c => c.Color).OfType<string>().Distinct().ToList(),
                 choices.Select(c => c.Region).OfType<string>().Distinct().ToList(),
                 reviews.Average,
-                reviews.Count));
+                reviews.Count,
+                product.Category.Slug));
         }
         return columns;
     }

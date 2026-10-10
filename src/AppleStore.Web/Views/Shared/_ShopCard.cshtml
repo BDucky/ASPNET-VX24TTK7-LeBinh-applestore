@@ -1,4 +1,5 @@
 @model AppleStore.Web.Models.Products.ShopCardViewModel
+@using AppleStore.Web.Models.Products
 @using AppleStore.Infrastructure.Formatting
 <a class="product-card" href="@Model.Href">
     <div class="product-card-media">
@@ -8,7 +9,7 @@
         }
         else
         {
-            <partial name="_NoPhoto" model="(string?)null" />
+            <partial name="_NoPhoto" model="NoPhoto.For(Model.CategorySlug)" />
         }
     </div>
     @if (Model.Badge is not null)

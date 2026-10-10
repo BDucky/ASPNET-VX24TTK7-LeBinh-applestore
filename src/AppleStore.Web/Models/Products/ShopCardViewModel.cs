@@ -4,4 +4,5 @@ namespace AppleStore.Web.Models.Products;
 // laid out like rauvang.com's cards: photo, a badge under it, a centred
 // name, and a red "From" price (or "Contact for price" when there is none).
 // WasPrice, while a promotion lowers that price, shows crossed out beside it.
-public record ShopCardViewModel(string Href, string? ImageUrl, string Title, string? Badge, decimal? Price, decimal? WasPrice = null);
+// CategorySlug picks the placeholder drawing when there is no photo.
+public record ShopCardViewModel(string Href, string? ImageUrl, string Title, string? Badge, decimal? Price, decimal? WasPrice = null, string? CategorySlug = null);
