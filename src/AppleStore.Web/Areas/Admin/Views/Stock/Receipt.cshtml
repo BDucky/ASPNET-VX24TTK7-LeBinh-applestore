@@ -1,0 +1,25 @@
+@model AppleStore.Infrastructure.Services.StockReceiptView
+@using AppleStore.Infrastructure.Services
+@{
+    ViewData["Title"] = $"Stock receipt #{Model.Id}";
+}
+
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Stock receipt #@Model.Id</h1>
+        <partial name="_AdminNav" />
+        <p class="account-lead">@Model.Supplier · @((Model.CreatedAt + ReportService.ShopOffset).ToString("dd/MM/yyyy HH:mm")) · by @(Model.CreatedBy ?? "a deleted account")</p>
+        @if (Model.Note is not null)
+        {
+            <p class="account-hint">@Model.Note</p>
+        }
+        <div class="compare-scroll">
+            <partial name="_ReceiptLines" model="Model" />
+        </div>
+        <div class="cart-actions">
+            <a class="btn-store-primary" asp-action="Print" asp-route-id="@Model.Id">Print</a>
+            <a class="btn-store-ghost" asp-action="Index">All receipts</a>
+        </div>
+    </div>
+</section>

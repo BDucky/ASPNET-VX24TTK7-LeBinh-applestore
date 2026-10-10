@@ -1,0 +1,44 @@
+@model IReadOnlyList<AppleStore.Infrastructure.Services.StockLevelRow>
+@{
+    ViewData["Title"] = "Stock levels";
+    var search = ViewData["Search"] as string;
+}
+
+@* The employee's stock check: every variant, lowest stock first. *@
+<section class="statement is-compact account-page">
+    <div class="account-card is-full">
+        <div class="hero-eyebrow">Staff</div>
+        <h1 class="account-title">Stock levels</h1>
+        <partial name="_AdminNav" />
+        <form method="get" asp-action="Levels" class="admin-filter" role="search">
+            <label for="q">SKU or product</label>
+            <input id="q" name="q" value="@search" />
+            <button type="submit" class="btn-store-ghost">Search</button>
+        </form>
+        @if (Model.Count == 0)
+        {
+            <p class="account-lead">Nothing matches.</p>
+        }
+        else
+        {
+            <div class="compare-scroll">
+                <table class="report-table">
+                    <thead>
+                        <tr><th scope="col">SKU</th><th scope="col">Product</th><th scope="col">Stock</th><th scope="col">On sale</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model)
+                        {
+                            <tr data-stock-sku="@v.Sku">
+                                <td>@v.Sku</td>
+                                <td>@v.ProductName @string.Join(" ", new[] { v.Configuration, v.Color, v.Region }.OfType<string>())</td>
+                                <td>@v.StockQty</td>
+                                <td>@(v.OnSale ? "Yes" : "No")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,14 @@
+@model AppleStore.Infrastructure.Services.StockReceiptView
+@using AppleStore.Infrastructure.Services
+@{
+    Layout = "/Views/Shared/_PrintLayout.cshtml";
+    ViewData["Title"] = $"Stock receipt #{Model.Id}";
+}
+
+<h1>Stock receipt #@Model.Id</h1>
+<p>Apple Store. Supplier: @Model.Supplier. Received @((Model.CreatedAt + ReportService.ShopOffset).ToString("dd/MM/yyyy HH:mm")) (Vietnam time) by @(Model.CreatedBy ?? "a deleted account").</p>
+@if (Model.Note is not null)
+{
+    <p>@Model.Note</p>
+}
+<partial name="_ReceiptLines" model="Model" />
