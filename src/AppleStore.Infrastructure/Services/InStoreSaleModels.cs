@@ -32,6 +32,7 @@ public enum SaleOutcome
     UnknownCustomer,
 }
 
+// Options: the variant's full name (VariantText.Label).
 public sealed record SaleQuoteLine(int VariantId, string Sku, string ProductName, string? Options, decimal? UnitPrice, decimal? WasPrice, int Quantity, int StockQty)
 {
     public decimal? LineTotal => UnitPrice * Quantity;
