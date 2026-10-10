@@ -66,7 +66,7 @@ public class FormTokenTests : WebFlowTestBase
             "/", PhoneVariantUrl, "/Cart", "/Checkout", orderPath, "/Orders", "/Track", "/Account", "/Account/Profile", "/Account/ChangePassword",
             "/Account/Addresses/Create", "/Admin", "/Admin/Orders", $"/Admin/Orders/{orderId}", "/Admin/Products", "/Admin/Products/New",
             $"/Admin/Products/{productId}", "/Admin/Vouchers", "/Admin/Vouchers/New", $"/Admin/Vouchers/{voucherId}", "/Admin/Users",
-            "/Admin/Reviews", "/Admin/Reports", "/Products/iphone-17", "/Compare", "/Admin/Promotions", "/Admin/Promotions/New", $"/Admin/Promotions/{promotionId}", "/Admin/Prices", "/Admin/Stock", "/Admin/Stock/New", "/Admin/Stock/Levels",
+            "/Admin/Reviews", "/Admin/Reports", "/Products/iphone-17", "/Compare", "/Admin/Promotions", "/Admin/Promotions/New", $"/Admin/Promotions/{promotionId}", "/Admin/Prices", "/Admin/Stock", "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000002", "/Admin/Stock/Levels",
         };
         var missing = new List<string>();
         foreach (var page in pages)

@@ -50,8 +50,13 @@ public class StockFlowTests : WebFlowTestBase
         return form;
     }
 
-    private async Task<string> FormKeyAsync() =>
-        Regex.Match(await PageAsync("/Admin/Stock/New"), "name=\"FormKey\"[^>]*value=\"([^\"]+)\"").Groups[1].Value;
+    // The form lives at /Admin/Stock/New?key=..., so Back returns to the same key.
+    private async Task<string> FormKeyAsync()
+    {
+        var fresh = await Client.GetAsync("/Admin/Stock/New");
+        var url = fresh.Headers.Location!.OriginalString;
+        return Regex.Match(await PageAsync(url), "name=\"FormKey\"[^>]*value=\"([^\"]+)\"").Groups[1].Value;
+    }
 
     [Fact]
     public async Task An_employee_receives_goods_and_sees_the_receipt()
@@ -61,7 +66,7 @@ public class StockFlowTests : WebFlowTestBase
         Assert.Contains("href=\"/Admin/Stock\"", await PageAsync("/Admin/Orders"));
 
         var response = await PostFormAsync("/Admin/Stock/New",
-            Form(await FormKeyAsync(), (blue.ToString(), "10", "21000000"), ("", "", ""), (black.ToString(), "2", "21500000")), formPage: "/Admin/Stock/New");
+            Form(await FormKeyAsync(), (blue.ToString(), "10", "21000000"), ("", "", ""), (black.ToString(), "2", "21500000")), formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
 
         Assert.Matches("^/Admin/Stock/\\d+$", response.Headers.Location?.OriginalString ?? "");
         Assert.Equal((13, 7), (Stock(blue), Stock(black)));
@@ -80,12 +85,36 @@ public class StockFlowTests : WebFlowTestBase
         await SignInAsync(UserRole.Employee, "staff@example.com");
         var key = await FormKeyAsync();
 
-        var first = await PostFormAsync("/Admin/Stock/New", Form(key, (blue.ToString(), "10", "1")), formPage: "/Admin/Stock/New");
-        var second = await PostFormAsync("/Admin/Stock/New", Form(key, (blue.ToString(), "10", "1")), formPage: "/Admin/Stock/New");
+        var first = await PostFormAsync("/Admin/Stock/New", Form(key, (blue.ToString(), "10", "1")), formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
+        var second = await PostFormAsync("/Admin/Stock/New", Form(key, (blue.ToString(), "10", "1")), formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
 
         Assert.Equal(first.Headers.Location?.OriginalString, second.Headers.Location?.OriginalString);
         Assert.Equal((13, 1), (Stock(blue), Receipts()));
         Assert.Equal("This receipt was already saved. The stock was not added again.", Notice(await PageAsync(second.Headers.Location!.OriginalString), "status"));
+    }
+
+    // Found by the live check 2026-10-10: after saving, the browser's Back
+    // fetched the form again with a new key, and saving again received the
+    // goods twice. The key is in the address now, so Back comes to the same
+    // key, and a used key leads to the saved receipt instead of the form.
+    [Fact]
+    public async Task Back_to_a_saved_form_shows_the_receipt_and_cannot_save_it_again()
+    {
+        var (blue, _, _) = Seed();
+        await SignInAsync(UserRole.Employee, "staff@example.com");
+        var fresh = await Client.GetAsync("/Admin/Stock/New");
+        var formUrl = fresh.Headers.Location!.OriginalString;
+        Assert.Matches("^/Admin/Stock/New\\?key=[0-9a-f-]{36}$", formUrl);
+        var key = Regex.Match(await PageAsync(formUrl), "name=\"FormKey\"[^>]*value=\"([^\"]+)\"").Groups[1].Value;
+        Assert.Equal(formUrl.Split('=')[1], key);
+        var saved = await PostFormAsync("/Admin/Stock/New", Form(key, (blue.ToString(), "10", "1")), formPage: formUrl);
+        await Client.GetStringAsync(saved.Headers.Location!.OriginalString);
+
+        var back = await Client.GetAsync(formUrl);
+
+        Assert.Equal(saved.Headers.Location!.OriginalString, back.Headers.Location?.OriginalString);
+        Assert.Equal("This receipt was already saved. The stock was not added again.", Notice(await PageAsync(back.Headers.Location!.OriginalString), "status"));
+        Assert.Equal((13, 1), (Stock(blue), Receipts()));
     }
 
     [Theory]
@@ -113,7 +142,7 @@ public class StockFlowTests : WebFlowTestBase
         if (which == "supplier")
             form["Supplier"] = " ";
 
-        var response = await PostFormAsync("/Admin/Stock/New", form, formPage: "/Admin/Stock/New");
+        var response = await PostFormAsync("/Admin/Stock/New", form, formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains(message, WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
@@ -125,7 +154,7 @@ public class StockFlowTests : WebFlowTestBase
     {
         var (blue, _, _) = Seed();
         await SignInAsync(UserRole.Admin, "admin@example.com");
-        var saved = await PostFormAsync("/Admin/Stock/New", Form(await FormKeyAsync(), (blue.ToString(), "4", "100")), formPage: "/Admin/Stock/New");
+        var saved = await PostFormAsync("/Admin/Stock/New", Form(await FormKeyAsync(), (blue.ToString(), "4", "100")), formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
 
         var print = await PageAsync(saved.Headers.Location!.OriginalString + "/Print");
 
