@@ -1,0 +1,25 @@
+<section id="csdl" data-transition="fade" style="background:#F4F2EC;color:#14161C;font-family:'Be Vietnam Pro', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;color:#2F5BE0;letter-spacing:3px;text-transform:uppercase">Thiết kế</p>
+<h2 style="font-size:72px;font-weight:700;line-height:1.1">Cơ sở dữ liệu</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #DDD9CF;border-radius:20px;padding:36px">
+<h3 style="font-size:32px;font-weight:700">Danh mục và sản phẩm</h3>
+<p style="font-size:26px;color:#4A5060;line-height:1.45">Categories, Products, ProductVariants, OptionTypes, OptionValues, VariantOptions, ProductImages</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #DDD9CF;border-radius:20px;padding:36px">
+<h3 style="font-size:32px;font-weight:700">Mua hàng</h3>
+<p style="font-size:26px;color:#4A5060;line-height:1.45">Carts, CartItems, Orders, OrderItems, Payments, Shipments, Addresses</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #DDD9CF;border-radius:20px;padding:36px">
+<h3 style="font-size:32px;font-weight:700">Tài khoản và đánh giá</h3>
+<p style="font-size:26px;color:#4A5060;line-height:1.45">Users, UserTokens (Identity), Reviews, Favorites, CompareLists</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#E6ECFF;border-radius:20px;padding:36px">
+<h3 style="font-size:32px;font-weight:700">Bổ sung so với đặc tả, có ghi lý do</h3>
+<p style="font-size:26px;color:#2B3245;line-height:1.45">Vouchers và VoucherProducts (quy tắc voucher BM_VOUCHER_01), cột Kind cho khuyến mãi tự động, PriceChanges (lịch sử đổi giá BM_PRICE_01). Mọi thay đổi bằng EF Core migration.</p>
+</div>
+<aside>Cơ sở dữ liệu giữ đúng 24 bảng của đặc tả và thêm ba phần có lý do rõ ràng: bảng voucher vì đặc tả mô tả quy tắc voucher mà không có chỗ lưu, cột Kind để khuyến mãi dùng chung bảng voucher, và bảng lịch sử đổi giá theo BM_PRICE_01. Mọi thay đổi đều đi qua EF Core migration.</aside>
+</section>
