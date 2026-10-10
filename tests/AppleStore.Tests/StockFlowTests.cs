@@ -90,7 +90,7 @@ public class StockFlowTests : WebFlowTestBase
 
         Assert.Equal(first.Headers.Location?.OriginalString, second.Headers.Location?.OriginalString);
         Assert.Equal((13, 1), (Stock(blue), Receipts()));
-        Assert.Equal("This receipt was already saved. The stock was not added again.", Notice(await PageAsync(second.Headers.Location!.OriginalString), "status"));
+        Assert.Equal("This form was already saved as a receipt, so nothing was added. To receive other goods, start a new receipt.", Notice(await PageAsync(second.Headers.Location!.OriginalString), "status"));
     }
 
     // Found by the live check 2026-10-10: after saving, the browser's Back
@@ -113,7 +113,7 @@ public class StockFlowTests : WebFlowTestBase
         var back = await Client.GetAsync(formUrl);
 
         Assert.Equal(saved.Headers.Location!.OriginalString, back.Headers.Location?.OriginalString);
-        Assert.Equal("This receipt was already saved. The stock was not added again.", Notice(await PageAsync(back.Headers.Location!.OriginalString), "status"));
+        Assert.Equal("This form was already saved as a receipt, so nothing was added. To receive other goods, start a new receipt.", Notice(await PageAsync(back.Headers.Location!.OriginalString), "status"));
         Assert.Equal((13, 1), (Stock(blue), Receipts()));
     }
 
@@ -186,5 +186,37 @@ public class StockFlowTests : WebFlowTestBase
 
         Assert.StartsWith("/Account/Login", anonymous.Headers.Location!.PathAndQuery);
         Assert.StartsWith("/Account/AccessDenied", customer.Headers.Location!.PathAndQuery);
+    }
+
+    // Review 2026-10-10: a duplicated tab reuses the key; its different goods
+    // must not look received.
+    [Fact]
+    public async Task A_second_tab_with_the_same_key_is_told_to_start_a_new_receipt()
+    {
+        var (blue, black, _) = Seed();
+        await SignInAsync(UserRole.Employee, "staff@example.com");
+        var key = await FormKeyAsync();
+        await PostFormAsync("/Admin/Stock/New", Form(key, (blue.ToString(), "10", "1")), formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
+
+        var second = await PostFormAsync("/Admin/Stock/New", Form(key, (black.ToString(), "4", "1")), formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
+        var page = await PageAsync(second.Headers.Location!.OriginalString);
+
+        Assert.Contains("start a new receipt", Notice(page, "status"));
+        Assert.Contains("href=\"/Admin/Stock/New\"", page);
+        Assert.Equal((5, 1), (Stock(black), Receipts()));
+    }
+
+    [Fact]
+    public async Task An_empty_form_key_is_never_used()
+    {
+        var (blue, _, _) = Seed();
+        await SignInAsync(UserRole.Employee, "staff@example.com");
+
+        var get = await Client.GetAsync("/Admin/Stock/New?key=00000000-0000-0000-0000-000000000000");
+        var post = await PostFormAsync("/Admin/Stock/New", Form("00000000-0000-0000-0000-000000000000", (blue.ToString(), "1", "1")), formPage: "/Admin/Stock/New?key=00000000-0000-0000-0000-000000000001");
+
+        Assert.Matches("^/Admin/Stock/New\\?key=(?!00000000-0000-0000-0000-000000000000)", get.Headers.Location!.OriginalString);
+        Assert.StartsWith("/Admin/Stock/New", post.Headers.Location!.OriginalString);
+        Assert.Equal((3, 0), (Stock(blue), Receipts()));
     }
 }

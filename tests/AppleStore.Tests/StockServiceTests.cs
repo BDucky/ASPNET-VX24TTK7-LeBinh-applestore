@@ -154,6 +154,17 @@ public sealed class StockServiceTests : IDisposable
         Assert.Equal(int.MaxValue - 1, Stock(_blue));
     }
 
+    // Review 2026-10-10: two lines just under int.MaxValue each must not
+    // break the receipt pages when their quantities are added up.
+    [Fact]
+    public async Task Totals_of_very_large_quantities_do_not_overflow()
+    {
+        var result = await _sut.ReceiveAsync(Input(new StockReceiptLineInput(_black, 1_200_000_000, 0m), new StockReceiptLineInput(_retired, 1_200_000_000, 0m)), _staff);
+
+        Assert.Equal(2_400_000_000L, (await _sut.ReceiptAsync(result.Id!.Value))!.TotalQuantity);
+        Assert.Equal(2_400_000_000L, (await _sut.ReceiptsAsync())[0].Quantity);
+    }
+
     [Fact]
     public async Task Receipts_list_newest_first_with_totals()
     {
