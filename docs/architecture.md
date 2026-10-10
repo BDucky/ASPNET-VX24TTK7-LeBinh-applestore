@@ -275,6 +275,16 @@ edit never unhides a review staff hid), and lets staff reply and hide. The
 `ProductReviews` view component puts the block on a product's model and
 configuration pages; `/Admin/Reviews` is for Admin and Employee.
 
+## Stock intake
+
+Added 2026-10-10, use case 20. `/Admin/Stock` (Admin and Employee) lists
+receipts, receives goods, prints a receipt and lists stock levels.
+`StockService` saves a receipt in one transaction: each line adds to the
+stock in the database (`StockQty + n`) and reads the closing stock back, so
+a sale at the same moment is kept and closing = opening + quantity holds.
+The form's key is unique and lives in the address (`/Admin/Stock/New?key=`),
+so a second press, Back, or a duplicated tab never receives goods twice.
+
 ## Prices and their history
 
 Added 2026-10-09, BM_PRICE_01. `/Admin/Prices` (Admin and Employee) changes

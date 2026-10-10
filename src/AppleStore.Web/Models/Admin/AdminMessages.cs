@@ -68,4 +68,20 @@ public static class AdminMessages
         Domain.Enums.PriceChangeSource.NewVariant => "New variant",
         _ => "Edited",
     };
+
+    public const string ReceiptSaved = "Receipt saved. The stock is updated.";
+    // Covers a second press and a duplicated tab alike: nothing new was received.
+    public const string ReceiptAlreadySaved = "This form was already saved as a receipt, so nothing was added. To receive other goods, start a new receipt.";
+
+    public static string For(StockReceiptResult result) => result.Outcome switch
+    {
+        StockReceiptOutcome.MissingSupplier => "Enter the supplier.",
+        StockReceiptOutcome.NoLines => "Add at least one line.",
+        StockReceiptOutcome.UnknownVariant => "Pick each product from the list.",
+        StockReceiptOutcome.DuplicateSku => $"{result.Sku} is on the receipt twice. Put it on one line.",
+        StockReceiptOutcome.InvalidQuantity => "A quantity is at least 1.",
+        StockReceiptOutcome.InvalidCost => "A cost is 0 or more, and at most 9.999.999.999.",
+        StockReceiptOutcome.AlreadySaved => ReceiptAlreadySaved,
+        _ => ReceiptSaved,
+    };
 }

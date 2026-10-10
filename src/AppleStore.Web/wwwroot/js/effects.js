@@ -322,3 +322,23 @@
     requestAnimationFrame(animateRing);
   }
 })();
+
+// Stock receipt form (use case 20): "Add a line" copies the last line with
+// empty values and the next index, so MVC binds Lines[0..n].
+(function () {
+  document.querySelectorAll("[data-add-line]").forEach(function (button) {
+    var form = button.closest("form");
+    var list = form && form.querySelector("[data-receipt-lines]");
+    if (!list) return;
+    button.addEventListener("click", function () {
+      var lines = list.querySelectorAll("[data-receipt-line]");
+      var copy = lines[lines.length - 1].cloneNode(true);
+      var index = lines.length;
+      copy.querySelectorAll("[name]").forEach(function (field) {
+        field.name = field.name.replace(/Lines\[\d+\]/, "Lines[" + index + "]");
+        if (field.tagName === "SELECT") field.selectedIndex = 0; else field.value = "";
+      });
+      list.appendChild(copy);
+    });
+  });
+})();

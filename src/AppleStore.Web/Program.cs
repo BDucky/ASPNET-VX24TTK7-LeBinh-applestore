@@ -46,6 +46,7 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ICompareService, CompareService>();
 builder.Services.AddScoped<IPriceService, PriceService>();
+builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddSingleton<IImageLibrary, AppleStore.Web.Services.WebImageLibrary>();
 builder.Services.AddSingleton(TimeProvider.System);
 // Online payment: the simulated gateway in Development (appsettings), none otherwise.

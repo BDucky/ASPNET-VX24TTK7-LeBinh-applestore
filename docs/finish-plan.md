@@ -74,6 +74,7 @@ puts a demoable buying flow and the admin area first.
 | 10e | Promotions | 28 | `feat/promotions` | EF migration, a base controller with thin subclasses per role, one owner for the sale price, `TimeProvider` | done, verified 15/15, PR #28 |
 | 10f | Batch prices and price history | 28 (BM_PRICE_01) | `feat/price-history` | EF migration, a transaction with compare-and-swap writes, `[Authorize]` for two roles | done, verified 11/11, PR #29 |
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
+| 11a | Use case 20, stock intake (BM_STOCK_01) and stock levels | 20 | `feat/stock-intake` | EF migration, one transaction with in-database adds, a form key in the address, `[Authorize]` for two roles | done, verified 13/13, PR #33 |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)
@@ -89,6 +90,8 @@ puts a demoable buying flow and the admin area first.
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
+| Stock intake | 2026-10-10 | quantity and unit cost per line, supplier typed in, one variant twice refused, a stock levels page (owner). Admins and employees (report); off-sale variants can be received, cost 0 allowed, a form key in the address so Back or a second press never receives goods twice (Claude's) |
+| Batch prices after Back | 2026-10-10 | open: Back to /Admin/Prices and pressing again applies the change again (the history shows it). Treat as intended, or guard like the stock form? |
 | Code attempts | 2026-10-10 | five wrong codes, owner: already true for both code forms (registration ends the attempt; a reset code counts as a failed sign-in and locks the account after five, Identity's lockout). No change needed. `/Track` has no limit yet: still open |
 | Products without a photo | 2026-10-10 | a placeholder drawn for the product's kind, not an older model's photo (owner). Applies to MagSafe Battery Pack, Apple Watch Ultra 4, Apple Watch SE 3, iPad Air 8 11" and 13" |
 | Prices | 2026-10-09 | batch by products or a category, percent or amount, all or nothing; a percent result rounded to 1.000 dong; admins and employees use /Admin/Prices (owner). Off-sale variants included, unpriced ones skipped, an amount typed with a dot refused, prices capped at what decimal(12,2) holds (Claude's) |
@@ -113,6 +116,8 @@ puts a demoable buying flow and the admin area first.
 | Real email | 2026-10-05 | Gmail SMTP with an App Password held in user-secrets on the owner's machine; without SMTP settings mail stays in the log |
 
 ## Known gaps carried forward
+
+- Stock intake (2026-10-10 review): the path where two saves of one form race past the early check (unique key, rollback, re-read) is not tested, because the tests share one in-memory SQLite connection; a cancel restock can push a variant at int.MaxValue past int (pre-existing, not from intake).
 
 - Promotions (2026-10-09 review): the home page loads the running promotions once per product it shows (a few small queries); a fixed discount may have fractions of a dong, as vouchers already could; if one promotion ends and another starts between the checkout page and the press with the same total, the order goes through at the total the shopper saw.
 - After pulling the promotions change, run `dotnet ef database update` once: a database without the `Vouchers.Kind` and `Name` columns gives an error page on product pages (the app does not migrate itself).
