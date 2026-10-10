@@ -5,6 +5,22 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-10: stock intake (use case 20), photo placeholder, code attempts
+
+**What landed.** PR #32: products without a photo show a placeholder of
+their kind (owner's choice, not an older model's photo). Five wrong codes
+was already true for both code forms. PR #33: `/Admin/Stock` (receipts,
+receive goods, print, stock levels) for admins and employees; 600 tests;
+`verify-stock` 13 of 13; the live check caught Back receiving goods twice
+(fixed: the form key is in the address).
+
+**After pulling:** `dotnet ef database update` (migration `StockReceipts`).
+
+**Next:** use case 21 (in-person sale): ask the owner tax, numbering and
+walk-in customer first. Then the report and slides final pass on
+`docs/thesis-report` (PR #31, draft; its HANDOFF entry has the new-machine
+setup). Open: batch prices after Back, `/Track` limit, the cover line.
+
 ## 2026-10-09 (evening): batch prices and price history (BM_PRICE_01)
 
 **What landed.** `PriceChanges` table, `PriceService` (batch, all or

@@ -4,6 +4,36 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-10: stock intake (`feat/stock-intake`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 600 of 600 (29 new) |
+| `python3 setup/verify-stock/verify.py` | **13 of 13**, stock and receipt lines compared with the database |
+| related checks rerun | admin 31, checkout 25, orders 19, admin-catalog 15, prices 11, promotions 15 |
+
+**Mutation checks** (all caught): opening read before the add; stock
+overwritten instead of added (a sale lost); no duplicate check; no cost
+ceiling; no overflow check; both double-save guards removed; a dotted cost
+allowed; empty rows kept; the pages for admins only.
+
+**Found by the live check:** after saving, the browser's Back fetched the
+form again with a fresh key, and saving again received the goods twice
+(stock 60 became 70). The key now lives in the form's address; Back returns
+to it and a used key shows the saved receipt (RED then GREEN).
+
+**Same class elsewhere:** checkout (cart empty), products and vouchers (name,
+SKU, code unique) are safe after Back; a promotion is duplicated harmlessly;
+a batch price change applies again (open question to the owner).
+
+**Review (code-reviewer agent).** No blocking findings. Fixed: a duplicated
+tab's goods looked received (now told to start a new receipt), an empty key
+was accepted, quantity totals could overflow int, lines now go in variant
+order (no SQL Server deadlock), one owner for the variant option text. Not
+tested: the race past the early key check (shared in-memory connection).
+
 ## 2026-10-10: placeholder of the product's kind (`feat/photo-placeholder`)
 
 | Command | Result |
