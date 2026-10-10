@@ -157,9 +157,10 @@ public class InStoreSaleService : IInStoreSaleService
             // The same form sold a moment earlier (unique FormKey): undo this one.
             await tx.RollbackAsync(ct);
             _db.ChangeTracker.Clear();
-            return await SoldWithAsync(input.FormKey, ct) is { } other
-                ? new SaleResult(SaleOutcome.AlreadySold, other)
-                : throw new InvalidOperationException("An in-store sale could not be saved.");
+            // Anything else is a real failure: rethrown for the caller to log.
+            if (await SoldWithAsync(input.FormKey, ct) is { } other)
+                return new SaleResult(SaleOutcome.AlreadySold, other);
+            throw;
         }
         await tx.CommitAsync(ct);
         return new SaleResult(SaleOutcome.Done, order.Id);

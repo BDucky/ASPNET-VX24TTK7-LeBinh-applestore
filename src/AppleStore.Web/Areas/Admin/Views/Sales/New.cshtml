@@ -91,6 +91,7 @@
             @if (form.ExpectedTotal is { } expected)
             {
                 <input type="hidden" name="ExpectedTotal" value="@expected.ToString("0.##")" />
+                <input type="hidden" name="QuotedFor" value="@form.QuotedFor" />
             }
             <div class="cart-actions">
                 <button type="submit" name="Intent" value="quote" class="btn-store-ghost" formnovalidate>Price the sale</button>

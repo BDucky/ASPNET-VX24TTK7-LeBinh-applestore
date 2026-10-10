@@ -33,11 +33,9 @@ public class SalesController : Controller
     [HttpGet("New")]
     public async Task<IActionResult> New(Guid? key, CancellationToken ct)
     {
-        if (key is not { } formKey || formKey == Guid.Empty)
-            return RedirectToAction(nameof(New), new { key = Guid.NewGuid() });
-        if (await _sales.OrderForKeyAsync(formKey, ct) is { } sold)
-            return ToSale(sold, AdminMessages.SaleAlreadyDone);
-        return View(await PageAsync(new SaleForm { FormKey = formKey, Lines = [new()] }, null, null, ct));
+        if (await this.FreshOrUsedAsync(key, k => _sales.OrderForKeyAsync(k, ct), sold => ToSale(sold, AdminMessages.SaleAlreadyDone)) is { } elsewhere)
+            return elsewhere;
+        return View(await PageAsync(new SaleForm { FormKey = key!.Value, Lines = [new()] }, null, null, ct));
     }
 
     [HttpPost("New"), ValidateAntiForgeryToken]
@@ -49,6 +47,12 @@ public class SalesController : Controller
             return View(await PageAsync(form, null, AdminMessages.UnreadableNumber, ct));
         try
         {
+            if (form.Intent == "sell" && form.QuotedFor != form.Signature())
+            {
+                // Priced again; its own problem (stock, voucher) comes first.
+                var again = await _sales.QuoteAsync(form.FilledLines, form.VoucherCode, ct);
+                return View(await PageAsync(form, again, QuoteProblem(again) ?? AdminMessages.SaleChangedAfterPricing, ct));
+            }
             if (form.Intent == "sell")
             {
                 var result = await _sales.SellAsync(form.ToInput(), form.ExpectedTotal ?? -1m, User.AccountId()!.Value, ct);
@@ -58,9 +62,7 @@ public class SalesController : Controller
                 return View(await PageAsync(form, fresh, AdminMessages.For(result.Outcome, result.Sku, result.VoucherProblem), ct));
             }
             var quote = await _sales.QuoteAsync(form.FilledLines, form.VoucherCode, ct);
-            var problem = AdminMessages.For(quote.Problem, quote.ProblemSku, VoucherProblem.None)
-                ?? (quote.VoucherCode is not null && quote.VoucherProblem != VoucherProblem.None ? AdminMessages.Voucher(quote.VoucherProblem) : null);
-            return View(await PageAsync(form, quote, problem, ct));
+            return View(await PageAsync(form, quote, QuoteProblem(quote), ct));
         }
         catch (Exception ex) when (ex.IsDatabaseFailure())
         {
@@ -68,6 +70,10 @@ public class SalesController : Controller
             return View(await PageAsync(form, null, AdminMessages.SaveFailed, ct));
         }
     }
+
+    private static string? QuoteProblem(SaleQuote quote) =>
+        AdminMessages.For(quote.Problem, quote.ProblemSku, VoucherProblem.None)
+        ?? (quote.VoucherCode is not null && quote.VoucherProblem != VoucherProblem.None ? AdminMessages.Voucher(quote.VoucherProblem) : null);
 
     private RedirectResult ToSale(int orderId, string message)
     {
@@ -82,8 +88,13 @@ public class SalesController : Controller
         var variants = (await _stock.LevelsAsync(null, ct)).Where(v => v.OnSale).OrderBy(v => v.ProductName).ThenBy(v => v.Sku).ToList();
         if (form.Lines.Count == 0)
             form.Lines.Add(new SaleLineForm());
-        form.ExpectedTotal = quote is { Problem: SaleOutcome.Done } ? quote.Total : null;
+        // "Complete sale" only for a quote with no problem at all, the
+        // voucher included (review 2026-10-10), and for exactly what was priced.
+        var sellable = quote is { Problem: SaleOutcome.Done } && (quote.VoucherCode is null || quote.VoucherProblem == VoucherProblem.None);
+        form.ExpectedTotal = sellable ? quote!.Total : null;
+        form.QuotedFor = sellable ? form.Signature() : null;
         ModelState.Remove(nameof(SaleForm.ExpectedTotal));
+        ModelState.Remove(nameof(SaleForm.QuotedFor));
         return new SalePage(form, variants, quote, error);
     }
 }

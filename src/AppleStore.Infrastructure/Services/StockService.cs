@@ -86,9 +86,10 @@ public class StockService : IStockService
             // The same form saved a moment earlier (unique FormKey): undo this one.
             await tx.RollbackAsync(ct);
             _db.ChangeTracker.Clear();
-            return await SavedWithAsync(input.FormKey, ct) is { } other
-                ? new StockReceiptResult(StockReceiptOutcome.AlreadySaved, other)
-                : throw new InvalidOperationException("A stock receipt could not be saved.");
+            // Anything else is a real failure: rethrown for the caller to log.
+            if (await SavedWithAsync(input.FormKey, ct) is { } other)
+                return new StockReceiptResult(StockReceiptOutcome.AlreadySaved, other);
+            throw;
         }
         await tx.CommitAsync(ct);
         return new StockReceiptResult(StockReceiptOutcome.Done, receipt.Id);

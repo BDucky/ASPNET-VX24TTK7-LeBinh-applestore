@@ -86,6 +86,7 @@ public static class AdminMessages
     };
 
     public const string SaleDone = "Sale completed and paid.";
+    public const string SaleChangedAfterPricing = "The sale changed after it was priced. Check the new total and complete the sale again.";
     public const string SaleAlreadyDone = "This form was already used for a sale, so nothing more was sold. To sell again, start a new sale.";
 
     // A sale's or a quote's problem as the staff member reads it; null when there is none.

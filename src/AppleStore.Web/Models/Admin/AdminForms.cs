@@ -200,6 +200,14 @@ public sealed class SaleForm
     public decimal? ExpectedTotal { get; set; }
     public string? Intent { get; set; }
 
+    // What was priced (lines and voucher), sent back with "Complete sale": a
+    // sale changed after pricing is priced again, never sold unseen
+    // (review 2026-10-10: a product switched for one at the same price).
+    public string? QuotedFor { get; set; }
+
+    public string Signature() =>
+        string.Join(",", FilledLines.Select(l => $"{l.VariantId}x{l.Quantity}")) + "|" + (VoucherCode?.Trim().ToUpperInvariant() ?? "");
+
     public IReadOnlyList<SaleLineInput> FilledLines =>
         Lines.Where(l => l.VariantId is not null || l.Quantity is not null).Select(l => new SaleLineInput(l.VariantId ?? 0, l.Quantity ?? 0)).ToList();
 

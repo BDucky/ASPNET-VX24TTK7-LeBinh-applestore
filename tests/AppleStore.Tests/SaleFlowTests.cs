@@ -129,7 +129,12 @@ public class SaleFlowTests : WebFlowTestBase
         var formUrl = await FormUrlAsync();
         var key = formUrl.Split('=')[1];
 
-        var response = await PostFormAsync("/Admin/Sales/New", Sale(key, "sell", "1", lines: [(blue, 1)]), formPage: formUrl);
+        // Priced at one total; the sale arrives with another (as when a
+        // promotion starts in between).
+        var quoted = WebUtility.HtmlDecode(await (await PostFormAsync("/Admin/Sales/New", Sale(key, "quote", lines: [(blue, 1)]), formPage: formUrl)).Content.ReadAsStringAsync());
+        var sell = Sale(key, "sell", "1", lines: [(blue, 1)]);
+        sell["QuotedFor"] = Field(quoted, "QuotedFor");
+        var response = await PostFormAsync("/Admin/Sales/New", sell, formPage: formUrl);
         var page = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
 
         Assert.Contains("The total changed. Check it and complete the sale again.", page);
