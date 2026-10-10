@@ -4,6 +4,39 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-10: in-person sale and batch invoices (`feat/in-store-sale`)
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet test` | 633 of 633 (33 new) |
+| `python3 setup/verify-sales/verify.py` | **11 of 11**, order, payment, stock and revenue compared with the database |
+| related checks rerun | admin 31, orders 19, checkout 25, payment 16, reports 16, reviews 9, account 69, stock 13 |
+
+**Refactor first:** the voucher check, the conditional stock take and the
+voucher use moved from `CheckoutService` to `SaleRules` (no behavior change;
+removing the stock or limit condition is still caught).
+
+**Mutation checks** (all caught): no total check; any payment method;
+a stock refusal ignored; an off-sale product sold; an unknown email sold as a
+walk-in; the order not completed; the walk-in email read with `FirstAsync`
+(the order and invoice pages crashed); the page for admins only; the check
+that the sale is what was priced; a refused voucher still sellable.
+
+**Found while building:** making `Orders.UserId` nullable broke the order
+and invoice pages for a walk-in sale (`FirstAsync` on the customer's email);
+a web test caught it before any commit.
+
+**Review (code-reviewer agent).** No blocking findings. Fixed: a save failure
+other than the same form twice became a bare 500 with the cause lost (stock
+receipts had the same, both fixed); "Complete sale" was offered with a
+refused voucher; a line switched after pricing to another product at the
+same price could be sold unseen (now `QuotedFor`); the form-key steps were
+copied in two controllers (now `FormKeys`). Tests added: a voucher used up
+mid-sale, a counter sale cannot be cancelled or paid again. Not changed:
+batch invoices run a few queries per order (no cap was asked for).
+
 ## 2026-10-10: stock intake (`feat/stock-intake`)
 
 | Command | Result |

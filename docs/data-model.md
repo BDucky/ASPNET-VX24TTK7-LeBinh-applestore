@@ -117,6 +117,9 @@ The report keeps only `Orders.VoucherCode`; BM_VOUCHER_01 describes percent or f
 
 **Added 2026-10-09 (`feat/promotions`, use case 28):** `Kind (int: Code=0, Automatic=1)` and `Name (nvarchar 120, nullable)`; `Code` became nullable. The owner chose to keep promotions in this table: an `Automatic` row is a promotion with a name and no code, minimum order or usage limit, and it lowers prices while it runs (`SalePrices`). The unique index on `Code` ignores the nulls (SQLite allows several, the SQL Server provider filters them out).
 
+### Orders: in-person sales (changed 2026-10-10, `feat/in-store-sale`)
+`UserId` is nullable (a walk-in customer at the counter has no account); added `Channel (int: Online=0, InStore=1)`, `SoldByUserId (FK -> Users, set null)` and `FormKey (uniqueidentifier, nullable, unique)`. `PaymentMethod` gained `Cash=3` and `BankTransfer=4` for the counter. Use case 21: the owner chose to record an in-person sale as an order, so invoices, the revenue report and the customer's orders cover it.
+
 ### StockReceipts and StockReceiptLines (added 2026-10-10, not in the report)
 `StockReceipts`: `Id (PK)`, `Supplier (nvarchar 200)`, `Note (nvarchar 400, nullable)`, `FormKey (uniqueidentifier, unique)`, `CreatedByUserId (FK -> Users, set null)`, `CreatedAt`.
 `StockReceiptLines`: `Id (PK)`, `ReceiptId (FK, cascade)`, `VariantId (FK -> ProductVariants, restrict)`, `Quantity (int)`, `UnitCost (decimal(12,2))`, `OpeningStock`, `ClosingStock (int)`; unique `(ReceiptId, VariantId)`.
