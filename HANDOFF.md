@@ -5,6 +5,49 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-12 (night, latest): a full live-test audit, three real bugs fixed and
+merged (PRs #39-#40 territory, see below), and a demo video attempt that
+needs a redo
+
+**What landed and merged into `dev` this entry (on top of the previous
+one):** asked directly whether every page had been live-tested as
+carefully as possible, the honest answer was no. Reran all 15
+`setup/verify-*` scripts fresh (309/309), then cross-checked every view
+file against what each script actually opens and found two pages no
+script had ever visited (`/Home/Credits`, `/Home/Privacy`). Opened them
+live and found `/Home/Credits` overflows sideways at 390px; fixed
+(`.credits-scroll`). Owner then asked for a full responsive sweep (not
+just 1440/390) before merging: swept 320/375/768/1024/1440px across every
+public, signed-in and admin page and found the real bug underneath —
+`navbar-expand-lg` (992px Bootstrap collapse) was too low for a signed-in
+nav's actual width (~1062px with Cart/Account/Sign out, or Staff for
+admins), so every signed-in and admin page scrolled sideways between 992
+and about 1061px; fixed by moving to `navbar-expand-xl` (1200px). Two
+more 320px bugs found and fixed along the way (`.admin-form select` width,
+`.admin-filter` wrap). New permanent script `setup/verify-responsive`
+(128 checks) keeps all five breakpoints checked going forward. All landed
+in PR #39, merged.
+
+**Demo video: attempted, rejected, needs a redo.** Owner asked for a
+screen-recorded walkthrough for the presentation and report (own file,
+not embedded in the slides). First attempt used `playwright-cli` driven
+live, one command at a time, with `video-show-actions` for cursor/action
+annotation. Owner's review found two defects: a 404 error page visible on
+camera (the agent tried the wrong product slug live, with recording
+already on) and no visible cursor anywhere in the output (the CLI-level
+annotation overlay did not work as expected). Owner also wants two
+separate flows — a customer's journey and a seller/staff's journey — not
+one video mixing both. Full plan for the redo, including the root cause
+of each defect and the fix (write one `page.screencast`-driven script,
+rehearse unrecorded first, watch the actual output before calling it
+done): `docs/specs/demo-video.md`. The rejected files
+(`~/Desktop/AppleStore-Demo/apple-store-demo.mp4` and the `.webm` in this
+session's scratchpad) are local to the machine this session ran on, never
+touched the repository, and should be discarded, not reused.
+
+**Pick up here:** read `docs/specs/demo-video.md` in full before
+recording anything. Redo as two separate videos per that spec.
+
 ## 2026-10-12 (later still): PR #37 merged into `dev`; `/Track` rate limit
 
 **What landed.** PR #37 (whole dong everywhere) merged into `dev`. Then two
