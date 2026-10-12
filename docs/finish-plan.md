@@ -77,6 +77,7 @@ puts a demoable buying flow and the admin area first.
 | 11a | Use case 20, stock intake (BM_STOCK_01) and stock levels | 20 | `feat/stock-intake` | EF migration, one transaction with in-database adds, a form key in the address, `[Authorize]` for two roles | done, verified 13/13, PR #33 |
 | 11b | Use case 21, in-person sale (BM_INVOICE_01) and batch invoices | 21 | `feat/in-store-sale` | the order model extended (channel, nullable customer), shared sale rules, a form key in the address, batch printing | done, verified 11/11, PR #34 |
 | 11d | Whole dong in every staff money field | 25, 28, 29 | `fix/whole-dong-everywhere` | model validation with one attribute (`WholeDongAttribute`) | done, 644 tests, `verify-admin-catalog` 20/20, `verify-promotions` 15/15 (no regression); PR #37 |
+| 11e | Demo video for the presentation and report | | not a feature branch (not code) | `page.screencast` "hero script" via `playwright-cli run-code`, not live CLI commands | **redo needed**, plan in `docs/specs/demo-video.md`: first attempt (2026-10-12) had a 404 caught on camera and no visible cursor; owner also wants two separate videos (customer flow, seller/staff flow), not one mixed video |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)
