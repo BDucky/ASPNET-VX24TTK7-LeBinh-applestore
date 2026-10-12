@@ -7,6 +7,11 @@ project actually got here.
 
 ## 2026-10-12 (later): slides rebuilt, lecturer name, report PDF
 
+**Status: draft.** The owner pointed out (2026-10-12) that the app is not
+finished, so the PDF and deck here are drafts. Do not merge PR #31 or export
+the .pptx until the app work is done; then rerun `capture.py`, rebuild, and
+export again.
+
 **Done on `docs/thesis-report`:**
 - Deck https://claude.ai/artifact/JNrn7bidSq78ZbvTEhnfxv rebuilt as 18
   slides, one large cropped 2x screenshot each (new: order handling, sales
