@@ -4,6 +4,23 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-12: batch prices change only variants on sale (`fix/batch-prices-on-sale`)
+
+**Found while taking the report's screenshots:** a +2% batch on the real
+Watch category was refused ("That would bring AWS11-41 to 0 or less"). The
+seed keeps about 40 retired variants with old prices of 29 to 1.399 dong; the
+batch included off-sale variants (Claude's earlier choice), and 399 dong
++2% rounded to the nearest 1.000 is 0. The unit tests had no price under 500
+dong, so they never saw it. Owner's decision: a batch changes only variants
+on sale.
+
+| Command | Result |
+|---|---|
+| `dotnet test` | 637 of 637 (1 new, 3 expectations changed with the rule) |
+| `python3 setup/verify-prices/verify.py` | **12 of 12**, a new check runs +2% on the real Watch category (80 prices changed) |
+
+Mutation: removing the on-sale filter fails 4 tests.
+
 ## 2026-10-10: in-person sale and batch invoices (`feat/in-store-sale`)
 
 | Command | Result |

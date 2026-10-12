@@ -5,6 +5,12 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-12: batch prices on sale only (PR #36)
+
+The bug noted below is fixed: a batch changes only variants on sale (owner's
+decision), with a unit test and a live check on the real Watch category.
+637 tests. Next: the report and slides final pass on `docs/thesis-report`.
+
 ## 2026-10-10 (later): in-person sale (use case 21): all 37 use cases done
 
 **What landed.** PR #34: `/Admin/Sales/New` (price, then complete at that

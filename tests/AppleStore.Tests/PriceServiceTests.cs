@@ -78,12 +78,12 @@ public sealed class PriceServiceTests : IDisposable
     {
         var result = await BatchAsync(PriceBatchMode.Percent, 3m, products: _phone);
 
-        // 24.990.000 + 3% = 25.739.700, 25.490.000 + 3% = 26.254.700, 19.990.000 + 3% = 20.589.700
-        Assert.Equal((PriceBatchOutcome.Done, 3), (result.Outcome, result.Changed));
+        // 24.990.000 + 3% = 25.739.700, 25.490.000 + 3% = 26.254.700; OLD is off sale and keeps its price.
+        Assert.Equal((PriceBatchOutcome.Done, 2), (result.Outcome, result.Changed));
         var prices = Prices();
-        Assert.Equal((25_740_000m, 26_255_000m, 20_590_000m, (decimal?)null), (prices["BLUE"], prices["BLACK"], prices["OLD"], prices["ASK"]));
+        Assert.Equal((25_740_000m, 26_255_000m, 19_990_000m, (decimal?)null), (prices["BLUE"], prices["BLACK"], prices["OLD"], prices["ASK"]));
         var log = Log();
-        Assert.Equal(3, log.Count);
+        Assert.Equal(2, log.Count);
         var blue = log.Single(c => c.VariantId == _blue);
         Assert.Equal((24_990_000m, 25_740_000m, PriceChangeSource.Batch, _staff, Now.UtcDateTime),
             (blue.OldPrice, blue.NewPrice, blue.Source, blue.ChangedByUserId, blue.ChangedAt));
@@ -102,9 +102,28 @@ public sealed class PriceServiceTests : IDisposable
     {
         var result = await BatchAsync(PriceBatchMode.Amount, 10_000m, category: _iphoneCategory);
 
-        Assert.Equal(4, result.Changed);
+        Assert.Equal(3, result.Changed);
         var prices = Prices();
         Assert.Equal((1_000_000m, 3_490_000m), (prices["CASE"], prices["PODS"]));
+    }
+
+    // Owner's decision 2026-10-10: a batch changes only variants on sale. The
+    // seed keeps retired variants with old prices of a few hundred dong; +2%
+    // rounded to 1.000 took one to 0 and refused the whole Watch batch.
+    [Fact]
+    public async Task A_batch_leaves_variants_off_sale_alone()
+    {
+        _db.Database.ExecuteSql($"UPDATE ProductVariants SET Price = 399 WHERE Id = {_retired}");
+        var hidden = NewProduct(_db.Categories.Single(c => c.Id == _iphoneCategory), "iPhone 5s", "iphone-5s", 1m, status: false);
+        AddVariant(_db, hidden, "IP5S", 199m, 1);
+        _db.SaveChanges();
+
+        var result = await BatchAsync(PriceBatchMode.Percent, 2m, category: _iphoneCategory);
+
+        Assert.Equal(PriceBatchOutcome.Done, result.Outcome);
+        var prices = Prices();
+        Assert.Equal((399m, 199m), (prices["OLD"], prices["IP5S"]));
+        Assert.DoesNotContain(Log(), c => c.VariantId == _retired);
     }
 
     [Fact]
@@ -223,7 +242,7 @@ public sealed class PriceServiceTests : IDisposable
         var all = await _sut.HistoryAsync();
         var pods = await _sut.HistoryAsync(_pods);
 
-        Assert.Equal(4, all.Count);
+        Assert.Equal(3, all.Count); // the phone's off-sale variant is not changed
         Assert.Equal("iPhone 17", all[0].ProductName);
         Assert.Equal("AirPods 4", all[^1].ProductName);
         var row = Assert.Single(pods);
