@@ -63,7 +63,7 @@ def main():
     product, slug = rows(db, """
         select p.Id, p.Slug from Products p join ProductVariants v on v.ProductId = p.Id
         where p.Status = 1 and v.Status = 1 and v.Price is not null group by p.Id having count(*) > 1 order by p.SortOrder, p.Id limit 1""")[0]
-    before = {vid: int(float(price)) for vid, price in rows(db, "select Id, Price from ProductVariants where ProductId = ? and Price is not null", product)}
+    before = {vid: int(float(price)) for vid, price in rows(db, "select v.Id, v.Price from ProductVariants v join Products p on p.Id = v.ProductId where v.ProductId = ? and v.Price is not null and v.Status = 1 and p.Status = 1", product)}
     proc = h.start_app("Development", db, log, {"SeedAdmin__Email": ADMIN, "SeedAdmin__Password": ADMIN_PASSWORD})
     try:
         r = step(sign_in(ADMIN, ADMIN_PASSWORD) + r"""
@@ -82,7 +82,7 @@ def main():
   out.consoleErrors = consoleErrors;
   return JSON.stringify(out);
 """)
-        after = {vid: int(float(price)) for vid, price in rows(db, "select Id, Price from ProductVariants where ProductId = ? and Price is not null", product)}
+        after = {vid: int(float(price)) for vid, price in rows(db, "select v.Id, v.Price from ProductVariants v join Products p on p.Id = v.ProductId where v.ProductId = ? and v.Price is not null and v.Status = 1 and p.Status = 1", product)}
         changed = [vid for vid in before if raised(before[vid]) != before[vid]]
         check("the admin's batch says how many prices changed", r["status"] == [f"Changed {len(changed)} price{'' if len(changed) == 1 else 's'}."] and r["url"] == "/Admin/Prices", str(r["status"]))
         check("every priced variant now holds the 3% price rounded to 1.000 dong", all(after[v] == raised(before[v]) for v in before), str({v: (before[v], after[v]) for v in list(before)[:3]}))
@@ -111,7 +111,7 @@ def main():
 """)
         check("an amount typed as 1.000 is refused, not read as one dong", r["dots"] == ["Type numbers only, without dots or commas (for example 24990000)."], str(r["dots"]))
         check("a batch that would bring a price to 0 is refused", len(r["zero"]) == 1 and "Nothing was changed." in r["zero"][0], str(r["zero"]))
-        still = {vid: int(float(price)) for vid, price in rows(db, "select Id, Price from ProductVariants where ProductId = ? and Price is not null", product)}
+        still = {vid: int(float(price)) for vid, price in rows(db, "select v.Id, v.Price from ProductVariants v join Products p on p.Id = v.ProductId where v.ProductId = ? and v.Price is not null and v.Status = 1 and p.Status = 1", product)}
         check("the refused batches changed no price and logged nothing", still == after and len(rows(db, "select Id from PriceChanges")) == len(changed))
 
         # An employee (made one in the database) can use the page.
@@ -132,6 +132,21 @@ def main():
   return JSON.stringify({ status: await text(page, '.cart-status'), by: await page.locator('tr[data-price-change]').first().innerText() });
 """)
         check("an employee changes prices and is named in the history", r["status"] == [f"Changed {len(after)} price{'' if len(after) == 1 else 's'}."] and "Price Staff" in r["by"], str(r))
+
+        # The real Watch category holds retired variants with old prices of a
+        # few hundred dong; a batch skips them (owner's decision 2026-10-10).
+        watch = rows(db, """select count(*) from ProductVariants v join Products p on p.Id = v.ProductId join Categories c on c.Id = p.CategoryId
+            where c.Slug = 'watch' and v.Price is not null and v.Status = 1 and p.Status = 1""")[0][0]
+        r = step(r"""
+  await page.goto(APP + '/Admin/Prices');
+  await page.selectOption('#CategoryId', { label: 'Watch' });
+  await page.selectOption('#Mode', 'Percent');
+  await page.fill('#Value', '2');
+  await press(page, 'button:has-text("Change prices")');
+  return JSON.stringify({ status: await text(page, '.cart-status'), error: await text(page, '.account-error') });
+""")
+        check("a +2% batch on the real Watch category changes every on-sale variant and skips the retired ones",
+              r["status"] == [f"Changed {watch} prices."] and r["error"] == [], str(r))
     finally:
         h.stop_app(proc)
         h.close_browser()

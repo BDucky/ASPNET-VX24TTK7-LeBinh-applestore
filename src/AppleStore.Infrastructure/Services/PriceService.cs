@@ -8,9 +8,10 @@ namespace AppleStore.Infrastructure.Services;
 // BM_PRICE_01: batch price changes and the price history. A batch is all or
 // nothing in one transaction: each variant is saved only if its price and
 // version are still the ones read, and moves its version, so an edit page
-// opened before the batch cannot save the old price back. Variants that are
-// off sale are changed too (they keep a price for when they return);
-// variants with no price ("Contact for price") are left alone (Claude's).
+// opened before the batch cannot save the old price back. Only variants on
+// sale are changed (owner's decision 2026-10-10: the seed keeps retired
+// variants with old prices of a few hundred dong, which rounding took to 0);
+// variants with no price ("Contact for price") are left alone.
 public class PriceService : IPriceService
 {
     // Owner's choice 2026-10-09: a percent change lands on a whole 1.000 dong.
@@ -35,7 +36,7 @@ public class PriceService : IPriceService
 
         await using var tx = await _db.Database.BeginTransactionAsync(ct);
         var variants = await _db.ProductVariants.AsNoTracking()
-            .Where(v => v.Price != null && (products.Contains(v.ProductId) || v.Product.CategoryId == input.CategoryId))
+            .Where(v => v.Price != null && v.Status && v.Product.Status && (products.Contains(v.ProductId) || v.Product.CategoryId == input.CategoryId))
             .OrderBy(v => v.Id)
             .Select(v => new { v.Id, v.SKU, Price = v.Price!.Value, v.UpdatedAt })
             .ToListAsync(ct);
