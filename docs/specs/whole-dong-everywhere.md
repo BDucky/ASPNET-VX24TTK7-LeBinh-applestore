@@ -1,8 +1,8 @@
 # Whole dong everywhere (`fix/whole-dong-everywhere`)
 
-Status: **PLAN draft, not approved, no code yet** (2026-10-12). The next step
-is the owner's yes on the approach and answers to the questions below. Only
-then RED tests.
+Status: **done** (2026-10-12). The owner approved the proposed approach and
+answered the three questions below with the recommended defaults. Code,
+tests and the live check all landed; see "Outcome" at the bottom.
 
 ## Why
 
@@ -52,22 +52,39 @@ Not checked yet: whether any seeded or existing row already holds a fraction
 3. Percent values (voucher percent, batch percent) are not money and keep
    their current rules.
 
-## Questions for the owner
+## Questions for the owner (answered 2026-10-12)
 
 1. Scope: only staff-typed money (table above), or also existing data
-   (a one-off check or migration that rounds stored fractions)?
+   (a one-off check or migration that rounds stored fractions)? **Owner:
+   only staff-typed money.** No migration or data sweep was added.
 2. A fixed voucher typed as `50.000`: today it binds as 50 with scale 3.
    Refuse it like the prices form does (current house rule), or accept dots
-   as thousands separators everywhere?
-3. Does the batch percent rule (round to 1.000 dong) stay as is?
+   as thousands separators everywhere? **Owner: refuse it, keep the house
+   rule.**
+3. Does the batch percent rule (round to 1.000 dong) stay as is? **Owner:
+   yes, unchanged.**
 
-## Test plan (after approval)
+## Outcome
 
-- RED per form: a fraction or a dotted amount is refused with the field
-  message, nothing is saved; a whole amount saves.
-- Run against the real controllers through `AppleStoreWebFactory`, next to
-  `AdminCatalogFlowTests` and the voucher and promotion flow tests, no
-  mocked validation.
-- Live check: extend `setup/verify-admin-catalog` (product and variant
-  prices) and `setup/verify-promotions` (vouchers and promotions) with one
-  refused and one accepted amount per form at 1440px and 390px.
+- One `WholeDongAttribute` (`src/AppleStore.Web/Models/Admin/AdminForms.cs`)
+  replaces `WholeDong.Is` plus the two ad-hoc `AmountIsWhole` /
+  `CostsAreWhole` properties. Applied directly to `ProductForm.BasePrice`,
+  `VariantAddForm.Price`, `VariantChangeForm.Price`, `VoucherForm.MinOrderAmount`,
+  `StockLineForm.UnitCost`; gated by a sibling enum property (so the same box
+  is left alone when it holds a percent, not money) on `VoucherForm.Value`
+  (only when `Type == Fixed`) and `PriceBatchForm.Value` (only when
+  `Mode == Amount`). `PricesController` and `StockController` collapsed back
+  to a plain `ModelState.IsValid` check.
+- Tests: `AdminCatalogFlowTests` gained cases for a one-dot base price, a new
+  variant's price, a fixed voucher's value and its minimum order (each
+  refused), a percent voucher typed with a dot (still saves, proving the
+  gate reads the sibling field correctly), and a fixed voucher with whole
+  amounts (saves). 644 tests, all green.
+- Live check: extended `setup/verify-admin-catalog` for the product base
+  price, a new variant's price, and a fixed voucher's value and minimum
+  order (refused with a dot, saved whole); 20 of 20 checks pass. Did not
+  touch `setup/verify-promotions`: `VoucherKindRules.For(Automatic)` sets
+  `HasLimits: false`, so `MinOrderAmount` never reaches a promotion row, and
+  `New`/`Edit` are the same `DiscountAdminController` action for both kinds,
+  so the `Value` gate is already exercised through the voucher script.
+  15 of 15 promotion checks still pass (no regression).

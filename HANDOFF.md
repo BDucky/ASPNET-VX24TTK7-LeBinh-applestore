@@ -5,6 +5,31 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-12 (night): whole dong everywhere, done
+
+**What landed.** The owner answered the spec's three questions (all the
+recommended default): only staff-typed money gets the rule, a fixed
+voucher typed with a dot is refused (house rule kept), batch percent
+rounding unchanged. `WholeDongAttribute` replaces `WholeDong.Is` and the two
+ad-hoc checks (`AmountIsWhole`, `CostsAreWhole`); it now also guards
+`ProductForm.BasePrice`, `VariantAddForm.Price`, `VariantChangeForm.Price`,
+`VoucherForm.Value` (gated to `Type == Fixed`), `VoucherForm.MinOrderAmount`.
+644 tests; `verify-admin-catalog` extended and passing 20/20;
+`verify-promotions` rerun unchanged at 15/15 (`MinOrderAmount` never reaches
+a promotion row, so nothing to add there). PR #37 ready for the owner's
+review; not yet merged into `dev`.
+
+**This session needed a one-time machine setup.** `dotnet` was only the
+runtime (Homebrew cask `dotnet-runtime`), no SDK, so `dotnet build`/`test`
+could not run. Fixed by `brew uninstall --cask dotnet-runtime && brew
+install --cask dotnet-sdk` (the two casks conflict; the SDK cask already
+includes the runtime). This needs the owner's own terminal, since
+Homebrew's installer needs an interactive `sudo` password.
+
+**Next:** the owner reviews PR #37 and either merges it into `dev` or asks
+for changes; then the report and slides final pass on `docs/thesis-report`
+(PR #31, draft), which has been waiting on this PR.
+
 ## 2026-10-12 (evening): whole dong everywhere, PLAN only
 
 **Status:** branch `fix/whole-dong-everywhere` from `dev` (274c886), draft PR
