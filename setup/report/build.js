@@ -116,7 +116,7 @@ const cover = [
   centered("CÔNG NGHỆ APPLE (APPLE STORE)", { bold: true, size: 36, after: 600 }),
   ...blank(4),
   new Paragraph({ indent: { left: 4536 }, children: [new TextRun({ text: "Giảng viên hướng dẫn:", bold: true })] }),
-  new Paragraph({ indent: { left: 4536 }, spacing: { after: 240 }, children: [new TextRun("TS. Đoàn Phước Miền")] }),
+  new Paragraph({ indent: { left: 4536 }, spacing: { after: 240 }, children: [new TextRun("Nguyễn Nhứt Lam")] }),
   new Paragraph({ indent: { left: 4536 }, children: [new TextRun({ text: "Sinh viên thực hiện:", bold: true })] }),
   new Paragraph({ indent: { left: 4536 }, children: [new TextRun("Họ tên: Lê Bình")] }),
   new Paragraph({ indent: { left: 4536 }, children: [new TextRun("MSSV: 470124170")] }),
@@ -131,7 +131,7 @@ const unnumberedTitle = text => new Paragraph({ style: "FrontTitle", children: [
 
 const front = [
   unnumberedTitle("LỜI CẢM ƠN"),
-  p("Em xin gửi lời cảm ơn chân thành đến thầy TS. Đoàn Phước Miền, giảng viên hướng dẫn môn Chuyên đề ASP.NET, đã tận tình hướng dẫn, góp ý và định hướng cho em trong suốt quá trình thực hiện đồ án này. Những kiến thức về ASP.NET Core mà thầy truyền đạt là nền tảng để em xây dựng được website Apple Store."),
+  p("Em xin gửi lời cảm ơn chân thành đến thầy Nguyễn Nhứt Lam, giảng viên hướng dẫn môn Chuyên đề ASP.NET, đã tận tình hướng dẫn, góp ý và định hướng cho em trong suốt quá trình thực hiện đồ án này. Những kiến thức về ASP.NET Core mà thầy truyền đạt là nền tảng để em xây dựng được website Apple Store."),
   p("Em cũng xin cảm ơn Ban Giám hiệu, Trường Kỹ thuật và Công nghệ, Khoa Công nghệ Thông tin cùng các thầy cô đã tạo điều kiện học tập và nghiên cứu để em hoàn thành đồ án."),
   p("Em xin cảm ơn gia đình và bạn bè đã luôn động viên, hỗ trợ em trong thời gian học tập và thực hiện đề tài."),
   p("Do thời gian và kinh nghiệm còn hạn chế, đồ án không tránh khỏi những thiếu sót. Em rất mong nhận được ý kiến đóng góp của thầy cô để đề tài được hoàn thiện hơn."),

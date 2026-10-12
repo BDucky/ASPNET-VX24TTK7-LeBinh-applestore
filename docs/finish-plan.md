@@ -17,8 +17,9 @@ puts a demoable buying flow and the admin area first.
    tag helpers and model validation, EF Core Code First migrations, Areas for
    the admin side, dependency injection. Report chapter 2 is written around
    these.
-2. **Reference:** a previous student's submission for the same course and
-   instructor (TS. Đoàn Phước Miền), the owner's file
+2. **Reference:** a previous student's submission for the same course (its
+   cover names TS. Đoàn Phước Miền; this project's lecturer is Nguyễn Nhứt
+   Lam, owner's correction 2026-10-12), the owner's file
    `~/Downloads/chia sẽ khóa học.rar`: cover template, a 5-chapter Word
    report, and a .NET 9 MVC project using Identity. It is an example, not an
    official rubric. Check new features against it; do better where it is weak
