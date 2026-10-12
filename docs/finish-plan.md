@@ -76,6 +76,7 @@ puts a demoable buying flow and the admin area first.
 | 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
 | 11a | Use case 20, stock intake (BM_STOCK_01) and stock levels | 20 | `feat/stock-intake` | EF migration, one transaction with in-database adds, a form key in the address, `[Authorize]` for two roles | done, verified 13/13, PR #33 |
 | 11b | Use case 21, in-person sale (BM_INVOICE_01) and batch invoices | 21 | `feat/in-store-sale` | the order model extended (channel, nullable customer), shared sale rules, a form key in the address, batch printing | done, verified 11/11, PR #34 |
+| 11d | Whole dong in every staff money field | 25, 28, 29 | `fix/whole-dong-everywhere` | model validation with one attribute (`WholeDong`) | PLAN draft in `docs/specs/whole-dong-everywhere.md`, waiting for the owner's yes; draft PR open |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)

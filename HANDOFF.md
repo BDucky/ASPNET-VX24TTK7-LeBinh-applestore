@@ -5,6 +5,24 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-12 (evening): whole dong everywhere, PLAN only
+
+**Status:** branch `fix/whole-dong-everywhere` from `dev` (274c886), draft PR
+open. No code yet. The spec with the sweep, the proposed approach and three
+questions for the owner is `docs/specs/whole-dong-everywhere.md`.
+
+**Pick up on another machine:**
+1. `git fetch && git switch fix/whole-dong-everywhere`, then the setup in
+   `README.md` (`dotnet tool restore`, user-secrets for `SeedAdmin` and,
+   if mail is needed, `Smtp`), then `dotnet ef database update`.
+2. `dotnet build --no-incremental && dotnet test`: 637 tests expected green.
+3. Get the owner's answers to the three questions in the spec, then RED,
+   GREEN, live check, as in `docs/finish-plan.md` "Definition of done".
+4. Tick the checklist in the PR description as each step lands.
+
+**Also open elsewhere:** PR #31 (`docs/thesis-report`, draft) waits until the
+app work is done; see its own HANDOFF entry on that branch.
+
 ## 2026-10-12: batch prices on sale only (PR #36)
 
 The bug noted below is fixed: a batch changes only variants on sale (owner's
