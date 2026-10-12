@@ -5,6 +5,35 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-12 (later): slides rebuilt, lecturer name, report PDF
+
+**Done on `docs/thesis-report`:**
+- Deck https://claude.ai/artifact/JNrn7bidSq78ZbvTEhnfxv rebuilt as 18
+  slides, one large cropped 2x screenshot each (new: order handling, sales
+  report, batch prices, stock intake, counter sale); numbers 37/37, 637
+  tests, 15 scripts, 302 checks, 24 merged PRs (#12 to #36, #31 is this
+  draft). Source in `thesis/abs/slides-src/`.
+- Owner's correction: the lecturer is **Nguyễn Nhứt Lam** (no academic
+  title given, so none is written). Fixed on the report cover, the thanks
+  section and the slide cover. Đoàn Phước Miền is only the sample report's.
+- `capture.py`: `shot(..., top=900)` keeps the top of long lists; figures
+  16 (products) and 27 (stock levels) were 12.570 and 79.610 px tall and
+  shrank to a sliver in the PDF.
+- `thesis/pdf/BaoCao_...pdf`: 60 pages, exported with LibreOffice
+  (installed with `brew install --cask libreoffice`). A plain
+  `--convert-to pdf` leaves the table of contents without page numbers;
+  the export runs an in-process macro that updates the three indexes
+  first. Recipe: put a script in
+  `<profile>/user/Scripts/python/topdf.py` and run `soffice
+  -env:UserInstallation=file://<profile> --headless
+  'vnd.sun.star.script:topdf.py$run?language=Python&location=user'`
+  (LibreOffice's own `python` is killed by macOS on this machine).
+
+**Open:** the .pptx (open the deck, Share, Export, PowerPoint, save to
+`thesis/abs/`); owner questions: the "TRƯỜNG ĐẠI HỌC TRÀ VINH" cover line,
+the lecturer's title, a try limit on `/Track`, batch price re-applied by
+Back. Then mark PR #31 ready and merge, then release `dev` to `main`.
+
 ## 2026-10-12: batch prices on sale only (PR #36)
 
 The bug noted below is fixed: a batch changes only variants on sale (owner's

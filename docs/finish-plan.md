@@ -77,7 +77,7 @@ puts a demoable buying flow and the admin area first.
 | 11 | Report (Word, 5 chapters) and cover, slides | | `docs/thesis-report` | chapter 2 explains the mechanisms above | report .docx and 14-slide online deck done 2026-10-09; PDF and .pptx export waiting on the owner (no Word or LibreOffice on this machine) |
 | 11a | Use case 20, stock intake (BM_STOCK_01) and stock levels | 20 | `feat/stock-intake` | EF migration, one transaction with in-database adds, a form key in the address, `[Authorize]` for two roles | done, verified 13/13, PR #33 |
 | 11b | Use case 21, in-person sale (BM_INVOICE_01) and batch invoices | 21 | `feat/in-store-sale` | the order model extended (channel, nullable customer), shared sale rules, a form key in the address, batch printing | done, verified 11/11, PR #34 |
-| 11c | Final pass on report and slides | | `docs/thesis-report` (PR #31, draft) | retake screenshots cropped to the part that matters at 2x, one large image per slide (owner agreed 2026-10-09 that the current ones are too small), rebuild the report, export PDF and .pptx, merge | in progress 2026-10-10 |
+| 11c | Final pass on report and slides | | `docs/thesis-report` (PR #31, draft) | retake screenshots cropped to the part that matters at 2x, one large image per slide (owner agreed 2026-10-09 that the current ones are too small), rebuild the report, export PDF and .pptx, merge | in progress: screenshots, report, PDF (60 pages) and the 18-slide deck done 2026-10-12; .pptx export and owner questions left |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)

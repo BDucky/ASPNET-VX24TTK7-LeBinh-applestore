@@ -34,10 +34,21 @@ def step(body):
     return h.step(body)
 
 
-def shot(name, path, selector=None, before="", wait=1500, full=False):
-    """A 2x shot of `path` with the current sign-in; cropped to `selector`."""
-    target = f"await p.locator('{selector}').first().screenshot({{ path: '{OUT / (name + '.png')}' }});" if selector \
-        else f"await p.screenshot({{ path: '{OUT / (name + '.png')}', fullPage: {'true' if full else 'false'} }});"
+def shot(name, path, selector=None, before="", wait=1500, full=False, top=None):
+    """A 2x shot of `path` with the current sign-in; cropped to `selector`.
+
+    `top` keeps only the first `top` CSS pixels of a long element (a list of
+    every variant is thousands of pixels tall and shrinks to a sliver in the
+    report)."""
+    png = OUT / (name + '.png')
+    if selector and top:
+        target = (f"const b = await p.locator('{selector}').first().boundingBox();"
+                  f" await p.screenshot({{ path: '{png}', fullPage: true,"
+                  f" clip: {{ x: b.x, y: b.y, width: b.width, height: Math.min(b.height, {top}) }} }});")
+    elif selector:
+        target = f"await p.locator('{selector}').first().screenshot({{ path: '{png}' }});"
+    else:
+        target = f"await p.screenshot({{ path: '{png}', fullPage: {'true' if full else 'false'} }});"
     step(r"""
   const ctx = await page.context().browser().newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2, storageState: await page.context().storageState() });
   const p = await ctx.newPage();
@@ -191,13 +202,13 @@ def main():
     await p.click('[data-add-line]');
 """.replace("__A__", str(va)))
         shot("26-phieu-nhap", r["receipt"], ".account-card")
-        shot("27-ton-kho", "/Admin/Stock/Levels", ".account-card")
+        shot("27-ton-kho", "/Admin/Stock/Levels", ".account-card", top=900)
         shot("29-don-tai-quay", r["sale"], ".account-card")
         shot("30-in-hoa-don-loat", f"/Admin/Orders/Invoices?ids={order}&ids={sale}", full=True)
         for name, path in [("14-admin-tong-quan", "/Admin"), ("15-admin-don-hang", "/Admin/Orders"), ("16-admin-san-pham", "/Admin/Products"),
                            ("17-admin-voucher", "/Admin/Vouchers"), ("18-admin-khuyen-mai", "/Admin/Promotions"),
                            ("20-admin-bao-cao", "/Admin/Reports"), ("22-admin-tai-khoan", "/Admin/Users")]:
-            shot(name, path, ".account-card")
+            shot(name, path, ".account-card", top=900 if name == "16-admin-san-pham" else None)
         r = step(r"""
   await page.goto(APP + '/Admin/Prices');
   // One product with four variants, so the history stays short enough to read.
