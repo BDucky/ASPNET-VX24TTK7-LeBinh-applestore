@@ -319,14 +319,17 @@ def main():
         db.close()
         check("another user's address is untouched", still == ("Not yours",), str(still))
 
-        # 11. Signed-in and new pages: load, no sideways scroll, no console errors.
+        # 11. Signed-in and new pages, plus the two static pages no other
+        # script opens (Credits, Privacy): load, no sideways scroll, no
+        # console errors. Credits' table overflowed at 390px until fixed
+        # 2026-10-12 (found by this check).
         r = step(r"""
   const consoleErrors = [];
   page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
   const out = {};
   for (const [w, h] of [[1440, 900], [390, 844]]) {
     await page.setViewportSize({ width: w, height: h });
-    for (const p of ['/Account', '/Account/Profile', '/Account/ChangePassword', '/Account/Addresses', '/Account/Addresses/Create']) {
+    for (const p of ['/Account', '/Account/Profile', '/Account/ChangePassword', '/Account/Addresses', '/Account/Addresses/Create', '/Home/Credits', '/Home/Privacy']) {
       const resp = await page.goto(APP + p);
       out[p + '@' + w] = { status: resp.status(), scroll: await page.evaluate(() => document.documentElement.scrollWidth) };
     }
