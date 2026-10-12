@@ -200,13 +200,14 @@ def main():
             shot(name, path, ".account-card")
         r = step(r"""
   await page.goto(APP + '/Admin/Prices');
-  await page.selectOption('#CategoryId', { label: 'Watch' });
+  // One product with four variants, so the history stays short enough to read.
+  await page.selectOption('#ProductIds', { label: 'Mac Mini' });
   await page.selectOption('#Mode', 'Percent');
   await page.fill('#Value', '2');
   await press(page, 'button:has-text("Change prices")');
   return JSON.stringify({ status: await text(page, '.cart-status'), error: await text(page, '.account-error') });
 """)
-        print("price batch:", r)
+        assert r["status"] and r["status"][0].startswith("Changed "), f"price batch: {r}"
         shot("19-admin-gia", "/Admin/Prices", ".account-card")
 
         # 3. The customer reviews what was delivered; staff see it.
