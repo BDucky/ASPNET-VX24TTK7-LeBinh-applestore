@@ -26,7 +26,7 @@ public sealed class TrackForm
     public string? Phone { get; set; }
 }
 
-public sealed record TrackPage(TrackForm Form, TrackingResult? Result, bool Searched);
+public sealed record TrackPage(TrackForm Form, TrackingResult? Result, bool Searched, bool LockedOut);
 
 // The nav link each staff role gets: one table, not role checks in views.
 public static class StaffLinks

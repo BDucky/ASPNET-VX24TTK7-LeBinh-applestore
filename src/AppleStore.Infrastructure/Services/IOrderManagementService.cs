@@ -17,5 +17,7 @@ public interface IOrderManagementService
     Task<OrderChangeResult> CancelAsync(int orderId, int? customerId, CancellationToken ct = default);
 
     // Public lookup by order number and receiver phone (BM_ORDER_TRACK_01).
-    Task<TrackingResult?> TrackAsync(int orderId, string? phone, CancellationToken ct = default);
+    // Five wrong phones against one order number lock it for a while, the
+    // same rule the account lockout already uses.
+    Task<TrackResult> TrackAsync(int orderId, string? phone, CancellationToken ct = default);
 }

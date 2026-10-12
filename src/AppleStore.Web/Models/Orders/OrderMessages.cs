@@ -7,6 +7,7 @@ public static class OrderMessages
 {
     public const string SaveFailed = "We could not save that change. Please try again.";
     public const string NotTracked = "No order matches that number and phone.";
+    public const string TooManyAttempts = "Too many attempts for this order number. Please try again in a few minutes.";
 
     public static (string Text, bool Good) ForCustomerCancel(OrderChangeResult result) => result.Outcome switch
     {

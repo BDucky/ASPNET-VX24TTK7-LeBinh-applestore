@@ -387,6 +387,29 @@ namespace AppleStore.Infrastructure.Migrations
                     b.ToTable("OrderItems");
                 });
 
+            modelBuilder.Entity("AppleStore.Domain.Entities.OrderTrackLockout", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FailCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LockedUntil")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.ToTable("OrderTrackLockouts");
+                });
+
             modelBuilder.Entity("AppleStore.Domain.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -1151,6 +1174,15 @@ namespace AppleStore.Infrastructure.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Variant");
+                });
+
+            modelBuilder.Entity("AppleStore.Domain.Entities.OrderTrackLockout", b =>
+                {
+                    b.HasOne("AppleStore.Domain.Entities.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AppleStore.Domain.Entities.Payment", b =>
