@@ -13,7 +13,7 @@
         <div class="hero-eyebrow">Staff</div>
         <h1 class="account-title">Prices</h1>
         <partial name="_AdminNav" />
-        <p class="account-hint">Change the price of every variant of the products you pick, or of a whole category, at once. A percent lands on a whole 1.000 dong. If any price would reach 0, or someone changes one meanwhile, nothing is changed. Variants without a price are left alone.</p>
+        <p class="account-hint">Change the price of every variant of the products you pick, or of a whole category, at once. A percent lands on a whole 1.000 dong. If any price would reach 0, or someone changes one meanwhile, nothing is changed. Only variants on sale change; variants off sale or without a price are left alone.</p>
         @if (Model.Error is not null)
         {
             <p class="account-error" role="alert">@Model.Error</p>

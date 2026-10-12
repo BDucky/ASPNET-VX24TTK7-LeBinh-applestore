@@ -242,7 +242,7 @@ public sealed class PriceServiceTests : IDisposable
         var all = await _sut.HistoryAsync();
         var pods = await _sut.HistoryAsync(_pods);
 
-        Assert.Equal(4, all.Count);
+        Assert.Equal(3, all.Count); // the phone's off-sale variant is not changed
         Assert.Equal("iPhone 17", all[0].ProductName);
         Assert.Equal("AirPods 4", all[^1].ProductName);
         var row = Assert.Single(pods);
