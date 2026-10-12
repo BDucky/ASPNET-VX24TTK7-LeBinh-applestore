@@ -7,21 +7,20 @@
 <div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DDD9CF;border-radius:20px;padding:40px">
 <h3 style="font-size:36px;font-weight:700">Hạn chế</h3>
 <ul style="font-size:28px;color:#4A5060;line-height:1.5">
-<li>Chưa làm nhập kho và bán tại quầy (UC 20, 21)</li>
 <li>VNPay, MoMo chạy qua cổng giả lập, chưa có sandbox thật</li>
-<li>Chưa giới hạn số lần thử ở form mã OTP và tra cứu đơn</li>
+<li>Tra cứu đơn chưa giới hạn số lần thử (OTP đã giới hạn 5 lần)</li>
 <li>Phát triển trên SQLite, chưa chạy thử SQL Server</li>
 </ul>
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#14161C;color:#F4F2EC;border-radius:20px;padding:40px">
 <h3 style="font-size:36px;font-weight:700">Hướng phát triển</h3>
 <ul style="font-size:28px;color:#C9CCD6;line-height:1.5">
-<li>Hoàn thiện nhập kho, bán tại quầy, phiếu nhập và phiếu bán</li>
+<li>Ràng buộc SKU duy nhất trong cơ sở dữ liệu</li>
 <li>Kết nối sandbox VNPay, MoMo thật</li>
 <li>Rate limiting có sẵn của ASP.NET Core</li>
 <li>Triển khai lên máy chủ với SQL Server</li>
 </ul>
 </div>
 </div>
-<aside>Em nói rõ các hạn chế: hai use case nhập kho và bán tại quầy chưa làm, thanh toán online mới là giả lập, chưa giới hạn số lần thử, và mới chạy trên SQLite. Hướng phát triển đi thẳng vào các điểm đó, dùng tiếp các cơ chế có sẵn như rate limiting của ASP.NET Core.</aside>
+<aside>Em nói rõ các hạn chế: thanh toán online mới là giả lập, trang tra cứu đơn chưa giới hạn số lần thử, và mới chạy trên SQLite. Mã OTP thì đã khóa sau 5 lần nhập sai. Hướng phát triển đi thẳng vào các điểm đó, dùng tiếp các cơ chế có sẵn như rate limiting của ASP.NET Core.</aside>
 </section>
