@@ -16,6 +16,7 @@ public sealed class ProductForm
     public int CategoryId { get; set; }
 
     [Display(Name = "Base price (VND)")]
+    [WholeDong]
     public decimal? BasePrice { get; set; }
 
     [Display(Name = "On sale")]
@@ -35,6 +36,7 @@ public sealed class VariantAddForm
     public string? Configuration { get; set; }
     public string? Color { get; set; }
     public string? Region { get; set; }
+    [WholeDong]
     public decimal? Price { get; set; }
     public int StockQty { get; set; }
     public bool OnSale { get; set; } = true;
@@ -42,6 +44,7 @@ public sealed class VariantAddForm
 
 public sealed class VariantChangeForm
 {
+    [WholeDong]
     public decimal? Price { get; set; }
     public int StockQty { get; set; }
     public bool OnSale { get; set; }
@@ -61,9 +64,11 @@ public sealed class VoucherForm
     public VoucherDiscountType Type { get; set; }
 
     [Display(Name = "Discount (percent or VND)")]
+    [WholeDong(nameof(Type), VoucherDiscountType.Fixed)]
     public decimal Value { get; set; }
 
     [Display(Name = "Minimum order (VND)")]
+    [WholeDong]
     public decimal? MinOrderAmount { get; set; }
 
     [Display(Name = "Starts (local time)")]
@@ -126,9 +131,8 @@ public sealed class PriceBatchForm
     public List<int> ProductIds { get; set; } = [];
     public int? CategoryId { get; set; }
     public PriceBatchMode Mode { get; set; }
+    [WholeDong(nameof(Mode), PriceBatchMode.Amount)]
     public decimal? Value { get; set; }
-
-    public bool AmountIsWhole => Mode != PriceBatchMode.Amount || WholeDong.Is(Value);
 
     public PriceBatchInput ToInput() => new(ProductIds, CategoryId, Mode, Value ?? 0m);
 }
@@ -138,11 +142,38 @@ public sealed record PricesPage(PriceBatchForm Form, IReadOnlyList<(int Id, stri
 
 // An amount of money typed in a staff form is whole dong without separators.
 // "1.000" binds as 1 with three decimals (scale 3), so it is refused instead
-// of saving one dong where a thousand was meant (found 2026-10-09). The one
-// place that says so, for the prices and the stock forms.
-public static class WholeDong
+// of saving one dong where a thousand was meant (found 2026-10-09). One
+// attribute for every money field; a gate property and value (an enum field
+// on the same form) narrow it to the mode or type where the field is
+// actually money, since the same box can also hold a percent.
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class WholeDongAttribute : ValidationAttribute
 {
-    public static bool Is(decimal? amount) => amount is not { } v || v.Scale == 0;
+    private readonly string? _gateProperty;
+    private readonly object? _gateValue;
+
+    public WholeDongAttribute()
+    {
+    }
+
+    public WholeDongAttribute(string gateProperty, object gateValue)
+    {
+        _gateProperty = gateProperty;
+        _gateValue = gateValue;
+    }
+
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        if (_gateProperty is not null)
+        {
+            var gate = validationContext.ObjectType.GetProperty(_gateProperty)?.GetValue(validationContext.ObjectInstance);
+            if (!Equals(gate, _gateValue))
+                return ValidationResult.Success;
+        }
+        return value as decimal? is not { } v || v.Scale == 0
+            ? ValidationResult.Success
+            : new ValidationResult("Type numbers only, without dots or commas (for example 24990000).");
+    }
 }
 
 // Use case 20. Rows with neither a variant nor a quantity are empty rows of
@@ -161,8 +192,6 @@ public sealed class StockReceiptForm
 
     public IEnumerable<StockLineForm> FilledLines => Lines.Where(l => l.VariantId is not null || l.Quantity is not null);
 
-    public bool CostsAreWhole => FilledLines.All(l => WholeDong.Is(l.UnitCost));
-
     public StockReceiptInput ToInput() => new(Supplier, Note, FormKey,
         FilledLines.Select(l => new StockReceiptLineInput(l.VariantId ?? 0, l.Quantity ?? 0, l.UnitCost ?? 0m)).ToList());
 }
@@ -171,6 +200,7 @@ public sealed class StockLineForm
 {
     public int? VariantId { get; set; }
     public int? Quantity { get; set; }
+    [WholeDong]
     public decimal? UnitCost { get; set; }
 }
 

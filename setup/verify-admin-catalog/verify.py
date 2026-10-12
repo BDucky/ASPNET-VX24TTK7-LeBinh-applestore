@@ -10,11 +10,15 @@ What it does:
      customer through the real form.
   2. Admin: searches products, adds one with a photo from the library, adds a
      variant, is refused a variant save after a sale, takes the product off
-     sale and back; checks the three photos added on 2026-10-08 show.
-  3. Admin creates a voucher; the customer applies it at checkout.
-  4. Admin makes the customer an Employee while the customer is signed in
+     sale and back; checks the three photos added on 2026-10-08 show. A base
+     price or a new variant's price typed with a dot is refused, not read as
+     a fraction (whole-dong-everywhere, 2026-10-12).
+  3. A fixed voucher's amount and its minimum order are refused the same way
+     when typed with a dot, and save once whole.
+  4. Admin creates a voucher; the customer applies it at checkout.
+  5. Admin makes the customer an Employee while the customer is signed in
      elsewhere: that session ends, and signing in again shows the Staff link.
-  5. 1440px and 390px; PASS/FAIL per check, non-zero exit on any FAIL.
+  6. 1440px and 390px; PASS/FAIL per check, non-zero exit on any FAIL.
 """
 import sqlite3
 import sys
@@ -86,11 +90,21 @@ def main():
   out.photos = await page.locator('input[name=ImageUrl]').count();
   await page.fill('#Name', 'Live Check Mac __S__');
   await page.selectOption('#CategoryId', { label: 'Mac' });
-  await page.fill('#BasePrice', '15990000');
+  await page.fill('#BasePrice', '15.990');
   await page.check('input[name=ImageUrl][value="/img/products/mac-mini-m4.jpg"]');
+  await press(page, 'button:has-text("Save product")');
+  out.priceDotRefused = await text(page, '.account-error');
+  await page.fill('#BasePrice', '15990000');
   await press(page, 'button:has-text("Save product")');
   out.saved = await text(page, '.cart-status');
   out.edit = page.url().replace(APP, '');
+  await page.fill('#Sku', 'LIVE-__S__');
+  await page.fill('#Configuration', 'Live Check Mac __S__ 512GB');
+  await page.fill('#Color', 'Silver');
+  await page.fill('#Price', '15.990');
+  await page.fill('#StockQty', '4');
+  await press(page, 'button:has-text("Add variant")');
+  out.variantDotRefused = await text(page, '.cart-error');
   await page.fill('#Sku', 'LIVE-__S__');
   await page.fill('#Configuration', 'Live Check Mac __S__ 512GB');
   await page.fill('#Color', 'Silver');
@@ -106,6 +120,10 @@ def main():
         slug = scalar(db, "select Slug from Products where Id = ?", product_id)
         check("the product list searches", r["found"] >= 5, str(r["found"]))
         check("the form offers the photo library", r["photos"] >= 50, str(r["photos"]))
+        check("a base price typed with a dot is refused, not read as a fraction",
+              r["priceDotRefused"] == ["Type numbers only, without dots or commas (for example 24990000)."], str(r["priceDotRefused"]))
+        check("a new variant's price typed with a dot is refused, not read as a fraction",
+              r["variantDotRefused"] == ["Type numbers only, without dots or commas (for example 24990000)."], str(r["variantDotRefused"]))
         check("a product is added and a variant with it", r["saved"] == ["Product saved."] and r["variant"] == ["Variant added."], str(r))
         r = step(r"""
   await page.goto(APP + '/Products/__SLUG__');
@@ -141,6 +159,37 @@ def main():
               r["stale"] == ["The stock changed to 3 while you were editing (a sale, or another admin). Check it and save again."]
               and scalar(db, "select StockQty from ProductVariants where Id = ?", variant_id) == 3, str(r["stale"]))
         check("off sale hides it from the shop and back on sale shows it", r["shopOff"] == 404 and r["shopOn"] == 200 and r["off"] == ["Taken off sale. Orders that include it are not changed."], str(r))
+
+        # 3b. A fixed voucher's amount and minimum order refuse a dot, accept a whole amount.
+        r = step(r"""
+  await page.goto(APP + '/Admin/Vouchers/New');
+  await page.fill('#Code', 'dot__S__');
+  await page.selectOption('#Type', 'Fixed');
+  await page.fill('#Value', '50.000');
+  await page.fill('#MinOrderAmount', '500000');
+  await press(page, 'button:has-text("Save voucher")');
+  const out = { valueDotRefused: await text(page, '.account-error') };
+  await page.goto(APP + '/Admin/Vouchers/New');
+  await page.fill('#Code', 'dot__S__');
+  await page.selectOption('#Type', 'Fixed');
+  await page.fill('#Value', '50000');
+  await page.fill('#MinOrderAmount', '500.000');
+  await press(page, 'button:has-text("Save voucher")');
+  out.minDotRefused = await text(page, '.account-error');
+  await page.goto(APP + '/Admin/Vouchers/New');
+  await page.fill('#Code', 'dot__S__');
+  await page.selectOption('#Type', 'Fixed');
+  await page.fill('#Value', '50000');
+  await page.fill('#MinOrderAmount', '500000');
+  await press(page, 'button:has-text("Save voucher")');
+  out.saved = await text(page, '.cart-status');
+  return JSON.stringify(out);
+""".replace("__S__", STAMP))
+        check("a fixed voucher's amount typed with a dot is refused, not read as a fraction",
+              r["valueDotRefused"] == ["Type numbers only, without dots or commas (for example 24990000)."], str(r["valueDotRefused"]))
+        check("a voucher's minimum order typed with a dot is refused, not read as a fraction",
+              r["minDotRefused"] == ["Type numbers only, without dots or commas (for example 24990000)."], str(r["minDotRefused"]))
+        check("a fixed voucher with whole amounts saves", r["saved"] == ["Voucher saved."], str(r["saved"]))
 
         # 4. A voucher the admin makes is accepted at checkout.
         r = step(r"""

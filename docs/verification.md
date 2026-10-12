@@ -4,6 +4,30 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-12: whole dong in every staff money field (`fix/whole-dong-everywhere`)
+
+Five money fields a staff member types (a product's base price, a new or
+changed variant's price, a fixed voucher's value, its minimum order) did not
+refuse a typed decimal point, unlike the batch price and stock intake forms.
+`WholeDongAttribute` now guards all seven money fields; `VoucherForm.Value`
+and `PriceBatchForm.Value` are gated by a sibling enum property, since the
+same box also holds a percentage there.
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet test` | 644 of 644 (7 new: a base price, a new variant's price, a fixed voucher's value and its minimum order refused with a dot; a percent voucher with a dot still saves; a fixed voucher with whole amounts saves) |
+| `dotnet format --verify-no-changes` | clean |
+| `python3 setup/verify-admin-catalog/verify.py` | **20 of 20** (5 new checks: base price and new-variant-price dot refusal, fixed-voucher value and minimum-order dot refusal, fixed-voucher whole-amount save) |
+| `python3 setup/verify-promotions/verify.py` | 15 of 15, unchanged (`MinOrderAmount` never reaches a promotion row: `VoucherKindRules.For(Automatic)` sets `HasLimits: false`; `Value`'s gate is already exercised through the shared `DiscountAdminController` action in the voucher script) |
+
+One machine-setup note: this session's machine had only the .NET runtime
+installed (Homebrew cask `dotnet-runtime`), no SDK, so `dotnet build`/`test`
+could not run until the owner ran `brew uninstall --cask dotnet-runtime &&
+brew install --cask dotnet-sdk` themselves (Homebrew's installer needs an
+interactive `sudo` password, which cannot be supplied from an automated
+shell).
+
 ## 2026-10-12: batch prices change only variants on sale (`fix/batch-prices-on-sale`)
 
 **Found while taking the report's screenshots:** a +2% batch on the real

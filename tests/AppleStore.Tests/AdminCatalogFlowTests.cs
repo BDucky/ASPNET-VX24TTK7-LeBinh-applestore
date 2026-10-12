@@ -171,6 +171,7 @@ public class AdminCatalogFlowTests : WebFlowTestBase
     [Theory]
     [InlineData("24.990.000")]
     [InlineData("abc")]
+    [InlineData("24.990")]
     public async Task A_price_the_server_cannot_read_is_refused_and_the_old_price_kept(string typed)
     {
         var (blue, _, _) = Seed();
@@ -206,6 +207,45 @@ public class AdminCatalogFlowTests : WebFlowTestBase
         Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await product.Content.ReadAsStringAsync()));
         Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await voucher.Content.ReadAsStringAsync()));
         Assert.Equal(HttpStatusCode.NotFound, (await Client.GetAsync("/Products/mac-mini-m5")).StatusCode);
+    }
+
+    // "14.990" binds as 14.99 with three decimals (scale 3), the same gap as
+    // the two-dot case above, just harder to notice since the number still
+    // looks plausible (found 2026-10-12, whole-dong-everywhere).
+    [Fact]
+    public async Task A_base_price_typed_with_one_dot_is_refused_too()
+    {
+        Seed();
+        await SignInAsync();
+        var form = ProductForm("Mac mini M5", await CategoryIdAsync("iphone"));
+        form["BasePrice"] = "14.990";
+
+        var response = await PostFormAsync("/Admin/Products/New", form, formPage: "/Admin/Products/New");
+
+        Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
+        Assert.Equal(HttpStatusCode.NotFound, (await Client.GetAsync("/Products/mac-mini-m5")).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_new_variants_price_typed_with_a_dot_is_refused()
+    {
+        Seed();
+        await SignInAsync();
+        var id = await ProductIdAsync("iphone-17");
+
+        var response = await PostFormAsync($"/Admin/Products/{id}/Variants", new()
+        {
+            ["Sku"] = "IP17-256-GREEN",
+            ["Configuration"] = "iPhone 17 256GB",
+            ["Color"] = "Green",
+            ["Region"] = "VN/A",
+            ["Price"] = "24.990",
+            ["StockQty"] = "4",
+            ["OnSale"] = "true",
+        }, formPage: $"/Admin/Products/{id}");
+
+        Assert.Equal("Type numbers only, without dots or commas (for example 24990000).", Notice(await PageAsync(Location(response)), "error"));
+        Assert.DoesNotContain("data-choice-color=\"Green\"", await Client.GetStringAsync(PhoneVariantUrl));
     }
 
     [Fact]
@@ -279,6 +319,65 @@ public class AdminCatalogFlowTests : WebFlowTestBase
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("A percent discount is at most 100.", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
+    }
+
+    // A fixed voucher's value and its minimum order are money; "50.000" binds
+    // as 50 with three decimals (scale 3), the same gap fixed on the product
+    // and variant forms (whole-dong-everywhere, 2026-10-12).
+    [Fact]
+    public async Task A_fixed_vouchers_amount_typed_with_a_dot_is_refused()
+    {
+        await SignInAsync();
+        var form = VoucherForm("FIFTY", "50.000");
+        form["Type"] = "Fixed";
+
+        var response = await PostFormAsync("/Admin/Vouchers/New", form, formPage: "/Admin/Vouchers/New");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
+        Assert.DoesNotContain("FIFTY", await PageAsync("/Admin/Vouchers"));
+    }
+
+    [Fact]
+    public async Task A_vouchers_minimum_order_typed_with_a_dot_is_refused()
+    {
+        await SignInAsync();
+        var form = VoucherForm("MIN500");
+        form["MinOrderAmount"] = "500.000";
+
+        var response = await PostFormAsync("/Admin/Vouchers/New", form, formPage: "/Admin/Vouchers/New");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Type numbers only, without dots or commas (for example 24990000).", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
+        Assert.DoesNotContain("MIN500", await PageAsync("/Admin/Vouchers"));
+    }
+
+    // A percent is not money: the same Value box takes "12.500" to mean
+    // 12.5%, and that must still save (the rule above only gates the box
+    // when Type is Fixed).
+    [Fact]
+    public async Task A_percent_discount_typed_with_a_decimal_point_still_saves()
+    {
+        await SignInAsync();
+
+        var response = await PostFormAsync("/Admin/Vouchers/New", VoucherForm("HALF", "12.500"), formPage: "/Admin/Vouchers/New");
+
+        Assert.Matches("^/Admin/Vouchers/\\d+$", Location(response));
+        Assert.Contains("HALF", await PageAsync("/Admin/Vouchers"));
+    }
+
+    [Fact]
+    public async Task A_fixed_voucher_with_whole_amounts_saves()
+    {
+        await SignInAsync();
+        var form = VoucherForm("FLAT50K", "50000");
+        form["Type"] = "Fixed";
+        form["MinOrderAmount"] = "500000";
+
+        var response = await PostFormAsync("/Admin/Vouchers/New", form, formPage: "/Admin/Vouchers/New");
+
+        Assert.Matches("^/Admin/Vouchers/\\d+$", Location(response));
+        Assert.Contains("FLAT50K", await PageAsync("/Admin/Vouchers"));
     }
 
     // ---------- Accounts ----------

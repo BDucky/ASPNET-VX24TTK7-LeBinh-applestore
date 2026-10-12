@@ -48,7 +48,7 @@ public class StockController : Controller
     {
         if (form.FormKey == Guid.Empty)
             return RedirectToAction(nameof(New));
-        if (!ModelState.IsValid || !form.CostsAreWhole)
+        if (!ModelState.IsValid)
             return View(await PageAsync(form, AdminMessages.UnreadableNumber, ct));
         StockReceiptResult result;
         try

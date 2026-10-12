@@ -5,6 +5,49 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-12 (night): whole dong everywhere, done
+
+**What landed.** The owner answered the spec's three questions (all the
+recommended default): only staff-typed money gets the rule, a fixed
+voucher typed with a dot is refused (house rule kept), batch percent
+rounding unchanged. `WholeDongAttribute` replaces `WholeDong.Is` and the two
+ad-hoc checks (`AmountIsWhole`, `CostsAreWhole`); it now also guards
+`ProductForm.BasePrice`, `VariantAddForm.Price`, `VariantChangeForm.Price`,
+`VoucherForm.Value` (gated to `Type == Fixed`), `VoucherForm.MinOrderAmount`.
+644 tests; `verify-admin-catalog` extended and passing 20/20;
+`verify-promotions` rerun unchanged at 15/15 (`MinOrderAmount` never reaches
+a promotion row, so nothing to add there). PR #37 ready for the owner's
+review; not yet merged into `dev`.
+
+**This session needed a one-time machine setup.** `dotnet` was only the
+runtime (Homebrew cask `dotnet-runtime`), no SDK, so `dotnet build`/`test`
+could not run. Fixed by `brew uninstall --cask dotnet-runtime && brew
+install --cask dotnet-sdk` (the two casks conflict; the SDK cask already
+includes the runtime). This needs the owner's own terminal, since
+Homebrew's installer needs an interactive `sudo` password.
+
+**Next:** the owner reviews PR #37 and either merges it into `dev` or asks
+for changes; then the report and slides final pass on `docs/thesis-report`
+(PR #31, draft), which has been waiting on this PR.
+
+## 2026-10-12 (evening): whole dong everywhere, PLAN only
+
+**Status:** branch `fix/whole-dong-everywhere` from `dev` (274c886), draft PR
+open (#37). No code yet. The spec with the sweep, the proposed approach and three
+questions for the owner is `docs/specs/whole-dong-everywhere.md`.
+
+**Pick up on another machine:**
+1. `git fetch && git switch fix/whole-dong-everywhere`, then the setup in
+   `README.md` (`dotnet tool restore`, user-secrets for `SeedAdmin` and,
+   if mail is needed, `Smtp`), then `dotnet ef database update`.
+2. `dotnet build --no-incremental && dotnet test`: 637 tests expected green.
+3. Get the owner's answers to the three questions in the spec, then RED,
+   GREEN, live check, as in `docs/finish-plan.md` "Definition of done".
+4. Tick the checklist in the PR description as each step lands.
+
+**Also open elsewhere:** PR #31 (`docs/thesis-report`, draft) waits until the
+app work is done; see its own HANDOFF entry on that branch.
+
 ## 2026-10-12: batch prices on sale only (PR #36)
 
 The bug noted below is fixed: a batch changes only variants on sale (owner's
