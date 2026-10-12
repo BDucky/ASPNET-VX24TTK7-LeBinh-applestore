@@ -5,6 +5,26 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-12 (later still): PR #37 merged into `dev`; `/Track` rate limit
+
+**What landed.** PR #37 (whole dong everywhere) merged into `dev`. Then two
+of the owner's known open gaps were resolved: `/Track` now locks an order
+number for 5 minutes after 5 wrong phones in a row (table
+`OrderTrackLockouts`, `OrderManagementService.TrackAsync` returns
+`TrackResult`); the batch-prices-after-Back behavior was confirmed intended
+(each press is its own batch, the history already shows every one), no code
+change. 647 tests; `verify-orders` extended to 21 of 21.
+
+**Still open on `docs/thesis-report` (PR #31), owner's explicit call to do
+other work first:** the cover line "TRƯỜNG ĐẠI HỌC TRÀ VINH" should read
+"ĐẠI HỌC TRÀ VINH" (owner's correction, no "TRƯỜNG" prefix); the lecturer's
+title on the cover needs checking against the sample report or other
+materials the owner provides, not guessed. Do not start the report/slides
+rebuild until the owner asks for it.
+
+**After pulling:** `dotnet ef database update` (migration
+`OrderTrackLockouts`).
+
 ## 2026-10-12 (night): whole dong everywhere, done
 
 **What landed.** The owner answered the spec's three questions (all the

@@ -134,6 +134,11 @@ BM_PRICE_01 asks for a price-change history log. One row per variant whose own p
 ### VoucherProducts (added 2026-10-07)
 Composite PK `(VoucherId, ProductId)`, both cascading. A voucher with rows here applies only to those products.
 
+### OrderTrackLockouts (added 2026-10-12, not in the report)
+`Id (PK)`, `OrderId (FK -> Orders, cascade, unique)`, `FailCount (int)`, `LockedUntil (datetime2(0), nullable)`.
+
+BM_ORDER_TRACK_01's public `/Track` lookup (order number and receiver phone) had no limit on guesses. One row per order, created on its first wrong phone; the fifth in a row locks that order number for five minutes, the same numbers Identity's own account lockout already uses. A made-up order number is never locked (nothing to protect), so this table only ever holds rows for real orders.
+
 ### CartItems
 `Id (PK)`, `CartId (FK -> Carts)`, `ProductId (FK -> Products)`, `VariantId (FK -> ProductVariants)`, `Quantity (int, >= 1)`
 

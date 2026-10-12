@@ -96,8 +96,9 @@ puts a demoable buying flow and the admin area first.
 | In-person sale | 2026-10-10 | an order with channel InStore, paid and completed at once; walk-in customer without an account, an email links an existing account; prices include VAT; batch invoice printing (owner). Cash or bank transfer; price then complete at the shown total for exactly what was priced; a form key in the address; the seller recorded (Claude's) |
 | Stock intake | 2026-10-10 | quantity and unit cost per line, supplier typed in, one variant twice refused, a stock levels page (owner). Admins and employees (report); off-sale variants can be received, cost 0 allowed, a form key in the address so Back or a second press never receives goods twice (Claude's) |
 | Batch prices: on-sale only | 2026-10-10 | a batch changes only variants on sale (owner), after retired seed variants with old prices of a few hundred dong made a Watch batch round one to 0 and fail; fixed in PR #36 |
-| Batch prices after Back | 2026-10-10 | open: Back to /Admin/Prices and pressing again applies the change again (the history shows it). Treat as intended, or guard like the stock form? |
-| Code attempts | 2026-10-10 | five wrong codes, owner: already true for both code forms (registration ends the attempt; a reset code counts as a failed sign-in and locks the account after five, Identity's lockout). No change needed. `/Track` has no limit yet: still open |
+| Batch prices after Back | 2026-10-12 | intended as is (owner): each press of "Change prices" is its own batch, and the history already shows every one. No guard added. |
+| Code attempts | 2026-10-10 | five wrong codes, owner: already true for both code forms (registration ends the attempt; a reset code counts as a failed sign-in and locks the account after five, Identity's lockout). No change needed. |
+| `/Track` lockout | 2026-10-12 | five wrong phones against one order number lock that order for five minutes, the same numbers Identity's own lockout uses (owner: recommended default). New table `OrderTrackLockouts`; a made-up order number is never locked. |
 | Products without a photo | 2026-10-10 | a placeholder drawn for the product's kind, not an older model's photo (owner). Applies to MagSafe Battery Pack, Apple Watch Ultra 4, Apple Watch SE 3, iPad Air 8 11" and 13" |
 | Prices | 2026-10-09 | batch by products or a category, percent or amount, all or nothing; a percent result rounded to 1.000 dong; admins and employees use /Admin/Prices (owner). Off-sale variants included, unpriced ones skipped, an amount typed with a dot refused, prices capped at what decimal(12,2) holds (Claude's) |
 | Promotions | 2026-10-09 | owner: one table (Vouchers gets Kind and Name), a time-window discount layer worked out when a price is read, vouchers stack on the lowered price, the largest discount wins, Admin and Employee manage promotions, price history in its own PR. Claude's: nothing is ever made free (a discount reaching the price is skipped; a promotion percent stays below 100) |
@@ -132,7 +133,10 @@ puts a demoable buying flow and the admin area first.
 - No "resend code" button on the OTP page; an expired code means
   registering again.
 - The lockout message reveals that an email has an account (Identity's
-  default behavior).
+  default behavior). `/Track`'s lockout has the same tradeoff: it only ever
+  triggers for a real order number, so a locked message (as opposed to "no
+  order matches") reveals that the number is real. Accepted for the same
+  reason as the account lockout above, not tracked as a separate gap.
 - The Production error page renders without CSS when run from source and
   still has the template's "Development mode" paragraph (pre-existing, see
   `docs/verification.md`, 2026-10-05).
@@ -149,11 +153,9 @@ puts a demoable buying flow and the admin area first.
   settings are still set, the next start creates it again.
 - An online order left unpaid keeps its stock until someone cancels it;
   there is no time limit on paying.
-- `/Track` has no limit on attempts; guessing needs both the order number
-  and the receiver's full phone number. A rate limit would need a number
-  from the owner.
-- No rate limit on `/Track`, the registration and reset code forms; the
-  built-in rate limiter needs numbers from the owner.
+- No rate limit on the registration and reset code forms (how often a code
+  can be requested, not a wrong-guess lockout); the built-in rate limiter
+  needs numbers from the owner.
 - "1.000" typed as a voucher discount reads as 1 under the server culture.
 - No unique index on SKU (two retired AirTag variants share SKUs); two
   admins adding the same new SKU at the same moment could both succeed.
