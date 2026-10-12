@@ -132,6 +132,21 @@ def main():
   return JSON.stringify({ status: await text(page, '.cart-status'), by: await page.locator('tr[data-price-change]').first().innerText() });
 """)
         check("an employee changes prices and is named in the history", r["status"] == [f"Changed {len(after)} price{'' if len(after) == 1 else 's'}."] and "Price Staff" in r["by"], str(r))
+
+        # The real Watch category holds retired variants with old prices of a
+        # few hundred dong; a batch skips them (owner's decision 2026-10-10).
+        watch = rows(db, """select count(*) from ProductVariants v join Products p on p.Id = v.ProductId join Categories c on c.Id = p.CategoryId
+            where c.Slug = 'watch' and v.Price is not null and v.Status = 1 and p.Status = 1""")[0][0]
+        r = step(r"""
+  await page.goto(APP + '/Admin/Prices');
+  await page.selectOption('#CategoryId', { label: 'Watch' });
+  await page.selectOption('#Mode', 'Percent');
+  await page.fill('#Value', '2');
+  await press(page, 'button:has-text("Change prices")');
+  return JSON.stringify({ status: await text(page, '.cart-status'), error: await text(page, '.account-error') });
+""")
+        check("a +2% batch on the real Watch category changes every on-sale variant and skips the retired ones",
+              r["status"] == [f"Changed {watch} prices."] and r["error"] == [], str(r))
     finally:
         h.stop_app(proc)
         h.close_browser()
