@@ -8,7 +8,7 @@ project actually got here.
 ## 2026-10-12 (evening): whole dong everywhere, PLAN only
 
 **Status:** branch `fix/whole-dong-everywhere` from `dev` (274c886), draft PR
-open. No code yet. The spec with the sweep, the proposed approach and three
+open (#37). No code yet. The spec with the sweep, the proposed approach and three
 questions for the owner is `docs/specs/whole-dong-everywhere.md`.
 
 **Pick up on another machine:**
