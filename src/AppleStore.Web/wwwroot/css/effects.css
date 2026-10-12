@@ -928,6 +928,12 @@ p {
 
 /* ---------- Credits table ---------- */
 
+/* Four columns of long titles and names are wider than a phone: the table
+   scrolls, the page does not (same pattern as .compare-scroll). */
+.credits-scroll {
+  overflow-x: auto;
+}
+
 .credits-table {
   width: 100%;
   border-collapse: collapse;
