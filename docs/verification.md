@@ -4,6 +4,31 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-12 (later): a rate limit on `/Track`, and the batch-Back question resolved
+
+Two of the known gaps the owner had left open: `/Track` had no limit on
+guesses (needs both the order number and the receiver's phone, but nothing
+stopped trying every phone against one number); pressing "Change prices"
+again after Back applies the batch a second time. Owner's answers: `/Track`
+gets the same 5-attempts rule the account lockout already uses; the batch
+behavior is intended (each press is its own batch, and the history already
+shows every one), so nothing was changed there.
+
+New table `OrderTrackLockouts` (one row per order, created on its first
+wrong phone); `OrderManagementService.TrackAsync` now returns `TrackResult`
+(`Tracking`, `LockedOut`) instead of a bare nullable `TrackingResult`. A
+made-up order number is never locked (nothing to protect).
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet test` | 647 of 647 (3 new: five wrong phones lock the order for 5 minutes then open again, a correct phone resets the count, the same rule through the real `/Track` controller) |
+| `dotnet format --verify-no-changes` | clean |
+| `python3 setup/verify-orders/verify.py` | **21 of 21** (2 new checks: the fifth wrong phone locks tracking for the order, and it stays locked even for the right phone) |
+
+Mutation: changing `>=` to `>` in the lockout threshold fails both the new
+unit test and the new web-flow test.
+
 ## 2026-10-12: whole dong in every staff money field (`fix/whole-dong-everywhere`)
 
 Five money fields a staff member types (a product's base price, a new or

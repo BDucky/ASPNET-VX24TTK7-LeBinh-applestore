@@ -27,7 +27,11 @@
         @if (Model.Searched)
         {
             <div class="track-result" data-track-result>
-                @if (result is null)
+                @if (Model.LockedOut)
+                {
+                    <p class="account-error">@OrderMessages.TooManyAttempts</p>
+                }
+                else if (result is null)
                 {
                     <p class="account-error">@OrderMessages.NotTracked</p>
                 }

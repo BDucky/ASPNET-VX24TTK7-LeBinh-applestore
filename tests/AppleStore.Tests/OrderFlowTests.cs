@@ -159,6 +159,23 @@ public class OrderFlowTests : PaymentFlowBase
         Assert.Contains("No order matches that number and phone.", WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync()));
     }
 
+    [Fact]
+    public async Task Five_wrong_phones_lock_tracking_for_that_order_number()
+    {
+        var order = await PlaceCashOrderAsync();
+        await PostFormAsync("/Account/Logout", new(), formPage: "/");
+        var wrong = () => PostFormAsync("/Track", new() { ["OrderId"] = order.ToString(), ["Phone"] = "0999999999" });
+
+        for (var i = 0; i < 4; i++)
+            Assert.Contains("No order matches that number and phone.", WebUtility.HtmlDecode(await (await wrong()).Content.ReadAsStringAsync()));
+        var locked = WebUtility.HtmlDecode(await (await wrong()).Content.ReadAsStringAsync());
+
+        Assert.Contains("Too many attempts for this order number. Please try again in a few minutes.", locked);
+        var evenWithTheRightPhone = await PostFormAsync("/Track", new() { ["OrderId"] = order.ToString(), ["Phone"] = Phone });
+        Assert.Contains("Too many attempts for this order number. Please try again in a few minutes.",
+            WebUtility.HtmlDecode(await evenWithTheRightPhone.Content.ReadAsStringAsync()));
+    }
+
     // ---------- Staff ----------
 
     [Fact]

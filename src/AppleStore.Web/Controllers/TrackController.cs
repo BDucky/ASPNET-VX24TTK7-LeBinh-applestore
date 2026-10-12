@@ -19,14 +19,15 @@ public class TrackController : Controller
     }
 
     [HttpGet("")]
-    public IActionResult Index() => View(new TrackPage(new TrackForm(), null, false));
+    public IActionResult Index() => View(new TrackPage(new TrackForm(), null, false, false));
 
     [HttpPost(""), ValidateAntiForgeryToken]
     public async Task<IActionResult> Index(TrackForm form, CancellationToken ct)
     {
         if (!ModelState.IsValid)
-            return View(new TrackPage(form, null, false));
+            return View(new TrackPage(form, null, false, false));
 
-        return View(new TrackPage(form, await _orders.TrackAsync(form.OrderId!.Value, form.Phone, ct), true));
+        var result = await _orders.TrackAsync(form.OrderId!.Value, form.Phone, ct);
+        return View(new TrackPage(form, result.Tracking, true, result.LockedOut));
     }
 }
