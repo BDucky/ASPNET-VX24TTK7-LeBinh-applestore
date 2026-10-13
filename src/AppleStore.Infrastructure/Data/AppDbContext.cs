@@ -34,6 +34,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<StockReceipt> StockReceipts => Set<StockReceipt>();
     public DbSet<StockReceiptLine> StockReceiptLines => Set<StockReceiptLine>();
     public DbSet<VoucherProduct> VoucherProducts => Set<VoucherProduct>();
+    public DbSet<OrderTrackLockout> OrderTrackLockouts => Set<OrderTrackLockout>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

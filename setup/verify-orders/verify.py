@@ -13,7 +13,9 @@ What it does:
   3. Employee: the Staff link, the order list and filters, confirm, ship
      (with and without a tracking number), complete; an unpaid online order
      waits for payment; a stale page; the dashboard stays closed.
-  4. Anyone: /Track with the order number and phone, and with a wrong phone.
+  4. Anyone: /Track with the order number and phone, and with a wrong phone;
+     a fifth wrong phone in a row locks that order number for a few minutes
+     (2026-10-12).
   5. 1440px and 390px; prints PASS/FAIL per check, exits non-zero on a FAIL.
 """
 import sqlite3
@@ -197,6 +199,13 @@ def main():
   await page.fill('#Phone', '0900000000');
   await page.click('form.account-form button'); await page.waitForLoadState('load');
   out.wrong = await page.locator('[data-track-result]').innerText();
+  for (let i = 0; i < 4; i++) {
+    await page.click('form.account-form button'); await page.waitForLoadState('load');
+  }
+  out.locked = await page.locator('[data-track-result]').innerText();
+  await page.fill('#Phone', '0977-123-456');
+  await page.click('form.account-form button'); await page.waitForLoadState('load');
+  out.lockedEvenRight = await page.locator('[data-track-result]').innerText();
   await page.setViewportSize({ width: 1440, height: 900 });
   return JSON.stringify(out);
 """.replace("__FIRST__", str(first)))
@@ -204,6 +213,9 @@ def main():
         check("tracking with the phone shows Delivered and the tracking number, no address or price",
               "Delivered" in r["track"] and "GHN555" in r["track"] and "Order Street" not in r["track"] and "VNĐ" not in r["track"] and r["trackScroll"] <= 390, r["track"])
         check("a wrong phone finds nothing", r["wrong"].strip() == "No order matches that number and phone.", r["wrong"])
+        check("the fifth wrong phone in a row locks tracking for this order number",
+              "Too many attempts for this order number" in r["locked"], r["locked"])
+        check("locked even with the right phone", "Too many attempts for this order number" in r["lockedEvenRight"], r["lockedEvenRight"])
     finally:
         h.stop_app(proc)
         h.close_browser()

@@ -4,6 +4,95 @@ Durable record of what was actually run and observed, so "it should work" never
 substitutes for proof. Newest entry first. Append a new dated entry per
 verification pass; do not edit or delete old ones, they are the audit trail.
 
+## 2026-10-12 (latest): full live-test audit; a nav overflow and two phone-width bugs found and fixed
+
+Asked directly: has every view been live-tested as carefully as possible.
+Answer before this pass: all 15 `setup/verify-*` scripts had passed before,
+but only at 1440px and 390px, and two pages (`/Home/Credits`, `/Home/Privacy`)
+had never been opened by any script.
+
+**What this pass did:**
+1. Reran all 15 existing scripts fresh (not from old logs): 309 of 309
+   checks pass.
+2. Cross-checked every view file against what each script actually opens
+   (`page.goto` calls): found `/Home/Credits` and `/Home/Privacy` uncovered.
+3. Opened both live: `/Home/Credits`'s table overflowed the page at 390px
+   (582px wide). Fixed with `.credits-scroll` (same pattern as
+   `.compare-scroll`): the table scrolls, the page does not. Folded both
+   pages into `verify-account`'s existing page-loop (73 of 73, was 69).
+4. Owner asked for a full responsive sweep before merging, not just 390 and
+   1440px. Swept 320, 375, 768, 1024 and 1440px across every public,
+   signed-in and admin page (128 checks): found two more real bugs.
+   - The top nav used Bootstrap's `navbar-expand-lg` (992px collapse), but
+     a signed-in nav (Cart, Account, Sign out, and Staff for admins) needs
+     up to about 1062px wide, so between 992 and about 1061px **every
+     signed-in and admin page** scrolled sideways. Fixed by moving the
+     collapse to `navbar-expand-xl` (1200px) and its matching CSS media
+     query (was `max-width: 991px`, now `1199.98px`).
+   - `/Admin/Prices`'s multi-select sized itself to its longest product
+     name at 320px (346px wide); `/Admin/Stock/Levels`'s filter bar did not
+     wrap at 320px (367px wide). Fixed: `.admin-form select { width: 100%
+     }`, `.admin-filter { flex-wrap: wrap }`.
+5. Folded the sweep into a new permanent script, `setup/verify-responsive`,
+   so these five breakpoints stay checked going forward, not just this once.
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet test` | 647 of 647 (unaffected: view/CSS only) |
+| `dotnet format --verify-no-changes` | clean |
+| All 15 existing `setup/verify-*` scripts, rerun after the fixes | 309 of 309 (no regression from the nav breakpoint change) |
+| `setup/verify-responsive` (new) | **128 of 128** |
+
+## 2026-10-12 (later): a rate limit on `/Track`, and the batch-Back question resolved
+
+Two of the known gaps the owner had left open: `/Track` had no limit on
+guesses (needs both the order number and the receiver's phone, but nothing
+stopped trying every phone against one number); pressing "Change prices"
+again after Back applies the batch a second time. Owner's answers: `/Track`
+gets the same 5-attempts rule the account lockout already uses; the batch
+behavior is intended (each press is its own batch, and the history already
+shows every one), so nothing was changed there.
+
+New table `OrderTrackLockouts` (one row per order, created on its first
+wrong phone); `OrderManagementService.TrackAsync` now returns `TrackResult`
+(`Tracking`, `LockedOut`) instead of a bare nullable `TrackingResult`. A
+made-up order number is never locked (nothing to protect).
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet test` | 647 of 647 (3 new: five wrong phones lock the order for 5 minutes then open again, a correct phone resets the count, the same rule through the real `/Track` controller) |
+| `dotnet format --verify-no-changes` | clean |
+| `python3 setup/verify-orders/verify.py` | **21 of 21** (2 new checks: the fifth wrong phone locks tracking for the order, and it stays locked even for the right phone) |
+
+Mutation: changing `>=` to `>` in the lockout threshold fails both the new
+unit test and the new web-flow test.
+
+## 2026-10-12: whole dong in every staff money field (`fix/whole-dong-everywhere`)
+
+Five money fields a staff member types (a product's base price, a new or
+changed variant's price, a fixed voucher's value, its minimum order) did not
+refuse a typed decimal point, unlike the batch price and stock intake forms.
+`WholeDongAttribute` now guards all seven money fields; `VoucherForm.Value`
+and `PriceBatchForm.Value` are gated by a sibling enum property, since the
+same box also holds a percentage there.
+
+| Command | Result |
+|---|---|
+| `dotnet build --no-incremental` | 0 warnings, 0 errors |
+| `dotnet test` | 644 of 644 (7 new: a base price, a new variant's price, a fixed voucher's value and its minimum order refused with a dot; a percent voucher with a dot still saves; a fixed voucher with whole amounts saves) |
+| `dotnet format --verify-no-changes` | clean |
+| `python3 setup/verify-admin-catalog/verify.py` | **20 of 20** (5 new checks: base price and new-variant-price dot refusal, fixed-voucher value and minimum-order dot refusal, fixed-voucher whole-amount save) |
+| `python3 setup/verify-promotions/verify.py` | 15 of 15, unchanged (`MinOrderAmount` never reaches a promotion row: `VoucherKindRules.For(Automatic)` sets `HasLimits: false`; `Value`'s gate is already exercised through the shared `DiscountAdminController` action in the voucher script) |
+
+One machine-setup note: this session's machine had only the .NET runtime
+installed (Homebrew cask `dotnet-runtime`), no SDK, so `dotnet build`/`test`
+could not run until the owner ran `brew uninstall --cask dotnet-runtime &&
+brew install --cask dotnet-sdk` themselves (Homebrew's installer needs an
+interactive `sudo` password, which cannot be supplied from an automated
+shell).
+
 ## 2026-10-12: batch prices change only variants on sale (`fix/batch-prices-on-sale`)
 
 **Found while taking the report's screenshots:** a +2% batch on the real

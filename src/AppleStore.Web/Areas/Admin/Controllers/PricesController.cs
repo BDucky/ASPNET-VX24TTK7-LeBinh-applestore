@@ -34,7 +34,7 @@ public class PricesController : Controller
     [HttpPost("Batch"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Batch(PriceBatchForm form, CancellationToken ct)
     {
-        if (!ModelState.IsValid || !form.AmountIsWhole)
+        if (!ModelState.IsValid)
             return View(nameof(Index), await PageAsync(form, null, AdminMessages.UnreadableNumber, ct));
         PriceBatchResult result;
         try

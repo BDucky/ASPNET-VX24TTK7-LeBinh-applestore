@@ -41,3 +41,7 @@ public sealed record OrderListItem(
 // What anyone with the order number and the receiver's phone may see: no
 // address, no prices.
 public sealed record TrackingResult(int OrderId, DateTime CreatedAt, OrderStatus Status, string? Carrier, string? TrackingNo, ShipmentStatus? ShipmentStatus);
+
+// LockedOut true: too many wrong phones for this order number recently;
+// Tracking is always null then, whatever phone was given this time.
+public sealed record TrackResult(TrackingResult? Tracking, bool LockedOut);

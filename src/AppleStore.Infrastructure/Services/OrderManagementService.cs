@@ -144,25 +144,63 @@ public class OrderManagementService : IOrderManagementService
             RefundDue: action == OrderAction.Cancel && order.PaymentStatus == OrderPaymentStatus.Paid);
     }
 
-    public async Task<TrackingResult?> TrackAsync(int orderId, string? phone, CancellationToken ct = default)
+    private const int MaxFailedTrackAttempts = 5;
+    private static readonly TimeSpan TrackLockoutWindow = TimeSpan.FromMinutes(5);
+
+    public async Task<TrackResult> TrackAsync(int orderId, string? phone, CancellationToken ct = default)
     {
         var given = Digits(phone);
         if (given.Length == 0)
-            return null;
+            return new TrackResult(null, false);
 
         var order = await _db.Orders.AsNoTracking()
             .Where(o => o.Id == orderId)
             .Select(o => new { o.Id, o.CreatedAt, o.Status, o.Phone })
             .FirstOrDefaultAsync(ct);
-        if (order is null || Digits(order.Phone) != given)
-            return null;
+        // A made-up order number has nothing to protect: never locked.
+        if (order is null)
+            return new TrackResult(null, false);
+
+        var now = _time.GetUtcNow().UtcDateTime;
+        var lockout = await _db.OrderTrackLockouts.FirstOrDefaultAsync(l => l.OrderId == order.Id, ct);
+        if (lockout is { LockedUntil: { } until } && until > now)
+            return new TrackResult(null, true);
+
+        if (Digits(order.Phone) != given)
+            return new TrackResult(null, await RecordFailedTrackAsync(lockout, order.Id, now, ct));
+
+        if (lockout is { FailCount: > 0 })
+        {
+            lockout.FailCount = 0;
+            await _db.SaveChangesAsync(ct);
+        }
 
         var shipment = await _db.Shipments.AsNoTracking()
             .Where(s => s.OrderId == order.Id)
             .OrderByDescending(s => s.Id)
             .Select(s => new { s.Carrier, s.TrackingNo, s.Status })
             .FirstOrDefaultAsync(ct);
-        return new TrackingResult(order.Id, order.CreatedAt, order.Status, shipment?.Carrier, shipment?.TrackingNo, shipment?.Status);
+        return new TrackResult(new TrackingResult(order.Id, order.CreatedAt, order.Status, shipment?.Carrier, shipment?.TrackingNo, shipment?.Status), false);
+    }
+
+    // The fifth wrong phone in a row locks the order number for the window,
+    // the same rule the account lockout already uses for a wrong OTP code.
+    private async Task<bool> RecordFailedTrackAsync(OrderTrackLockout? lockout, int orderId, DateTime now, CancellationToken ct)
+    {
+        if (lockout is null)
+        {
+            lockout = new OrderTrackLockout { OrderId = orderId };
+            _db.OrderTrackLockouts.Add(lockout);
+        }
+        lockout.FailCount++;
+        var locked = lockout.FailCount >= MaxFailedTrackAttempts;
+        if (locked)
+        {
+            lockout.LockedUntil = now.Add(TrackLockoutWindow);
+            lockout.FailCount = 0;
+        }
+        await _db.SaveChangesAsync(ct);
+        return locked;
     }
 
     // Spaces, dots and dashes are how people write phone numbers, not part of them.

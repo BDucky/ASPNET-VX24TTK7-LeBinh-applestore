@@ -235,7 +235,13 @@ p {
   border-color: var(--accent);
 }
 
-@media (max-width: 991px) {
+/* Matches navbar-expand-xl's own collapse point (Bootstrap's xl, 1200px):
+   below it the nav is the collapsed hamburger menu, so these rules must
+   move in lockstep with the class on <nav> in _Layout.cshtml. Found
+   2026-10-12: at navbar-expand-lg's 992px, a signed-in nav (with Cart,
+   Account, Sign out, and Staff for admins) needs up to 1062px, so it
+   overflowed the page sideways from 992px to about 1061px. */
+@media (max-width: 1199.98px) {
   .site-nav-links {
     padding-block: 8px;
   }
@@ -927,6 +933,12 @@ p {
 }
 
 /* ---------- Credits table ---------- */
+
+/* Four columns of long titles and names are wider than a phone: the table
+   scrolls, the page does not (same pattern as .compare-scroll). */
+.credits-scroll {
+  overflow-x: auto;
+}
 
 .credits-table {
   width: 100%;
@@ -2126,6 +2138,10 @@ a.btn-store-primary {
   border-radius: 12px;
   padding: 0.7rem 0.9rem;
   font: inherit;
+  /* A multi-select sizes itself to its longest option (a long product
+     name) otherwise, pushing the page wider than a phone (found 2026-10-12). */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .admin-photos {
@@ -2421,6 +2437,7 @@ a.btn-store-primary {
 
 .admin-filter {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;

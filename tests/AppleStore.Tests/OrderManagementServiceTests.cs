@@ -347,7 +347,7 @@ public sealed class OrderManagementServiceTests : IDisposable
 
         var tracked = await _sut.TrackAsync(order, phone);
 
-        Assert.Equal(new TrackingResult(order, Now.UtcDateTime, OrderStatus.Shipping, "GHN", "GHN123456", ShipmentStatus.InTransit), tracked);
+        Assert.Equal(new TrackResult(new TrackingResult(order, Now.UtcDateTime, OrderStatus.Shipping, "GHN", "GHN123456", ShipmentStatus.InTransit), false), tracked);
     }
 
     [Theory]
@@ -358,7 +358,38 @@ public sealed class OrderManagementServiceTests : IDisposable
     {
         var order = await PlaceAsync(phone: "0912 345 678");
 
-        Assert.Null(await _sut.TrackAsync(order, phone));
-        Assert.Null(await _sut.TrackAsync(999_999, "0912345678"));
+        Assert.Equal(new TrackResult(null, false), await _sut.TrackAsync(order, phone));
+        Assert.Equal(new TrackResult(null, false), await _sut.TrackAsync(999_999, "0912345678"));
+    }
+
+    [Fact]
+    public async Task Five_wrong_phones_lock_tracking_for_the_order_for_five_minutes()
+    {
+        var order = await PlaceAsync(phone: "0912 345 678");
+
+        for (var i = 0; i < 4; i++)
+            Assert.Equal(new TrackResult(null, false), await _sut.TrackAsync(order, "0999999999"));
+        var fifth = await _sut.TrackAsync(order, "0999999999");
+        Assert.Equal(new TrackResult(null, true), fifth);
+
+        // Locked even for the right phone, and even for a made-up order number is not locked.
+        Assert.Equal(new TrackResult(null, true), await _sut.TrackAsync(order, "0912345678"));
+        Assert.Equal(new TrackResult(null, false), await _sut.TrackAsync(999_999, "0999999999"));
+
+        var later = new OrderManagementService(_db, new FixedTime(Now.AddMinutes(5).AddSeconds(1)));
+        Assert.Equal(new TrackResult(new TrackingResult(order, Now.UtcDateTime, OrderStatus.Pending, null, null, null), false), await later.TrackAsync(order, "0912345678"));
+    }
+
+    [Fact]
+    public async Task A_correct_phone_resets_the_count_of_wrong_ones()
+    {
+        var order = await PlaceAsync(phone: "0912 345 678");
+
+        for (var i = 0; i < 4; i++)
+            await _sut.TrackAsync(order, "0999999999");
+        await _sut.TrackAsync(order, "0912345678");
+
+        for (var i = 0; i < 4; i++)
+            Assert.Equal(new TrackResult(null, false), await _sut.TrackAsync(order, "0999999999"));
     }
 }

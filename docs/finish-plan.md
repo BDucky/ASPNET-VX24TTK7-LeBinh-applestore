@@ -78,6 +78,8 @@ puts a demoable buying flow and the admin area first.
 | 11a | Use case 20, stock intake (BM_STOCK_01) and stock levels | 20 | `feat/stock-intake` | EF migration, one transaction with in-database adds, a form key in the address, `[Authorize]` for two roles | done, verified 13/13, PR #33 |
 | 11b | Use case 21, in-person sale (BM_INVOICE_01) and batch invoices | 21 | `feat/in-store-sale` | the order model extended (channel, nullable customer), shared sale rules, a form key in the address, batch printing | done, verified 11/11, PR #34 |
 | 11c | Final pass on report and slides | | `docs/thesis-report` (PR #31, draft) | retake screenshots cropped to the part that matters at 2x, one large image per slide (owner agreed 2026-10-09 that the current ones are too small), rebuild the report, export PDF and .pptx, merge | **draft only** (owner, 2026-10-12: the report and slides are finished after the app is): screenshots, report, PDF and the 18-slide deck exist as drafts; retake, rebuild and export once more when the app is done |
+| 11d | Whole dong in every staff money field | 25, 28, 29 | `fix/whole-dong-everywhere` | model validation with one attribute (`WholeDongAttribute`) | done, 644 tests, `verify-admin-catalog` 20/20, `verify-promotions` 15/15 (no regression); PR #37 |
+| 11e | Demo video for the presentation and report | | not a feature branch (not code) | `page.screencast` "hero script" via `playwright-cli run-code`, not live CLI commands | **redo needed**, plan in `docs/specs/demo-video.md`: first attempt (2026-10-12) had a 404 caught on camera and no visible cursor; owner also wants two separate videos (customer flow, seller/staff flow), not one mixed video |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
 
 ## Open decisions (ask before the task that needs them)
@@ -93,14 +95,16 @@ puts a demoable buying flow and the admin area first.
 
 | Decision | Date | Outcome |
 |---|---|---|
+| Whole dong everywhere | 2026-10-12 | only staff-typed money gets the rule, no sweep of existing stored data; a fixed voucher typed with a dot is refused like the prices form (house rule kept); the batch percent rounding (to 1.000 dong) stays as is (owner, all three recommended defaults) |
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
 | Number of addresses | 2026-10-05 | no limit |
 | In-person sale | 2026-10-10 | an order with channel InStore, paid and completed at once; walk-in customer without an account, an email links an existing account; prices include VAT; batch invoice printing (owner). Cash or bank transfer; price then complete at the shown total for exactly what was priced; a form key in the address; the seller recorded (Claude's) |
 | Stock intake | 2026-10-10 | quantity and unit cost per line, supplier typed in, one variant twice refused, a stock levels page (owner). Admins and employees (report); off-sale variants can be received, cost 0 allowed, a form key in the address so Back or a second press never receives goods twice (Claude's) |
 | Batch prices: on-sale only | 2026-10-10 | a batch changes only variants on sale (owner), after retired seed variants with old prices of a few hundred dong made a Watch batch round one to 0 and fail; fixed in PR #36 |
-| Batch prices after Back | 2026-10-10 | open: Back to /Admin/Prices and pressing again applies the change again (the history shows it). Treat as intended, or guard like the stock form? |
-| Code attempts | 2026-10-10 | five wrong codes, owner: already true for both code forms (registration ends the attempt; a reset code counts as a failed sign-in and locks the account after five, Identity's lockout). No change needed. `/Track` has no limit yet: still open |
+| Batch prices after Back | 2026-10-12 | intended as is (owner): each press of "Change prices" is its own batch, and the history already shows every one. No guard added. |
+| Code attempts | 2026-10-10 | five wrong codes, owner: already true for both code forms (registration ends the attempt; a reset code counts as a failed sign-in and locks the account after five, Identity's lockout). No change needed. |
+| `/Track` lockout | 2026-10-12 | five wrong phones against one order number lock that order for five minutes, the same numbers Identity's own lockout uses (owner: recommended default). New table `OrderTrackLockouts`; a made-up order number is never locked. |
 | Products without a photo | 2026-10-10 | a placeholder drawn for the product's kind, not an older model's photo (owner). Applies to MagSafe Battery Pack, Apple Watch Ultra 4, Apple Watch SE 3, iPad Air 8 11" and 13" |
 | Prices | 2026-10-09 | batch by products or a category, percent or amount, all or nothing; a percent result rounded to 1.000 dong; admins and employees use /Admin/Prices (owner). Off-sale variants included, unpriced ones skipped, an amount typed with a dot refused, prices capped at what decimal(12,2) holds (Claude's) |
 | Promotions | 2026-10-09 | owner: one table (Vouchers gets Kind and Name), a time-window discount layer worked out when a price is read, vouchers stack on the lowered price, the largest discount wins, Admin and Employee manage promotions, price history in its own PR. Claude's: nothing is ever made free (a discount reaching the price is skipped; a promotion percent stays below 100) |
@@ -135,7 +139,10 @@ puts a demoable buying flow and the admin area first.
 - No "resend code" button on the OTP page; an expired code means
   registering again.
 - The lockout message reveals that an email has an account (Identity's
-  default behavior).
+  default behavior). `/Track`'s lockout has the same tradeoff: it only ever
+  triggers for a real order number, so a locked message (as opposed to "no
+  order matches") reveals that the number is real. Accepted for the same
+  reason as the account lockout above, not tracked as a separate gap.
 - The Production error page renders without CSS when run from source and
   still has the template's "Development mode" paragraph (pre-existing, see
   `docs/verification.md`, 2026-10-05).
@@ -152,11 +159,9 @@ puts a demoable buying flow and the admin area first.
   settings are still set, the next start creates it again.
 - An online order left unpaid keeps its stock until someone cancels it;
   there is no time limit on paying.
-- `/Track` has no limit on attempts; guessing needs both the order number
-  and the receiver's full phone number. A rate limit would need a number
-  from the owner.
-- No rate limit on `/Track`, the registration and reset code forms; the
-  built-in rate limiter needs numbers from the owner.
+- No rate limit on the registration and reset code forms (how often a code
+  can be requested, not a wrong-guess lockout); the built-in rate limiter
+  needs numbers from the owner.
 - "1.000" typed as a voucher discount reads as 1 under the server culture.
 - No unique index on SKU (two retired AirTag variants share SKUs); two
   admins adding the same new SKU at the same moment could both succeed.
