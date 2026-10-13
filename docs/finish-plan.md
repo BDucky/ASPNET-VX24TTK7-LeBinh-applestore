@@ -17,8 +17,9 @@ puts a demoable buying flow and the admin area first.
    tag helpers and model validation, EF Core Code First migrations, Areas for
    the admin side, dependency injection. Report chapter 2 is written around
    these.
-2. **Reference:** a previous student's submission for the same course and
-   instructor (TS. Đoàn Phước Miền), the owner's file
+2. **Reference:** a previous student's submission for the same course (its
+   cover names TS. Đoàn Phước Miền; this project's lecturer is Nguyễn Nhứt
+   Lam, owner's correction 2026-10-12), the owner's file
    `~/Downloads/chia sẽ khóa học.rar`: cover template, a 5-chapter Word
    report, and a .NET 9 MVC project using Identity. It is an example, not an
    official rubric. Check new features against it; do better where it is weak
@@ -73,9 +74,10 @@ puts a demoable buying flow and the admin area first.
 | 10d | Filter by price, sort by newest | 8 | `feat/price-filter` | model binding of enums from the query string, one dispatch table, tag helpers keeping state in links | done, verified 16/16, PR #27 |
 | 10e | Promotions | 28 | `feat/promotions` | EF migration, a base controller with thin subclasses per role, one owner for the sale price, `TimeProvider` | done, verified 15/15, PR #28 |
 | 10f | Batch prices and price history | 28 (BM_PRICE_01) | `feat/price-history` | EF migration, a transaction with compare-and-swap writes, `[Authorize]` for two roles | done, verified 11/11, PR #29 |
-| 11 | Report (Word, 5 chapters) and cover | | `docs/thesis-report` | chapter 2 explains the mechanisms above | not started |
+| 11 | Report (Word, 5 chapters) and cover, slides | | `docs/thesis-report` | chapter 2 explains the mechanisms above | report .docx and 14-slide online deck done 2026-10-09; PDF and .pptx export waiting on the owner (no Word or LibreOffice on this machine) |
 | 11a | Use case 20, stock intake (BM_STOCK_01) and stock levels | 20 | `feat/stock-intake` | EF migration, one transaction with in-database adds, a form key in the address, `[Authorize]` for two roles | done, verified 13/13, PR #33 |
 | 11b | Use case 21, in-person sale (BM_INVOICE_01) and batch invoices | 21 | `feat/in-store-sale` | the order model extended (channel, nullable customer), shared sale rules, a form key in the address, batch printing | done, verified 11/11, PR #34 |
+| 11c | Final pass on report and slides | | `docs/thesis-report` (PR #31, draft) | report laid out like the sample (`220064_MauBia.doc`, `220064_MauBaoCao.doc`): framed cover with the school logo, evaluation pages after the cover, header and footer | 2026-10-13: report and PDF rebuilt with the sample layout and `dev` up to PR #40 (647 tests, 437 checks), lecturer "TS. Nguyễn Nhứt Lam" (owner, course page); slides updated online (version 12). Open: semester number on the cover, .pptx export, demo videos (11e) |
 | 11d | Whole dong in every staff money field | 25, 28, 29 | `fix/whole-dong-everywhere` | model validation with one attribute (`WholeDongAttribute`) | done, 644 tests, `verify-admin-catalog` 20/20, `verify-promotions` 15/15 (no regression); PR #37 |
 | 11e | Demo video for the presentation and report | | not a feature branch (not code) | `page.screencast` "hero script" via `playwright-cli run-code`, not live CLI commands | **redo needed**, plan in `docs/specs/demo-video.md`: first attempt (2026-10-12) had a 404 caught on camera and no visible cursor; owner also wants two separate videos (customer flow, seller/staff flow), not one mixed video |
 | 12 | Week 4 progress report (2026-10-07 to 10-13) | | with any PR that week | | started 2026-10-07 with task 4, update as the week goes |
@@ -85,11 +87,15 @@ puts a demoable buying flow and the admin area first.
 | Decision | Needed by task | Notes |
 |---|---|---|
 | Report written by Claude in Vietnamese (owner, 2026-10-09); slides online with a .pptx export (owner) | 11 | decided |
+| Keep the cover line "TRƯỜNG ĐẠI HỌC TRÀ VINH" above "Trường Kỹ thuật và Công nghệ"? The instructor's sample has no such line | 11c | open |
+| Stock intake: receipt tables, supplier field, who may do it | 11a | open |
+| In-person sale: tax rate (BM_INVOICE_01 has "+ tax"), receipt numbering, walk-in customer without an account | 11b | open |
 
 ## Decided
 
 | Decision | Date | Outcome |
 |---|---|---|
+| Report cover | 2026-10-13 | lecturer written "TS. Nguyễn Nhứt Lam" (owner, from the course page); first line "ĐẠI HỌC TRÀ VINH" (owner, 2026-10-12); layout, logo and place name "Vĩnh Long" follow the 2026 sample (Claude's, from the sample); "Học kỳ 7" kept until the owner gives the number |
 | Whole dong everywhere | 2026-10-12 | only staff-typed money gets the rule, no sweep of existing stored data; a fixed voucher typed with a dot is refused like the prices form (house rule kept); the batch percent rounding (to 1.000 dong) stays as is (owner, all three recommended defaults) |
 | Forgot password | 2026-10-05 | 6-digit code in `UserTokens` (`ResetPasswordOtp`), because `docs/requirements.md` use case 4 says "forgot password, OTP". An unknown email is told plainly there is no account (registration already reveals taken emails). |
 | Email change | 2026-10-05 | not offered; the email is the sign-in name |
