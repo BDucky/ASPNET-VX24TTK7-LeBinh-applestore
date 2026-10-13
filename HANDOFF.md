@@ -5,6 +5,72 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-13 (later): report rendering bugs fixed, .pptx exported and corrected
+
+**What landed on `docs/thesis-report`, on top of the entry below.** The owner opened
+the rebuilt report in Pages (no Word on this machine) and found three real rendering
+bugs, found and fixed one at a time by rebuilding to PDF with LibreOffice (newly
+installed via `brew install --cask libreoffice`, plus `poppler` for `pdftoppm`) and
+looking at the actual page images, not guessing from the generator code:
+
+1. The cover's "Vĩnh Long, tháng 10 năm 2026" line spilled onto a lone second page:
+   `blank(9)` before it was excess vertical space; cut to `blank(5)`.
+2. The running header (`TITLE_SHORT` + tab + `LECTURER`) collided with no gap
+   ("...công nghệ AppleTS. Nguyễn Nhứt Lam"): Pages does not honour a right tab stop
+   in a header/footer paragraph the way Word and LibreOffice do. Replaced the tab
+   stop with a two-column borderless table (the same technique already used for the
+   cover's lecturer/student block), which renders identically across viewers. Same
+   fix applied to the footer.
+3. The two evaluation pages' signature block (20 dotted writing lines) overflowed to
+   a second page in Pages: every `spacing.line` in `setup/report/build.js`, including
+   the document's own default style, was missing an explicit `lineRule`, which is
+   genuinely ambiguous in the OOXML spec and was answered differently by Pages versus
+   LibreOffice. Added `lineRule: "auto"` everywhere a `line` value is set, plus
+   trimmed the dotted lines from 20 to 16 for a safety margin. Both evaluation pages
+   now fit on one page each, confirmed in a LibreOffice render.
+
+Re-verified by converting the full 62-page docx to PDF and viewing every page: no
+further formatting bugs found. Two items raised as questions were answered "keep as
+is" by the owner: the evaluation pages' combined page-frame-plus-header (looks fine
+in the real render) and the 12pt table-cell font versus 13pt body text (kept, tables
+would wrap more at 13pt). `docs/finish-plan.md`'s cover-line open decision was stale
+(already resolved 2026-10-12) and removed; "Học kỳ 7" confirmed final by the owner.
+
+**Slides and .pptx, same session.** `thesis/abs/slides-src/slides/kien-truc.html` had
+a stale "15 script kiểm tra" (the report says 16, `verify-responsive` added later);
+fixed in the local source. The owner exported `.pptx` from the online deck
+(`https://claude.ai/artifact/JNrn7bidSq78ZbvTEhnfxv`) themselves (this session could
+not read or edit that deck: tried `mcp__claude_ai_Claude_Docs__read`, got `access:
+deny`, the deck isn't shared with this session). Opened the exported file: the font
+"Be Vietnam Pro" (a Google web font) is not installed on this machine and not
+embedded in the file (`embedTrueTypeFonts` absent from `presentation.xml`), so a
+fallback font renders everywhere; this alone did not break any layout when checked
+page by page (LibreOffice render, same font-missing situation the grader's machine
+will likely be in). Two real defects were found and patched directly in the
+downloaded `.pptx` XML (unzip, edit `ppt/slides/slide4.xml`, rezip): "AppleStore.
+Infrastructure" was wrapping mid-word ("Infrastructu" / "re") because the fallback
+font is wider than the original; given an explicit line break after the dot instead
+("AppleStore." / "Infrastructure"), and the same stale "15 script" text corrected to
+16. Two things that looked wrong in the LibreOffice render were checked against the
+raw XML and were NOT bugs: the closing slide's email looked like it had a stray space
+("binhl030 199@...") and "Xử lý đơn hàng" looked like a dropped diacritic ("Xủ") —
+both are rendering-only artifacts of the fallback font; the underlying text and
+Unicode codepoints are correct. The corrected file is
+`thesis/abs/Apple Store - Chuyên đề ASP.NET.pptx`; the owner was told not to use the
+original `~/Downloads` copy. The owner declined embedding the font (accepted the
+fallback look, already confirmed clean). A full speaker script compiled from all 18
+slide notes, plus five anticipated defense questions with short answers, is new at
+`thesis/abs/speaker-script.md`.
+
+**Also this session:** `setup/report/package-lock.json` added (first `npm install` in
+that folder on this machine); `LibreOffice` and `poppler` are now installed via
+Homebrew on this machine (not committed, local tooling only), useful going forward
+for rendering the docx or pptx to real page images instead of reasoning about the
+generator code blind.
+
+**Pick up here:** PR #31 still draft. Open: demo videos (11e, redo per
+`docs/specs/demo-video.md`), then mark the PR ready and merge.
+
 ## 2026-10-13: report laid out like the sample, slides updated (PR #31)
 
 **What landed on `docs/thesis-report`:** `dev` merged in (up to PR #40).
