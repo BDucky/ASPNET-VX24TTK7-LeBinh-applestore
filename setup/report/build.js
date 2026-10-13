@@ -6,7 +6,16 @@ const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell,
   WidthType, ImageRun, TableOfContents, StyleLevel, Footer, PageNumber, NumberFormat, SectionType,
   PageBreak, LevelFormat, BorderStyle, ShadingType, VerticalAlign, Header, TabStopType, TabStopPosition,
+  LineRuleType,
 } = require("docx");
+
+// Every explicit line-spacing value below names its rule (LineRuleType.AUTO):
+// a bare `line` value with no rule is ambiguous in the OOXML spec, and Pages
+// (which has no `lineRule` fallback matching Word/LibreOffice) rendered the
+// evaluation sheet's writing lines tall enough to push the signature block
+// onto a second page (2026-10-13). Naming the rule everywhere keeps every
+// viewer at the same line height.
+const AUTO_LINE = LineRuleType.AUTO;
 
 const ROOT = process.argv[2];
 const IMG = path.join(ROOT, "thesis", "doc", "hinh");
@@ -51,7 +60,7 @@ function cell(text, width, header = false) {
     shading: header ? { fill: "D9E2F3", type: ShadingType.CLEAR, color: "auto" } : undefined,
     margins: { top: 60, bottom: 60, left: 100, right: 100 },
     verticalAlign: VerticalAlign.CENTER,
-    children: String(text).split("\n").map(line => new Paragraph({ children: runs(line, { size: 24, bold: header || undefined }), spacing: { after: 0, line: 276 } })),
+    children: String(text).split("\n").map(line => new Paragraph({ children: runs(line, { size: 24, bold: header || undefined }), spacing: { after: 0, line: 276, lineRule: AUTO_LINE } })),
   });
 }
 
@@ -137,7 +146,7 @@ const cover = [
       plainCell(3900, [line("Sinh viên thực hiện:", { italics: true }), line(`Họ tên: ${STUDENT}`), line("MSSV: 470124170"), line("Lớp: VX24TTK7")]),
     ] })],
   }),
-  ...blank(9),
+  ...blank(5),
   centered(`${PLACE}, tháng 10 năm 2026`, { bold: true, italics: true }),
 ];
 
@@ -703,19 +712,19 @@ const refs = [
 
 // Dotted writing lines drawn with a dot-leader tab, as in the sample (borders on adjacent
 // paragraphs merge into one line in some viewers).
-const lines = n => Array.from({ length: n }, () => new Paragraph({ spacing: { after: 0, line: 480 },
+const lines = n => Array.from({ length: n }, () => new Paragraph({ spacing: { after: 0, line: 480, lineRule: AUTO_LINE },
   tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX, leader: "dot" }], children: [new TextRun("\t")] }));
 
 // Right after the cover, as in the sample and the faculty's report template.
 const evaluation = [
   new Paragraph({ style: "FrontTitle", children: [new TextRun("NHẬN XÉT CỦA GIẢNG VIÊN HƯỚNG DẪN")] }),
-  ...lines(20),
+  ...lines(16),
   ...blank(1),
   new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `${PLACE}, ngày ...... tháng ...... năm 2026`, italics: true })] }),
   new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Giảng viên hướng dẫn", bold: true })] }),
   new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "(Ký tên và ghi rõ họ tên)", italics: true })] }),
   new Paragraph({ style: "FrontTitle", pageBreakBefore: true, children: [new TextRun("NHẬN XÉT CỦA THÀNH VIÊN HỘI ĐỒNG")] }),
-  ...lines(20),
+  ...lines(16),
   ...blank(1),
   new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `${PLACE}, ngày ...... tháng ...... năm 2026`, italics: true })] }),
   new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Thành viên hội đồng", bold: true })] }),
@@ -726,11 +735,33 @@ const evaluation = [
 
 const pageProps = { page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1701, right: 1134 } } };
 const rule = { style: BorderStyle.SINGLE, size: 6, color: "000000", space: 1 };
-const rightTab = [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }];
-const header = () => new Header({ children: [new Paragraph({ tabStops: rightTab, border: { bottom: rule },
-  children: [new TextRun({ text: TITLE_SHORT, italics: true, size: 22 }), new TextRun({ text: `\t${LECTURER}`, bold: true, italics: true, size: 22 })] })] });
-const footer = () => new Footer({ children: [new Paragraph({ tabStops: rightTab, border: { top: rule },
-  children: [new TextRun({ text: STUDENT, bold: true, italics: true, size: 22 }), new TextRun({ children: ["\t", PageNumber.CURRENT], size: 22 })] })] });
+
+// A two-column borderless table, not a tab stop: Pages does not honour a right
+// tab stop in a header/footer paragraph (title and lecturer ran together with
+// no gap, 2026-10-13), a table cell's right alignment is the same trick
+// already used for the cover's lecturer/student block and renders the same
+// in Pages, Word and LibreOffice.
+const hfCell = (width, align, borders, children) =>
+  new TableCell({ borders, width: { size: width, type: WidthType.DXA }, margins: { top: 0, bottom: 0, left: 0, right: 0 },
+    children: [new Paragraph({ alignment: align, spacing: { after: 0 }, children })] });
+const hfRow = (w1, w2, left, right, borders) => new Table({
+  width: { size: TEXT_WIDTH, type: WidthType.DXA }, columnWidths: [w1, w2], borders: noBorders,
+  rows: [new TableRow({ children: [hfCell(w1, AlignmentType.LEFT, borders, left), hfCell(w2, AlignmentType.RIGHT, borders, right)] })],
+});
+const headerBorders = { ...noBorders, bottom: rule };
+const footerBorders = { ...noBorders, top: rule };
+const header = () => new Header({ children: [hfRow(
+  Math.round(TEXT_WIDTH * 0.62), TEXT_WIDTH - Math.round(TEXT_WIDTH * 0.62),
+  [new TextRun({ text: TITLE_SHORT, italics: true, size: 22 })],
+  [new TextRun({ text: LECTURER, bold: true, italics: true, size: 22 })],
+  headerBorders,
+)] });
+const footer = () => new Footer({ children: [hfRow(
+  Math.round(TEXT_WIDTH * 0.5), TEXT_WIDTH - Math.round(TEXT_WIDTH * 0.5),
+  [new TextRun({ text: STUDENT, bold: true, italics: true, size: 22 })],
+  [new TextRun({ children: [PageNumber.CURRENT], size: 22 })],
+  footerBorders,
+)] });
 
 const stepConfigs = Array.from({ length: stepLists }, (_, i) => ({
   reference: `steps${i + 1}`,
@@ -743,7 +774,7 @@ const doc = new Document({
   description: "Báo cáo đồ án môn Chuyên đề ASP.NET",
   features: { updateFields: true },
   styles: {
-    default: { document: { run: { font: FONT, size: SIZE }, paragraph: { spacing: { line: 336 } } } },
+    default: { document: { run: { font: FONT, size: SIZE }, paragraph: { spacing: { line: 336, lineRule: AUTO_LINE } } } },
     paragraphStyles: [
       { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
         run: { font: FONT, size: 30, bold: true, color: "000000" }, paragraph: { alignment: AlignmentType.CENTER, spacing: { before: 0, after: 360 }, outlineLevel: 0 } },
