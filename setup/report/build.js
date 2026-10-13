@@ -5,7 +5,7 @@ const path = require("path");
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell,
   WidthType, ImageRun, TableOfContents, StyleLevel, Footer, PageNumber, NumberFormat, SectionType,
-  PageBreak, LevelFormat, BorderStyle, ShadingType, VerticalAlign,
+  PageBreak, LevelFormat, BorderStyle, ShadingType, VerticalAlign, Header, TabStopType, TabStopPosition,
 } = require("docx");
 
 const ROOT = process.argv[2];
@@ -104,26 +104,47 @@ const centered = (text, opts = {}) => new Paragraph({ alignment: AlignmentType.C
 
 // ---------- cover ----------
 
+// Laid out like the sample cover (220064_MauBia.doc): a double frame, the school logo,
+// the lecturer on the left and the student on the right.
+const LECTURER = "TS. Nguyễn Nhứt Lam";
+const STUDENT = "Lê Bình";
+const PLACE = "Vĩnh Long";
+const TITLE_SHORT = "Xây dựng website bán sản phẩm công nghệ Apple";
+
+const noBorder = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+const noBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+const line = (text, opts = {}) => new Paragraph({ spacing: { after: 0 },
+  children: [new TextRun({ text, bold: opts.bold, italics: opts.italics })] });
+const plainCell = (width, children) => new TableCell({ borders: noBorders, width: { size: width, type: WidthType.DXA }, children });
+
 const cover = [
-  centered("TRƯỜNG ĐẠI HỌC TRÀ VINH", { bold: true, size: 28 }),
-  centered("TRƯỜNG KỸ THUẬT VÀ CÔNG NGHỆ", { bold: true, size: 28 }),
-  centered("KHOA CÔNG NGHỆ THÔNG TIN", { bold: true, size: 28, after: 200 }),
-  centered("--------------------", { after: 600 }),
-  ...blank(3),
-  centered("ĐỒ ÁN MÔN HỌC: CHUYÊN ĐỀ ASP.NET", { bold: true, size: 32, after: 120 }),
-  centered("HỌC KỲ 7, NĂM HỌC 2026", { bold: true, size: 28, after: 600 }),
-  centered("XÂY DỰNG WEBSITE BÁN SẢN PHẨM", { bold: true, size: 36, after: 60 }),
-  centered("CÔNG NGHỆ APPLE (APPLE STORE)", { bold: true, size: 36, after: 600 }),
-  ...blank(4),
-  new Paragraph({ indent: { left: 4536 }, children: [new TextRun({ text: "Giảng viên hướng dẫn:", bold: true })] }),
-  new Paragraph({ indent: { left: 4536 }, spacing: { after: 240 }, children: [new TextRun("Nguyễn Nhứt Lam")] }),
-  new Paragraph({ indent: { left: 4536 }, children: [new TextRun({ text: "Sinh viên thực hiện:", bold: true })] }),
-  new Paragraph({ indent: { left: 4536 }, children: [new TextRun("Họ tên: Lê Bình")] }),
-  new Paragraph({ indent: { left: 4536 }, children: [new TextRun("MSSV: 470124170")] }),
-  new Paragraph({ indent: { left: 4536 }, children: [new TextRun("Lớp: VX24TTK7")] }),
-  ...blank(5),
-  centered("Trà Vinh, tháng 10 năm 2026", { italics: true }),
+  ...blank(1),
+  centered("ĐẠI HỌC TRÀ VINH", { size: 26 }),
+  centered("TRƯỜNG KỸ THUẬT VÀ CÔNG NGHỆ", { size: 26 }),
+  centered("KHOA CÔNG NGHỆ THÔNG TIN", { bold: true, size: 26, after: 360 }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 600 },
+    children: [new ImageRun({ type: "jpg", data: fs.readFileSync(path.join(IMG, "00-logo-tvu.jpg")),
+      transformation: { width: 100, height: 100 }, altText: { title: "Logo", description: "Logo Đại học Trà Vinh", name: "logo" } })] }),
+  centered("ĐỒ ÁN MÔN HỌC: CHUYÊN ĐỀ ASP.NET", { bold: true, size: 26, after: 120 }),
+  centered("HỌC KỲ 7, NĂM HỌC 2026", { bold: true, size: 26, after: 240 }),
+  centered("XÂY DỰNG WEBSITE BÁN SẢN PHẨM", { bold: true, size: 36, after: 120 }),
+  centered("CÔNG NGHỆ APPLE (APPLE STORE)", { bold: true, size: 36, after: 1200 }),
+  ...blank(2),
+  new Table({
+    width: { size: 8200, type: WidthType.DXA }, columnWidths: [4300, 3900], alignment: AlignmentType.CENTER,
+    rows: [new TableRow({ children: [
+      plainCell(4300, [line("Giảng viên hướng dẫn:", { italics: true }), line(LECTURER, { bold: true })]),
+      plainCell(3900, [line("Sinh viên thực hiện:", { italics: true }), line(`Họ tên: ${STUDENT}`), line("MSSV: 470124170"), line("Lớp: VX24TTK7")]),
+    ] })],
+  }),
+  ...blank(9),
+  centered(`${PLACE}, tháng 10 năm 2026`, { bold: true, italics: true }),
 ];
+
+// A double line around the page, as on the sample cover and evaluation pages.
+const frameSide = { style: BorderStyle.DOUBLE, size: 6, color: "000000", space: 24 };
+const framed = { borders: { pageBorders: { display: "allPages", offsetFrom: "page" },
+  pageBorderTop: frameSide, pageBorderBottom: frameSide, pageBorderLeft: frameSide, pageBorderRight: frameSide } };
 
 // ---------- front matter ----------
 
@@ -131,7 +152,7 @@ const unnumberedTitle = text => new Paragraph({ style: "FrontTitle", children: [
 
 const front = [
   unnumberedTitle("LỜI CẢM ƠN"),
-  p("Em xin gửi lời cảm ơn chân thành đến thầy Nguyễn Nhứt Lam, giảng viên hướng dẫn môn Chuyên đề ASP.NET, đã tận tình hướng dẫn, góp ý và định hướng cho em trong suốt quá trình thực hiện đồ án này. Những kiến thức về ASP.NET Core mà thầy truyền đạt là nền tảng để em xây dựng được website Apple Store."),
+  p(`Em xin gửi lời cảm ơn chân thành đến thầy ${LECTURER}, giảng viên hướng dẫn môn Chuyên đề ASP.NET, đã tận tình hướng dẫn, góp ý và định hướng cho em trong suốt quá trình thực hiện đồ án này. Những kiến thức về ASP.NET Core mà thầy truyền đạt là nền tảng để em xây dựng được website Apple Store.`),
   p("Em cũng xin cảm ơn Ban Giám hiệu, Trường Kỹ thuật và Công nghệ, Khoa Công nghệ Thông tin cùng các thầy cô đã tạo điều kiện học tập và nghiên cứu để em hoàn thành đồ án."),
   p("Em xin cảm ơn gia đình và bạn bè đã luôn động viên, hỗ trợ em trong thời gian học tập và thực hiện đề tài."),
   p("Do thời gian và kinh nghiệm còn hạn chế, đồ án không tránh khỏi những thiếu sót. Em rất mong nhận được ý kiến đóng góp của thầy cô để đề tài được hoàn thiện hơn."),
@@ -249,7 +270,7 @@ const ch2 = [
   p("ASP.NET Core có sẵn cơ chế Dependency Injection (DI): các dịch vụ được đăng ký một lần trong Program.cs, ví dụ builder.Services.AddScoped<ICartService, CartService>(), và được tự động truyền vào constructor của controller khi cần. Nhờ DI, khi kiểm thử có thể thay một dịch vụ bằng phiên bản giả (ví dụ dịch vụ gửi email giả) mà không sửa mã."),
   p("Options pattern dùng để đọc cấu hình thành một lớp C# có kiểm tra hợp lệ. Đồ án dùng SmtpOptions cho thông tin gửi email và PaymentOptions cho cổng thanh toán, kèm ValidateOnStart để ứng dụng từ chối khởi động nếu cấu hình sai, thay vì lỗi khi người dùng đang thao tác. Mật khẩu email được lưu bằng user-secrets trên máy, không nằm trong mã nguồn."),
   h3("2.2.6. Model binding và model validation"),
-  p("Model binding tự động chuyển dữ liệu từ form hoặc đường dẫn thành tham số và đối tượng C#. Model validation kiểm tra dữ liệu bằng các thuộc tính như [Required], [StringLength] và kết quả nằm trong ModelState. Đồ án dựa vào ModelState để phát hiện số không đọc được, ví dụ khi nhân viên gõ giá \"24.990.000\" có dấu chấm, trang sẽ báo lỗi thay vì lưu giá rỗng. Riêng các ô số tiền ở trang Giá và trang nhập kho, giá trị \"1.000\" vẫn đọc được thành số 1 (có ba chữ số thập phân) nên được kiểm tra thêm: số tiền phải là số nguyên, không có dấu phân cách."),
+  p("Model binding tự động chuyển dữ liệu từ form hoặc đường dẫn thành tham số và đối tượng C#. Model validation kiểm tra dữ liệu bằng các thuộc tính như [Required], [StringLength] và kết quả nằm trong ModelState. Đồ án dựa vào ModelState để phát hiện số không đọc được, ví dụ khi nhân viên gõ giá \"24.990.000\" có dấu chấm, trang sẽ báo lỗi thay vì lưu giá rỗng. Riêng giá trị \"1.000\" vẫn đọc được thành số 1 (có ba chữ số thập phân), nên đồ án viết thêm một thuộc tính kiểm tra riêng, WholeDongAttribute (kế thừa ValidationAttribute): số tiền phải là số đồng nguyên, không có dấu phân cách. Mọi ô số tiền nhân viên nhập đều dùng chung thuộc tính này: giá sản phẩm, giá biến thể, mức giảm và đơn tối thiểu của voucher, đổi giá theo số tiền và giá nhập kho."),
   h3("2.2.7. Chống giả mạo yêu cầu (anti-forgery)"),
   p("Mọi form gửi bằng phương thức POST đều kèm một mã chống giả mạo (anti-forgery token), và action nhận form được đánh dấu [ValidateAntiForgeryToken]. Một trang web lạ không thể lấy được mã này nên không thể lừa trình duyệt của người dùng gửi yêu cầu thay họ (tấn công CSRF). Đồ án có một test riêng (FormTokenTests) đi qua tất cả các trang và kiểm tra từng form POST đều có mã này."),
   h2("2.3. Entity Framework Core"),
@@ -258,7 +279,7 @@ const ch2 = [
   h3("2.3.2. Cấu hình bằng IEntityTypeConfiguration"),
   p("Mỗi bảng có một lớp cấu hình riêng trong Data/Configurations, khai báo khóa chính, khóa ngoại, độ dài chuỗi (HasMaxLength), độ chính xác của tiền (HasPrecision(12, 2) tương ứng decimal(12,2)) và các chỉ mục duy nhất. Nhờ vậy cơ sở dữ liệu giữ đúng hình dạng thiết kế cho SQL Server dù khi phát triển dùng SQLite."),
   h3("2.3.3. Migration"),
-  p("Migration là các bước thay đổi cấu trúc cơ sở dữ liệu được sinh ra từ mã, lưu trong thư mục Migrations và áp dụng bằng lệnh dotnet ef database update. Đồ án có 23 migration, từ lược đồ ban đầu đến các thay đổi về sau như thêm bảng voucher, cột trả lời đánh giá, loại khuyến mãi, bảng lịch sử đổi giá, bảng phiếu nhập kho và các cột cho đơn bán tại quầy. Dữ liệu mẫu (danh mục, sản phẩm, biến thể, ảnh, voucher mẫu) cũng được đưa vào qua migration nên mọi máy đều có cùng dữ liệu."),
+  p("Migration là các bước thay đổi cấu trúc cơ sở dữ liệu được sinh ra từ mã, lưu trong thư mục Migrations và áp dụng bằng lệnh dotnet ef database update. Đồ án có 24 migration, từ lược đồ ban đầu đến các thay đổi về sau như thêm bảng voucher, cột trả lời đánh giá, loại khuyến mãi, bảng lịch sử đổi giá, bảng phiếu nhập kho, các cột cho đơn bán tại quầy và bảng khóa tra cứu đơn. Dữ liệu mẫu (danh mục, sản phẩm, biến thể, ảnh, voucher mẫu) cũng được đưa vào qua migration nên mọi máy đều có cùng dữ liệu."),
   h3("2.3.4. Giao dịch và cập nhật có điều kiện"),
   p("Khi một thao tác cần thay đổi nhiều bảng cùng lúc (ví dụ đặt hàng: trừ tồn kho, tăng lượt dùng voucher, xóa giỏ hàng, tạo đơn), đồ án dùng giao dịch (transaction) của EF Core để tất cả cùng thành công hoặc cùng bị hủy. Để chống hai yêu cầu chạy song song ghi đè nhau, đồ án dùng cập nhật có điều kiện (compare-and-swap) bằng ExecuteUpdateAsync: chỉ trừ tồn kho khi số tồn vẫn đủ, chỉ chuyển trạng thái đơn khi đơn vẫn ở trạng thái đã thấy, chỉ lưu sửa đổi của quản trị viên khi phiên bản dữ liệu chưa đổi."),
   h2("2.4. ASP.NET Core Identity"),
@@ -291,7 +312,7 @@ const ch2 = [
   h3("2.7.2. Phát triển hướng kiểm thử (TDD) và kiểm thử đột biến"),
   p("Với mỗi hành vi, test được viết trước và commit riêng ở trạng thái thất bại (RED), sau đó mới commit phần mã làm test qua (GREEN). Sau khi xong, các dòng mã quan trọng được cố ý làm sai (kiểm thử đột biến) để chắc chắn có test phát hiện; nếu không có test nào thất bại thì phải viết thêm test chặt hơn."),
   h3("2.7.3. Kiểm thử trên trình duyệt thật với Playwright"),
-  p("Mỗi tính năng có một kịch bản trong thư mục setup/verify-*/. Kịch bản tạo một cơ sở dữ liệu mới bằng chính các migration, khởi động ứng dụng thật, điều khiển trình duyệt Chromium làm như người dùng (đăng ký, nhận OTP, mua hàng, quản trị...), đo giao diện ở chiều rộng 1440 điểm ảnh và 390 điểm ảnh (điện thoại), so sánh dữ liệu với cơ sở dữ liệu và in kết quả đạt hoặc không đạt cho từng mục."),
+  p("Mỗi tính năng có một kịch bản trong thư mục setup/verify-*/. Kịch bản tạo một cơ sở dữ liệu mới bằng chính các migration, khởi động ứng dụng thật, điều khiển trình duyệt Chromium làm như người dùng (đăng ký, nhận OTP, mua hàng, quản trị...), đo giao diện ở chiều rộng 1440 điểm ảnh và 390 điểm ảnh (điện thoại), riêng kịch bản verify-responsive đo mọi trang ở năm chiều rộng 320, 375, 768, 1024 và 1440 điểm ảnh, so sánh dữ liệu với cơ sở dữ liệu và in kết quả đạt hoặc không đạt cho từng mục."),
   h2("2.8. Công cụ phát triển và quản lý mã nguồn"),
   ...bullets([
     "dotnet CLI để tạo, build, chạy và test dự án; dotnet-ef (cài như công cụ cục bộ) để tạo và áp dụng migration; dotnet format để kiểm tra định dạng mã.",
@@ -408,6 +429,7 @@ const ch3 = [
     ["Hủy", "Chờ xác nhận hoặc Đã xác nhận", "Chờ xác nhận", "Đã hủy (trả lại tồn kho và lượt voucher)"],
   ], [2, 3, 2, 2]),
   p("Hai nhân viên bấm cùng một nút, hoặc khách hủy đúng lúc nhân viên xác nhận, chỉ có một thay đổi được áp dụng vì mỗi lần chuyển trạng thái là một cập nhật có điều kiện trên trạng thái cũ. Đơn bán tại quầy được tạo ở trạng thái Hoàn tất nên không ai hủy hay thanh toán lại được."),
+  p("Khách tra cứu đơn không cần đăng nhập, bằng mã đơn và số điện thoại người nhận. Nhập sai số điện thoại 5 lần liên tiếp cho cùng một mã đơn thì mã đơn đó bị khóa tra cứu 5 phút, cùng con số mà khóa tài khoản của Identity dùng; nhập đúng thì số lần sai về 0."),
   h3("3.2.6. Đặc tả use case Nhập hàng vào kho (use case 20)"),
   ...numbered([
     "Nhân viên mở trang Nhập hàng; hệ thống chuyển sang địa chỉ có mã form riêng (/Admin/Stock/New?key=...).",
@@ -428,13 +450,14 @@ const ch3 = [
   ]),
   h2("3.3. Thiết kế cơ sở dữ liệu"),
   h3("3.3.1. Tổng quan"),
-  p("Lược đồ gồm 24 bảng theo thiết kế của đặc tả, tên cột giữ nguyên, cộng thêm năm bảng do nghiệp vụ cần: Vouchers, VoucherProducts, PriceChanges, StockReceipts và StockReceiptLines. Các nhóm bảng chính:"),
+  p("Lược đồ gồm 24 bảng theo thiết kế của đặc tả, tên cột giữ nguyên, cộng thêm sáu bảng do nghiệp vụ cần: Vouchers, VoucherProducts, PriceChanges, StockReceipts, StockReceiptLines và OrderTrackLockouts. Các nhóm bảng chính:"),
   ...bullets([
     "Tài khoản: Users, UserTokens, Addresses.",
     "Danh mục và sản phẩm: Categories, Products, ProductVariants, OptionTypes, OptionValues, VariantOptions, ProductImages, Attributes, CategoryAttributes, ProductAttributeValues.",
     "Mua hàng: Carts, CartItems, Orders, OrderItems, Payments, Shipments, Vouchers, VoucherProducts.",
     "Tương tác: Reviews, ReviewMedia, Favorites, CompareLists, CompareItems.",
     "Giá và kho: PriceChanges, StockReceipts, StockReceiptLines.",
+    "Bảo vệ tra cứu đơn: OrderTrackLockouts.",
   ]),
   h3("3.3.2. Các bảng chính"),
   ...table("3", "Bảng Products và ProductVariants", ["Bảng", "Các cột chính", "Ghi chú"], [
@@ -457,6 +480,7 @@ const ch3 = [
     ["PaymentMethod: Cash, BankTransfer", "Tiền mặt, chuyển khoản tại quầy", "Hai cách trả tiền khi mua tại cửa hàng"],
     ["Users: NormalizedEmail, SecurityStamp, AccessFailedCount, LockoutEnd", "Các cột Identity cần", "Dùng ASP.NET Core Identity trên bảng Users của đặc tả"],
     ["Reviews: Reply, RepliedAt, UpdatedAt", "Trả lời của cửa hàng", "Đặc tả cho nhân viên trả lời đánh giá nhưng chưa có cột lưu"],
+    ["OrderTrackLockouts", "Mã đơn, số lần nhập sai số điện thoại liên tiếp, thời điểm hết khóa", "Trang tra cứu đơn công khai cần chặn đoán số điện thoại; số lần sai phải được lưu lại giữa các yêu cầu"],
   ], [2.4, 3.6, 3]),
   h3("3.3.3. Mối quan hệ giữa các bảng"),
   ...bullets([
@@ -467,6 +491,7 @@ const ch3 = [
     "Một phiếu nhập có nhiều dòng, mỗi biến thể chỉ một dòng (chỉ mục duy nhất trên ReceiptId và VariantId); biến thể đã có trong phiếu nhập thì không xóa được.",
     "Mỗi khách hàng chỉ có một đánh giá cho một sản phẩm (chỉ mục duy nhất trên ProductId và UserId).",
     "Một voucher hoặc khuyến mãi có thể áp cho một số sản phẩm qua VoucherProducts; không có dòng nào nghĩa là áp cho mọi sản phẩm.",
+    "Mỗi đơn hàng có nhiều nhất một dòng khóa tra cứu (OrderTrackLockouts); mã đơn không có thật thì không bao giờ có dòng khóa.",
   ]),
   h3("3.3.4. Một số điều chỉnh so với thiết kế gốc"),
   ...bullets([
@@ -492,7 +517,7 @@ const ch3 = [
     "Giảm giá voucher tính trên tạm tính đã trừ khuyến mãi; giảm theo % được làm tròn tới đồng, không vượt quá phần được áp dụng.",
     "Tổng tiền = tạm tính - giảm giá voucher + phí vận chuyển (hiện miễn phí). Giá bán đã bao gồm VAT nên không cộng thêm thuế; đơn bán tại quầy không có phí vận chuyển.",
     "Doanh thu trong báo cáo chỉ tính các đơn đã thanh toán và không bị hủy, gom theo ngày giờ Việt Nam (UTC+7).",
-    "Đổi giá hàng loạt theo %: giá mới được làm tròn tới 1.000 đồng; nếu có biến thể nào về 0 hoặc vượt giá lớn nhất thì không thay đổi gì.",
+    "Đổi giá hàng loạt chỉ áp cho biến thể đang bán; theo % thì giá mới được làm tròn tới 1.000 đồng; nếu có biến thể nào về 0 hoặc vượt giá lớn nhất thì không thay đổi gì. Mỗi lần bấm Đổi giá là một lần đổi riêng và đều được ghi vào lịch sử giá.",
   ]),
 ];
 
@@ -517,8 +542,8 @@ const ch4 = [
     ["src/AppleStore.Infrastructure/Services", "CartService, CheckoutService, OrderManagementService, ProductCatalogService, CompareService, ReviewService, ReportService, PriceService, SalePrices, SaleRules, StockService, InStoreSaleService, AdminCatalogService, AdminVoucherService, AdminUserService, RegistrationService, PasswordResetService"],
     ["src/AppleStore.Infrastructure/Payments", "PaymentService, SimulatedPaymentGateway, PaymentSignature (HMAC-SHA512)"],
     ["src/AppleStore.Infrastructure/Identity", "UserStore, AdminSeeder, AppUserClaimsPrincipalFactory"],
-    ["tests/AppleStore.Tests", "637 test xUnit"],
-    ["setup/verify-*", "15 kịch bản kiểm tra trên trình duyệt; setup/screenshots chụp các hình trong chương này; setup/report dựng file báo cáo này"],
+    ["tests/AppleStore.Tests", "647 test xUnit"],
+    ["setup/verify-*", "16 kịch bản kiểm tra trên trình duyệt; setup/screenshots chụp các hình trong chương này; setup/report dựng file báo cáo này"],
   ], [3.2, 5]),
   p("Cách chạy ứng dụng: dotnet tool restore, dotnet ef database update (tạo cơ sở dữ liệu và dữ liệu mẫu), rồi dotnet run --project src/AppleStore.Web. Hướng dẫn đầy đủ có trong README.md."),
   h2("4.3. Giao diện phía khách hàng"),
@@ -578,16 +603,16 @@ const ch4 = [
   ...figure("4", "22-admin-tai-khoan.png", "Quản lý tài khoản và vai trò"),
   h2("4.5. Kiểm thử và đánh giá"),
   h3("4.5.1. Kiểm thử tự động"),
-  p("Bộ test hiện có 637 test xUnit, tất cả đều đạt. Trước mỗi lần gộp mã, cổng kiểm tra gồm: dotnet build --no-incremental (0 cảnh báo, 0 lỗi), dotnet test, dotnet format --verify-no-changes và kịch bản kiểm tra trên trình duyệt của tính năng đó."),
+  p("Bộ test hiện có 647 test xUnit, tất cả đều đạt. Trước mỗi lần gộp mã, cổng kiểm tra gồm: dotnet build --no-incremental (0 cảnh báo, 0 lỗi), dotnet test, dotnet format --verify-no-changes và kịch bản kiểm tra trên trình duyệt của tính năng đó."),
   h3("4.5.2. Kiểm thử trên trình duyệt"),
-  ...table("4", "Các kịch bản kiểm tra trên trình duyệt (chạy lại ngày 10/10/2026)", ["Kịch bản", "Nội dung", "Số mục kiểm tra"], [
+  ...table("4", "Các kịch bản kiểm tra trên trình duyệt (chạy lại ngày 12/10/2026)", ["Kịch bản", "Nội dung", "Số mục kiểm tra"], [
     ["verify-account", "Đăng ký, OTP, đăng nhập, khóa tài khoản, quên và đổi mật khẩu, hồ sơ, địa chỉ", "69"],
     ["verify-admin", "Khu vực quản trị, phân quyền, tài khoản quản trị đầu tiên", "31"],
     ["verify-cart", "Giỏ hàng", "23"],
     ["verify-checkout", "Đặt hàng và voucher", "25"],
     ["verify-payment", "Thanh toán VNPay, MoMo giả lập", "16"],
-    ["verify-orders", "Đơn hàng, tra cứu, xử lý đơn, email", "19"],
-    ["verify-admin-catalog", "Quản trị sản phẩm, voucher, vai trò", "15"],
+    ["verify-orders", "Đơn hàng, tra cứu và khóa tra cứu, xử lý đơn, email", "21"],
+    ["verify-admin-catalog", "Quản trị sản phẩm, voucher, vai trò, số tiền nguyên đồng", "20"],
     ["verify-reports", "Báo cáo, file Excel, PDF, hóa đơn", "16"],
     ["verify-reviews", "Đánh giá và trả lời", "9"],
     ["verify-compare", "So sánh sản phẩm", "12"],
@@ -596,7 +621,8 @@ const ch4 = [
     ["verify-prices", "Đổi giá hàng loạt và lịch sử giá", "12"],
     ["verify-stock", "Nhập kho, phiếu nhập, tồn kho", "13"],
     ["verify-sales", "Bán hàng tại quầy, in hóa đơn hàng loạt", "11"],
-    ["Tổng", "15 kịch bản", "302"],
+    ["verify-responsive", "Mọi trang ở 5 chiều rộng màn hình, không trang nào cuộn ngang", "128"],
+    ["Tổng", "16 kịch bản", "437"],
   ], [2.4, 5, 1.6]),
   h3("4.5.3. Kiểm thử đột biến và rà soát mã"),
   p("Sau mỗi tính năng, các dòng mã quyết định được cố ý làm sai để chắc có test phát hiện, ví dụ bỏ điều kiện tồn kho, bỏ kiểm tra chữ ký thanh toán, cho phép giá về 0. Một số lần có đột biến không bị phát hiện; khi đó hoặc viết thêm test chặt hơn, hoặc nhận ra dòng mã đó là thừa và bỏ đi. Mỗi pull request còn được rà soát bởi một lượt review độc lập, tìm các tình huống chạy song song, ghi dữ liệu chưa kiểm soát và phân quyền."),
@@ -612,10 +638,13 @@ const ch4 = [
     ["Lưu phiếu nhập xong, bấm Quay lại của trình duyệt rồi lưu lần nữa thì hàng được nhập hai lần (tồn 60 thành 70)", "Kịch bản kiểm tra nhập kho", "Đưa mã form vào địa chỉ trang; mã đã dùng thì chuyển tới phiếu đã lưu"],
     ["Trang chi tiết và hóa đơn của đơn khách lẻ (không có tài khoản) bị lỗi", "Test giao diện bán tại quầy", "Đọc email khách theo cách cho phép không có tài khoản"],
     ["Tên biến thể bị lặp (\"iPhone 18 Pro Max iPhone 18 Pro Max 256GB\") trên trang kho và bán hàng", "Ảnh chụp cho báo cáo này", "Một hàm duy nhất VariantText đặt tên biến thể, có test"],
+    ["Mọi trang khi đã đăng nhập bị cuộn ngang ở chiều rộng 992 đến 1061 điểm ảnh: thanh menu mở rộng quá sớm", "Quét giao diện ở 5 chiều rộng", "Cho menu mở rộng từ 1200 điểm ảnh; thêm kịch bản verify-responsive"],
+    ["Bảng ghi nguồn ảnh (trang Credits) tràn ngang trên điện thoại", "Rà lại các trang chưa kịch bản nào mở", "Cho riêng bảng cuộn ngang trong khung của nó"],
+    ["Ô giá sản phẩm, giá biến thể và voucher vẫn nhận \"1.000\" thành 1 đồng", "Rà soát các ô số tiền", "Một thuộc tính kiểm tra dùng chung WholeDongAttribute cho mọi ô số tiền"],
     ["Đổi giá cả danh mục Watch thêm 2% bị từ chối: biến thể cũ đã ngừng bán giá 399 đồng, làm tròn đến 1.000 thành 0", "Ảnh chụp cho báo cáo này", "Chỉ đổi giá biến thể đang bán (chủ dự án quyết định); thêm test và kiểm tra trên danh mục thật"],
   ], [3.4, 2, 3.4]),
   h3("4.5.5. Quy trình quản lý mã nguồn"),
-  p("Mỗi tính năng là một nhánh riêng (ví dụ feat/cart, feat/promotions, feat/price-history) và được gộp vào nhánh dev qua pull request sau khi qua đủ cổng kiểm tra. Từ PR #12 đến PR #36, mỗi pull request ghi rõ quyết định nào của chủ dự án, quyết định nào của người làm, và kết quả kiểm tra. Tiến độ được ghi hằng tuần trong thư mục progress-report/ và nhật ký kiểm tra trong docs/verification.md."),
+  p("Mỗi tính năng là một nhánh riêng (ví dụ feat/cart, feat/promotions, feat/price-history) và được gộp vào nhánh dev qua pull request sau khi qua đủ cổng kiểm tra. Từ PR #12 đến PR #40, mỗi pull request ghi rõ quyết định nào của chủ dự án, quyết định nào của người làm, và kết quả kiểm tra. Tiến độ được ghi hằng tuần trong thư mục progress-report/ và nhật ký kiểm tra trong docs/verification.md."),
 ];
 
 // ---------- chapter 5 ----------
@@ -626,18 +655,18 @@ const ch5 = [
   h3("5.1.1. Kết quả đạt được"),
   ...bullets([
     "Hoàn thành đủ 37 use case của đặc tả: tài khoản với OTP qua email thật, danh mục với tìm kiếm, lọc theo giá và so sánh, giỏ hàng, đặt hàng với voucher, thanh toán COD và VNPay, MoMo giả lập, xử lý đơn hàng với email thông báo, nhập kho và kiểm tra tồn kho, bán hàng tại quầy, quản trị sản phẩm, voucher, khuyến mãi, giá và lịch sử giá, tài khoản và vai trò, đánh giá, báo cáo doanh thu xuất Excel và PDF, in hóa đơn (kể cả in nhiều hóa đơn cùng lúc).",
-    "Sử dụng đúng các cơ chế của ASP.NET Core: MVC và Razor, Tag Helper, View Component, Area, Dependency Injection, Options pattern, model validation, anti-forgery, EF Core Code First với 23 migration, ASP.NET Core Identity trên bảng Users của đặc tả.",
+    "Sử dụng đúng các cơ chế của ASP.NET Core: MVC và Razor, Tag Helper, View Component, Area, Dependency Injection, Options pattern, model validation, anti-forgery, EF Core Code First với 24 migration, ASP.NET Core Identity trên bảng Users của đặc tả.",
     "Dữ liệu đúng khi nhiều người thao tác cùng lúc nhờ giao dịch và cập nhật có điều kiện; các tình huống này đều có test.",
-    "637 test tự động và 15 kịch bản kiểm tra trên trình duyệt (302 mục), tất cả đều đạt.",
+    "647 test tự động và 16 kịch bản kiểm tra trên trình duyệt (437 mục, trong đó 128 mục kiểm tra năm chiều rộng màn hình), tất cả đều đạt.",
   ]),
   h3("5.1.2. Ý nghĩa của đề tài"),
   p("Đề tài giúp em hiểu cách một ứng dụng ASP.NET Core được tổ chức từ cơ sở dữ liệu tới giao diện, và cách dùng các cơ chế có sẵn thay vì tự viết lại. Việc viết test trước và kiểm tra trên trình duyệt thật cho thấy nhiều lỗi chỉ lộ ra khi chạy ứng dụng thật hoặc khi hai yêu cầu đến cùng lúc."),
   h3("5.1.3. Hạn chế"),
   ...bullets([
     "VNPay và MoMo mới được giả lập trong ứng dụng, chưa kết nối sandbox thật.",
-    "Trang tra cứu đơn chưa giới hạn số lần thử vì chưa chọn con số; các form nhập mã OTP đã giới hạn 5 lần sai.",
-    "Ô mức giảm của voucher đọc \"1.000\" thành 1; mã SKU chưa có ràng buộc duy nhất.",
-    "Đổi giá hàng loạt xong, bấm Quay lại của trình duyệt rồi bấm lại thì thay đổi được áp dụng thêm một lần (lịch sử giá có ghi lại); chưa chốt có cần chặn như phiếu nhập hay không.",
+    "Chưa giới hạn số lần yêu cầu gửi mã OTP (đăng ký, quên mật khẩu); việc đoán mã đã bị giới hạn 5 lần sai.",
+    "Mã SKU chưa có ràng buộc duy nhất.",
+    "Khi trang tra cứu đơn báo khóa, người thử biết mã đơn đó có thật; đây là đánh đổi giống thông báo khóa tài khoản của Identity.",
     "Một số trang làm từ đầu (địa chỉ, hồ sơ, mở trang thanh toán) khi cơ sở dữ liệu lỗi thì hiện trang lỗi chung thay vì thông báo riêng.",
     "Đơn trực tuyến chưa thanh toán vẫn giữ tồn kho cho tới khi bị hủy.",
     "Bảng thuộc tính sản phẩm còn trống nên trang so sánh dùng giá, cấu hình, màu, khu vực và đánh giá; chức năng yêu thích (bảng Favorites) chưa làm.",
@@ -646,7 +675,7 @@ const ch5 = [
   h2("5.2. Hướng phát triển"),
   ...bullets([
     "Kết nối VNPay và MoMo sandbox thật khi có tài khoản.",
-    "Bật bộ giới hạn số lần thử có sẵn của ASP.NET Core cho trang tra cứu đơn.",
+    "Bật bộ giới hạn tần suất có sẵn của ASP.NET Core (rate limiter) cho các form gửi mã OTP.",
     "Thêm báo cáo nhập xuất theo kỳ (BM_REPORT_INOUT_01) từ dữ liệu phiếu nhập và đơn bán đã có.",
     "Chuyển sang SQL Server và triển khai bằng Docker hoặc dịch vụ đám mây, có HTTPS.",
     "Thêm thuộc tính sản phẩm theo danh mục để so sánh chi tiết hơn, chức năng yêu thích và thông báo qua SMS.",
@@ -672,28 +701,36 @@ const refs = [
   ], "refs"),
 ];
 
+// Dotted writing lines drawn with a dot-leader tab, as in the sample (borders on adjacent
+// paragraphs merge into one line in some viewers).
 const lines = n => Array.from({ length: n }, () => new Paragraph({ spacing: { after: 0, line: 480 },
-  border: { bottom: { style: BorderStyle.DOTTED, size: 6, color: "808080", space: 1 } }, children: [] }));
+  tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX, leader: "dot" }], children: [new TextRun("\t")] }));
 
+// Right after the cover, as in the sample and the faculty's report template.
 const evaluation = [
-  new Paragraph({ style: "FrontTitle", pageBreakBefore: true, children: [new TextRun("NHẬN XÉT CỦA GIẢNG VIÊN HƯỚNG DẪN")] }),
+  new Paragraph({ style: "FrontTitle", children: [new TextRun("NHẬN XÉT CỦA GIẢNG VIÊN HƯỚNG DẪN")] }),
   ...lines(20),
   ...blank(1),
-  new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Trà Vinh, ngày ...... tháng ...... năm 2026", italics: true })] }),
+  new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `${PLACE}, ngày ...... tháng ...... năm 2026`, italics: true })] }),
   new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Giảng viên hướng dẫn", bold: true })] }),
-  new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "(Ký và ghi rõ họ tên)", italics: true })] }),
+  new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "(Ký tên và ghi rõ họ tên)", italics: true })] }),
   new Paragraph({ style: "FrontTitle", pageBreakBefore: true, children: [new TextRun("NHẬN XÉT CỦA THÀNH VIÊN HỘI ĐỒNG")] }),
   ...lines(20),
   ...blank(1),
-  new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Trà Vinh, ngày ...... tháng ...... năm 2026", italics: true })] }),
+  new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `${PLACE}, ngày ...... tháng ...... năm 2026`, italics: true })] }),
   new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Thành viên hội đồng", bold: true })] }),
-  new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "(Ký và ghi rõ họ tên)", italics: true })] }),
+  new Paragraph({ indent: { left: 5103 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "(Ký tên và ghi rõ họ tên)", italics: true })] }),
 ];
 
 // ---------- document ----------
 
 const pageProps = { page: { size: { width: 11906, height: 16838 }, margin: { top: 1134, bottom: 1134, left: 1701, right: 1134 } } };
-const footer = format => new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ children: [PageNumber.CURRENT] })] })] });
+const rule = { style: BorderStyle.SINGLE, size: 6, color: "000000", space: 1 };
+const rightTab = [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }];
+const header = () => new Header({ children: [new Paragraph({ tabStops: rightTab, border: { bottom: rule },
+  children: [new TextRun({ text: TITLE_SHORT, italics: true, size: 22 }), new TextRun({ text: `\t${LECTURER}`, bold: true, italics: true, size: 22 })] })] });
+const footer = () => new Footer({ children: [new Paragraph({ tabStops: rightTab, border: { top: rule },
+  children: [new TextRun({ text: STUDENT, bold: true, italics: true, size: 22 }), new TextRun({ children: ["\t", PageNumber.CURRENT], size: 22 })] })] });
 
 const stepConfigs = Array.from({ length: stepLists }, (_, i) => ({
   reference: `steps${i + 1}`,
@@ -730,11 +767,13 @@ const doc = new Document({
     ],
   },
   sections: [
-    { properties: { ...pageProps }, children: cover },
-    { properties: { ...pageProps, type: SectionType.NEXT_PAGE, page: { ...pageProps.page, pageNumbers: { start: 1, formatType: NumberFormat.LOWER_ROMAN } } },
-      footers: { default: footer() }, children: front },
+    { properties: { ...pageProps, page: { ...pageProps.page, ...framed } }, children: cover },
+    { properties: { ...pageProps, type: SectionType.NEXT_PAGE, page: { ...pageProps.page, ...framed, pageNumbers: { start: 1, formatType: NumberFormat.LOWER_ROMAN } } },
+      headers: { default: header() }, footers: { default: footer() }, children: evaluation },
+    { properties: { ...pageProps, type: SectionType.NEXT_PAGE, page: { ...pageProps.page, pageNumbers: { formatType: NumberFormat.LOWER_ROMAN } } },
+      headers: { default: header() }, footers: { default: footer() }, children: front },
     { properties: { ...pageProps, type: SectionType.NEXT_PAGE, page: { ...pageProps.page, pageNumbers: { start: 1, formatType: NumberFormat.DECIMAL } } },
-      footers: { default: footer() }, children: [...ch1, ...ch2, ...ch3, ...ch4, ...ch5, ...refs, ...evaluation] },
+      headers: { default: header() }, footers: { default: footer() }, children: [...ch1, ...ch2, ...ch3, ...ch4, ...ch5, ...refs] },
   ],
 });
 
