@@ -5,6 +5,37 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-13: report laid out like the sample, slides updated (PR #31)
+
+**What landed on `docs/thesis-report`:** `dev` merged in (up to PR #40).
+`setup/report/build.js` now follows the sample (`220064_MauBia.doc`,
+`220064_MauBaoCao.doc` inside `~/Downloads/chia sẽ khóa học.rar`): framed
+cover with the school logo (`thesis/doc/hinh/00-logo-tvu.jpg`, taken from the
+sample cover), lecturer left and student right, the two evaluation pages
+right after the cover, header (title, lecturer) and footer (student, page
+number). Content brought to `dev`: 647 tests, 16 scripts and 437 checks,
+24 migrations, `OrderTrackLockouts`, `WholeDongAttribute`, three new rows in
+the bug table, limits and next steps rewritten. The lecturer is
+**TS. Nguyễn Nhứt Lam** (owner, course page). Place name "Vĩnh Long" as in
+the 2026 sample. PDF re-exported, 63 pages. Slides (deck
+https://claude.ai/artifact/JNrn7bidSq78ZbvTEhnfxv, version 12): cover title,
+test numbers, limits, database slide; sources in `thesis/abs/slides-src/`.
+
+**Files to download:** `thesis/doc/BaoCao_ChuyenDeASPNET_LeBinh_470124170_VX24TTK7.docx`
+and `thesis/pdf/BaoCao_ChuyenDeASPNET_LeBinh_470124170_VX24TTK7.pdf` on this
+branch. The deck link opens only for the owner's claude.ai account.
+
+**Rebuild on a new machine:** `cd setup/report && npm install && node
+build.js ../..`. For the PDF with page numbers in the contents, use the
+LibreOffice macro recipe in the 2026-10-12 (later) entry below (a plain
+`--convert-to pdf` leaves the contents without page numbers).
+
+**Open:** semester number on the cover ("Học kỳ 7" kept, the sample says
+"V"); .pptx export (deck, Share, Export, PowerPoint, save to `thesis/abs/`);
+an optional printable speaker script from the slide notes (18 notes, about
+1.190 words, about 7 to 8 minutes, an estimate); demo videos per
+`docs/specs/demo-video.md`.
+
 ## 2026-10-12 (night, latest): a full live-test audit, three real bugs fixed and
 merged (PRs #39-#40 territory, see below), and a demo video attempt that
 needs a redo
