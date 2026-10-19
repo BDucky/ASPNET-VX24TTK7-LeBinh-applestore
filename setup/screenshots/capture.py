@@ -9,7 +9,11 @@ promotion, a review, a stock receipt, a counter sale), then takes each shot
 in a fresh 2x browser context with the same sign-in, cropped to the block
 that matters (a card, the product panel, a table), so text stays readable
 when the image is enlarged on a slide or printed in the report (owner agreed
-2026-10-09 that whole-page shots were too small). Writes PNG files to
+2026-10-09 that whole-page shots were too small). Most shots also get a
+companion `<name>-full.png`: the whole page, 2x, with the cropped block
+outlined in red, so the report can show real page context next to the
+readable detail crop (owner, 2026-10-17, after the cropped-only shots made
+the page impossible to picture as a whole). Writes PNG files to
 thesis/doc/hinh/. Re-run after a UI change.
 """
 import sys
@@ -34,13 +38,74 @@ def step(body):
     return h.step(body)
 
 
-def shot(name, path, selector=None, before="", wait=1500, full=False, top=None):
+# A fake browser chrome bar (traffic-light dots + an address bar showing the
+# real URL), prepended as a normal (not fixed) block so it pushes the page
+# down and appears once in a `fullPage` shot. Inserted before the highlight
+# box is measured, so the box lands at the right (post-shift) coordinates.
+# Without this a full-page shot is still just "a dark rectangle of UI" with
+# nothing to anchor it as a real site at a real address (owner, 2026-10-17).
+CHROME_JS = (
+    "await p.evaluate(() => {"
+    "const bar = document.createElement('div');"
+    "bar.style.cssText = 'all:unset;display:flex;align-items:center;width:100%;height:40px;"
+    "background:#e8e8ec;padding:0 14px;box-sizing:border-box;border-bottom:1px solid #c7c7cc;"
+    "font-family:-apple-system,Helvetica,Arial,sans-serif;';"
+    "const dots = document.createElement('div');"
+    "dots.style.cssText = 'all:unset;display:flex;gap:7px;margin-right:16px;flex:none;';"
+    "for (const c of ['#ff5f57','#febc2e','#28c840']) {"
+    "const d = document.createElement('span');"
+    "d.style.cssText = 'all:unset;display:inline-block;width:12px;height:12px;border-radius:50%;background:' + c + ';';"
+    "dots.appendChild(d);"
+    "}"
+    "const addr = document.createElement('div');"
+    "addr.style.cssText = 'all:unset;flex:1;display:block;background:#fff;border-radius:6px;"
+    "padding:7px 12px;font-size:14px;line-height:1.2;color:#1d1d1f;border:1px solid #d0d0d5;"
+    "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';"
+    "addr.textContent = location.href;"
+    "bar.appendChild(dots);"
+    "bar.appendChild(addr);"
+    "document.body.insertBefore(bar, document.body.firstChild);"
+    "});"
+)
+
+# Outlines `selector` in red, in page (not viewport) coordinates, so the box
+# lands in the right place in a `fullPage` screenshot regardless of scroll.
+# Capped at 3x the viewport height: an uncapped `fullPage` shot of a page with
+# a long list (stock levels was 80.752px tall) shrinks to an unreadable sliver
+# once scaled to the report's column width (the same failure mode the 2026-
+# 10-10 session hit with whole-page shots generally, before cropping; capping
+# the height here keeps this specific companion shot safe without reverting
+# to a full crop).
+HIGHLIGHT_JS = (
+    CHROME_JS +
+    "const __hb = await p.locator('__SEL__').first().boundingBox();"
+    "await p.evaluate((r) => {"
+    "const d = document.createElement('div');"
+    "d.style.cssText = 'position:absolute;left:' + (r.x - 8 + window.scrollX) + 'px;top:' + "
+    "(r.y - 8 + window.scrollY) + 'px;width:' + (r.width + 16) + 'px;height:' + (r.height + 16) + "
+    "'px;border:5px solid #ff2d2d;border-radius:10px;box-shadow:0 0 0 2px rgba(255,45,45,.35);"
+    "pointer-events:none;z-index:2147483647;box-sizing:border-box;';"
+    "document.body.appendChild(d);"
+    "}, __hb);"
+    "const __sh = await p.evaluate(() => document.documentElement.scrollHeight);"
+    "await p.screenshot({ path: '__FULLPNG__', fullPage: true,"
+    " clip: { x: 0, y: 0, width: 1440, height: Math.min(__sh, 2700) } });"
+)
+
+
+def shot(name, path, selector=None, before="", wait=1500, full=False, top=None, highlight=False):
     """A 2x shot of `path` with the current sign-in; cropped to `selector`.
 
     `top` keeps only the first `top` CSS pixels of a long element (a list of
     every variant is thousands of pixels tall and shrinks to a sliver in the
-    report)."""
+    report). `highlight` (needs `selector`) also takes a companion full-page
+    shot (`<name>-full.png`) with `selector` outlined in red, so the report
+    can show the whole page for context next to the cropped detail."""
     png = OUT / (name + '.png')
+    highlight_js = ""
+    if highlight and selector:
+        full_png = OUT / (name + '-full.png')
+        highlight_js = HIGHLIGHT_JS.replace("__SEL__", selector).replace("__FULLPNG__", str(full_png))
     if selector and top:
         target = (f"const b = await p.locator('{selector}').first().boundingBox();"
                   f" await p.screenshot({{ path: '{png}', fullPage: true,"
@@ -57,13 +122,14 @@ def shot(name, path, selector=None, before="", wait=1500, full=False, top=None):
     __BEFORE__
     __HIDE__
     await p.waitForTimeout(__WAIT__);
+    __HIGHLIGHT__
     __TARGET__
   } finally {
     await ctx.close();
   }
   return JSON.stringify({});
 """.replace("__PATH__", path).replace("__BEFORE__", before).replace("__HIDE__", HIDE)
-        .replace("__WAIT__", str(wait)).replace("__TARGET__", target))
+        .replace("__WAIT__", str(wait)).replace("__HIGHLIGHT__", highlight_js).replace("__TARGET__", target))
 
 
 def sign_in(email, password):
@@ -95,7 +161,7 @@ def main():
         product_page = f"/Products/{slug}"
 
         # 1. A customer registers (shots of the forms), compares, buys twice.
-        shot("05-dang-ky", "/Account/Register", ".account-card")
+        shot("05-dang-ky", "/Account/Register", ".account-card", highlight=True)
         step(r"""
   await page.goto(APP + '/Account/Register');
   await fill(page, { Email: '__E__', FullName: 'Nguyễn Văn Khách', Phone: '0912345678', Password: '__P__', ConfirmPassword: '__P__' });
@@ -110,7 +176,7 @@ def main():
   return JSON.stringify({});
 """.replace("__C__", otp_for(log, CUSTOMER) or ""))
         step("await signOut(page); return JSON.stringify({});")
-        shot("07-dang-nhap", "/Account/Login", ".account-card")
+        shot("07-dang-nhap", "/Account/Login", ".account-card", highlight=True)
         sign_in(CUSTOMER, PASSWORD)
         r = step(r"""
   for (const s of ['__SLUG__', 'airpods-pro-3', 'macbook-pro-16-m5']) {
@@ -121,13 +187,13 @@ def main():
   await press(page, '[data-choice-buy]');
   return JSON.stringify({});
 """.replace("__SLUG__", slug).replace("__URL__", url))
-        shot("08-so-sanh", "/Compare", ".account-card")
-        shot("09-gio-hang", "/Cart", ".account-card")
+        shot("08-so-sanh", "/Compare", ".account-card", highlight=True)
+        shot("09-gio-hang", "/Cart", ".account-card", highlight=True)
         shot("10-thanh-toan", "/Checkout", ".account-card", before=r"""
     await p.fill('#AddressLine', '126 Nguyễn Thiện Thành');
     await p.fill('#VoucherCode', 'WELCOME10');
     await Promise.all([p.waitForNavigation(), p.click('button[value=apply]')]);
-""")
+""", highlight=True)
         r = step(r"""
   await page.goto(APP + '/Checkout');
   await page.fill('#AddressLine', '126 Nguyễn Thiện Thành');
@@ -146,8 +212,8 @@ def main():
   return JSON.stringify({ first });
 """)
         order = r["first"].split("/")[-1]
-        shot("11-don-hang", r["first"], ".account-card")
-        shot("12-don-cua-toi", "/Orders", ".account-card")
+        shot("11-don-hang", r["first"], ".account-card", highlight=True)
+        shot("12-don-cua-toi", "/Orders", ".account-card", highlight=True)
 
         # 2. Staff deliver the first order, start a promotion, receive goods, sell at the counter.
         sign_in(ADMIN, ADMIN_PASSWORD)
@@ -158,7 +224,7 @@ def main():
   await press(page, 'button[value=Ship]');
   return JSON.stringify({});
 """.replace("__ID__", order))
-        shot("23-admin-chi-tiet-don", f"/Admin/Orders/{order}", ".account-card")
+        shot("23-admin-chi-tiet-don", f"/Admin/Orders/{order}", ".account-card", highlight=True)
         r = step(r"""
   await page.goto(APP + '/Admin/Orders/__ID__');
   await press(page, 'button[value=Complete]');
@@ -200,15 +266,15 @@ def main():
     await p.fill('input[name="Lines[0].Quantity"]', '10');
     await p.fill('input[name="Lines[0].UnitCost"]', '21000000');
     await p.click('[data-add-line]');
-""".replace("__A__", str(va)))
-        shot("26-phieu-nhap", r["receipt"], ".account-card")
-        shot("27-ton-kho", "/Admin/Stock/Levels", ".account-card", top=900)
-        shot("29-don-tai-quay", r["sale"], ".account-card")
+""".replace("__A__", str(va)), highlight=True)
+        shot("26-phieu-nhap", r["receipt"], ".account-card", highlight=True)
+        shot("27-ton-kho", "/Admin/Stock/Levels", ".account-card", top=900, highlight=True)
+        shot("29-don-tai-quay", r["sale"], ".account-card", highlight=True)
         shot("30-in-hoa-don-loat", f"/Admin/Orders/Invoices?ids={order}&ids={sale}", full=True)
         for name, path in [("14-admin-tong-quan", "/Admin"), ("15-admin-don-hang", "/Admin/Orders"), ("16-admin-san-pham", "/Admin/Products"),
                            ("17-admin-voucher", "/Admin/Vouchers"), ("18-admin-khuyen-mai", "/Admin/Promotions"),
                            ("20-admin-bao-cao", "/Admin/Reports"), ("22-admin-tai-khoan", "/Admin/Users")]:
-            shot(name, path, ".account-card", top=900 if name == "16-admin-san-pham" else None)
+            shot(name, path, ".account-card", top=900 if name == "16-admin-san-pham" else None, highlight=True)
         r = step(r"""
   await page.goto(APP + '/Admin/Prices');
   // One product with four variants, so the history stays short enough to read.
@@ -219,7 +285,7 @@ def main():
   return JSON.stringify({ status: await text(page, '.cart-status'), error: await text(page, '.account-error') });
 """)
         assert r["status"] and r["status"][0].startswith("Changed "), f"price batch: {r}"
-        shot("19-admin-gia", "/Admin/Prices", ".account-card")
+        shot("19-admin-gia", "/Admin/Prices", ".account-card", highlight=True)
 
         # 3. The customer reviews what was delivered; staff see it.
         sign_in(CUSTOMER, PASSWORD)
@@ -230,22 +296,22 @@ def main():
   await press(page, 'button:has-text("Post review")');
   return JSON.stringify({});
 """.replace("__PRODUCT__", product_page))
-        shot("24-danh-gia", product_page, ".pdp-reviews")
+        shot("24-danh-gia", product_page, ".pdp-reviews", highlight=True)
         sign_in(ADMIN, ADMIN_PASSWORD)
-        shot("21-admin-danh-gia", "/Admin/Reviews", ".account-card")
+        shot("21-admin-danh-gia", "/Admin/Reviews", ".account-card", highlight=True)
 
         # 4. Visitor pages last, so they show the promotion and the review.
         step("await signOut(page); return JSON.stringify({});")
         shot("01-trang-chu", "/", wait=2500)
-        shot("02-danh-muc", "/Products?category=iphone", ".shop-page")
+        shot("02-danh-muc", "/Products?category=iphone", ".shop-page", highlight=True)
         shot("03-tim-kiem-loc-gia", "/Products?q=iphone&band=Over40M&sort=PriceAscending")
-        shot("04-cau-hinh-san-pham", url, ".product-detail")
+        shot("04-cau-hinh-san-pham", url, ".product-detail", highlight=True)
         shot("13-tra-cuu-don", "/Track", ".account-card", before=r"""
     await p.fill('#OrderId', '__ID__');
     await p.fill('#Phone', '0912345678');
     await Promise.all([p.waitForNavigation(), p.click('main form button[type=submit]')]);
-""".replace("__ID__", order))
-        shot("31-anh-cho", "/Products?category=watch", ".model-strip")
+""".replace("__ID__", order), highlight=True)
+        shot("31-anh-cho", "/Products?category=watch", ".model-strip", highlight=True)
     finally:
         h.stop_app(proc)
         h.close_browser()
