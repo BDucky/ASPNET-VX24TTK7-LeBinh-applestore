@@ -87,24 +87,30 @@ function table(chapter, caption, header, rows, weights) {
 
 let figNo = {};
 let figCount = 0;
-// A screenshot scaled to the text width (and at most ~19 cm tall), with a numbered caption below.
-function figure(chapter, file, caption, maxWidthCm = 16) {
-  figNo[chapter] = (figNo[chapter] ?? 0) + 1;
-  figCount++;
+
+// Reads a PNG's own pixel size and fits it inside maxWidthCm x maxHeightCm, keeping aspect ratio.
+function scaledImage(file, maxWidthCm, maxHeightCm) {
   const data = fs.readFileSync(path.join(IMG, file));
   const w = data.readUInt32BE(16), h = data.readUInt32BE(20);
+  let widthCm = maxWidthCm, heightCm = widthCm * h / w;
+  if (heightCm > maxHeightCm) { heightCm = maxHeightCm; widthCm = heightCm * w / h; }
   const pxPerCm = 37.8;
-  let width = maxWidthCm * pxPerCm;
-  let height = width * h / w;
-  const maxH = 15.5 * pxPerCm; // about 60% of the A4 text height
-  if (height > maxH) { height = maxH; width = height * w / h; }
+  return { data, width: Math.round(widthCm * pxPerCm), height: Math.round(heightCm * pxPerCm) };
+}
+
+// A screenshot scaled to the text width (and at most ~19 cm tall), with a numbered caption below.
+function figure(chapter, file, caption, maxWidthCm = 16, maxHeightCm = 15.5) {
+  figNo[chapter] = (figNo[chapter] ?? 0) + 1;
+  figCount++;
+  const { data, width, height } = scaledImage(file, maxWidthCm, maxHeightCm);
   return [
     new Paragraph({ alignment: AlignmentType.CENTER, keepNext: true, spacing: { before: 120, after: 60 },
-      children: [new ImageRun({ type: "png", data, transformation: { width: Math.round(width), height: Math.round(height) },
+      children: [new ImageRun({ type: "png", data, transformation: { width, height },
         altText: { title: caption, description: caption, name: file } })] }),
     new Paragraph({ style: "HinhCaption", children: [new TextRun(`Hình ${chapter}.${figNo[chapter]}: ${caption}`)] }),
   ];
 }
+
 
 const pageBreak = () => new Paragraph({ children: [new PageBreak()] });
 const blank = (n = 1) => Array.from({ length: n }, () => new Paragraph({ children: [] }));
@@ -407,6 +413,8 @@ const ch3 = [
   h3("3.2.1. Danh sách use case và trạng thái"),
   p("Đặc tả có 37 use case. Bảng 3.4 liệt kê toàn bộ cùng tình trạng hiện thực: cả 37 use case đều đã làm."),
   ...table("3", "Danh sách 37 use case", ["STT", "Use case", "Tác nhân", "Trạng thái"], useCases, [0.6, 3.6, 2.4, 2.2]),
+  p("Hình 3.1 gom 37 use case theo bốn tác nhân, cùng mức nhóm với Bảng 3.4 ở trên."),
+  ...figure("3", "35-so-do-use-case-tong-quan.png", "Sơ đồ use case theo tác nhân", 10),
   h3("3.2.2. Đặc tả use case Đăng ký tài khoản (use case 1, 2)"),
   ...numbered([
     "Khách mở trang Đăng ký, nhập email, họ tên, số điện thoại, mật khẩu và nhập lại mật khẩu.",
@@ -423,6 +431,7 @@ const ch3 = [
     "Trong một giao dịch, hệ thống tính lại giá, so với tổng khách đã thấy, trừ tồn kho có điều kiện, tăng lượt dùng voucher có điều kiện, xóa các dòng giỏ đã đặt và tạo đơn.",
     "Nếu tổng tiền đã thay đổi (ví dụ khuyến mãi vừa bắt đầu hoặc kết thúc) hoặc hết hàng, giao dịch bị hủy và khách được báo để xem lại; bấm đặt hai lần chỉ tạo một đơn.",
   ]),
+  ...figure("3", "36-luu-do-dat-hang-voucher.png", "Lưu đồ đặt hàng và áp dụng voucher", 9),
   h3("3.2.4. Đặc tả use case Thanh toán trực tuyến (use case 17)"),
   ...numbered([
     "Khách chọn VNPay hoặc MoMo; hệ thống tạo một lần thanh toán và chuyển khách sang trang cổng thanh toán (giả lập).",
@@ -439,6 +448,7 @@ const ch3 = [
   ], [2, 3, 2, 2]),
   p("Hai nhân viên bấm cùng một nút, hoặc khách hủy đúng lúc nhân viên xác nhận, chỉ có một thay đổi được áp dụng vì mỗi lần chuyển trạng thái là một cập nhật có điều kiện trên trạng thái cũ. Đơn bán tại quầy được tạo ở trạng thái Hoàn tất nên không ai hủy hay thanh toán lại được."),
   p("Khách tra cứu đơn không cần đăng nhập, bằng mã đơn và số điện thoại người nhận. Nhập sai số điện thoại 5 lần liên tiếp cho cùng một mã đơn thì mã đơn đó bị khóa tra cứu 5 phút, cùng con số mà khóa tài khoản của Identity dùng; nhập đúng thì số lần sai về 0."),
+  ...figure("3", "37-luu-do-trang-thai-don-hang.png", "Lưu đồ trạng thái đơn hàng (OrderTransitions)", 9),
   h3("3.2.6. Đặc tả use case Nhập hàng vào kho (use case 20)"),
   ...numbered([
     "Nhân viên mở trang Nhập hàng; hệ thống chuyển sang địa chỉ có mã form riêng (/Admin/Stock/New?key=...).",
@@ -468,6 +478,10 @@ const ch3 = [
     "Giá và kho: PriceChanges, StockReceipts, StockReceiptLines.",
     "Bảo vệ tra cứu đơn: OrderTrackLockouts.",
   ]),
+  p("Hình 3.4 đến 3.6 vẽ lại ba nhóm bảng trên thành sơ đồ thực thể - quan hệ (ERD), tách thành ba hình cho dễ đọc thay vì gộp 24 bảng vào một sơ đồ duy nhất."),
+  ...figure("3", "32-erd-danh-muc-san-pham.png", "ERD: Danh mục và sản phẩm", 15),
+  ...figure("3", "33-erd-mua-hang-tai-khoan.png", "ERD: Tài khoản và mua hàng", 15),
+  ...figure("3", "34-erd-tuong-tac-gia-kho.png", "ERD: Tương tác, giá và kho", 15),
   h3("3.3.2. Các bảng chính"),
   ...table("3", "Bảng Products và ProductVariants", ["Bảng", "Các cột chính", "Ghi chú"], [
     ["Products", "Id, CategoryId, Name, Slug, Description, BasePrice, Status, SortOrder, CreatedAt, UpdatedAt", "Một mẫu máy; Status = đang bán; ngừng bán thay cho xóa để đơn cũ còn nguyên"],
@@ -555,61 +569,71 @@ const ch4 = [
     ["setup/verify-*", "16 kịch bản kiểm tra trên trình duyệt; setup/screenshots chụp các hình trong chương này; setup/report dựng file báo cáo này"],
   ], [3.2, 5]),
   p("Cách chạy ứng dụng: dotnet tool restore, dotnet ef database update (tạo cơ sở dữ liệu và dữ liệu mẫu), rồi dotnet run --project src/AppleStore.Web. Hướng dẫn đầy đủ có trong README.md."),
+  h3("4.2.1. Một số module chính (kèm mã minh họa)"),
+  p("Bốn đoạn mã dưới đây là phần lõi, rút gọn, của bốn cơ chế đã nêu ở Chương 2 và Chương 3; mỗi đoạn lấy nguyên văn từ mã nguồn thật, bỏ bớt phần còn lại của file để vừa trang in."),
+  p("WholeDongAttribute (src/AppleStore.Web/Models/Admin/AdminForms.cs) là thuộc tính kiểm tra dữ liệu dùng chung cho mọi ô số tiền nhân viên gõ tay: giá sản phẩm, giá biến thể, mức giảm và đơn tối thiểu của voucher, giá nhập kho. Tham số gateProperty/gateValue (ví dụ chỉ bắt buộc khi Type == Fixed) để một thuộc tính tùy theo giá trị của thuộc tính khác."),
+  ...figure("4", "38-code-wholedongattribute.png", "WholeDongAttribute, thuộc tính kiểm tra số tiền nguyên đồng", 12),
+  p("OrderTransitions (src/AppleStore.Infrastructure/Services/OrderTransitions.cs) là bảng quy tắc duy nhất cho việc chuyển trạng thái đơn hàng (Hình 3.6 vẽ lại đúng bảng này); mọi trang (xác nhận, giao, hoàn tất, hủy) đều gọi vào đây thay vì mỗi trang tự kiểm tra trạng thái theo cách riêng."),
+  ...figure("4", "39-code-ordertransitions.png", "OrderTransitions, bảng quy tắc chuyển trạng thái đơn hàng", 14),
+  p("PriceService (src/AppleStore.Infrastructure/Services/PriceService.cs) đổi giá hàng loạt trong một giao dịch EF Core: chỉ lấy biến thể đang bán (v.Status && v.Product.Status, sửa lỗi BM_PRICE_01 nêu ở Chương 4.5), rồi ghi từng giá bằng cập nhật có điều kiện (so Price và UpdatedAt cũ trong mệnh đề Where) để hai người đổi giá cùng lúc không ghi đè nhau."),
+  ...figure("4", "40-code-priceservice.png", "PriceService, đổi giá hàng loạt trong một giao dịch (rút gọn)", 12),
+  p("UserStore (src/AppleStore.Infrastructure/Identity/UserStore.cs) là chỗ ASP.NET Core Identity đọc và ghi dữ liệu tài khoản; lớp này cài các interface của Identity để đọc/ghi thẳng vào bảng Users của đặc tả, không tạo bảng AspNetUsers riêng."),
+  ...figure("4", "41-code-userstore.png", "UserStore, Identity đọc ghi trên bảng Users của đặc tả", 13),
   h2("4.3. Giao diện phía khách hàng"),
   p("Các hình dưới đây được chụp từ ứng dụng thật, chạy trên một cơ sở dữ liệu mới tạo bằng migration, bằng script setup/screenshots/capture.py. Mỗi hình được cắt đúng khối cần xem và chụp ở độ phân giải gấp đôi để chữ đọc rõ khi in."),
   h3("4.3.1. Trang chủ và danh mục sản phẩm"),
   p("Trang chủ có băng chuyển động giới thiệu sản phẩm nổi bật và các banner sản phẩm. Trang danh mục hiển thị dải mẫu máy của danh mục, giống cách trình bày của trang tham khảo rauvang.com."),
   ...figure("4", "01-trang-chu.png", "Trang chủ"),
-  ...figure("4", "02-danh-muc.png", "Trang danh mục iPhone"),
+  ...figure("4", "02-danh-muc-full.png", "Trang danh mục iPhone (khung đỏ đánh dấu khối chính)", 10, 24),
   p("Năm sản phẩm chưa có ảnh được phép sử dụng của đúng mẫu máy hiển thị hình vẽ theo loại sản phẩm, ví dụ hình đồng hồ cho Apple Watch, thay vì ảnh của đời máy trước."),
-  ...figure("4", "31-anh-cho.png", "Dải mẫu Apple Watch: hai mẫu chưa có ảnh hiện hình vẽ đồng hồ"),
+  ...figure("4", "31-anh-cho-full.png", "Dải mẫu Apple Watch: hai mẫu chưa có ảnh hiện hình vẽ đồng hồ (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.3.2. Tìm kiếm, lọc theo giá và sắp xếp"),
   p("Khách tìm theo tên, lọc theo bốn khoảng giá (dưới 10 triệu, 10 đến 20 triệu, 20 đến 40 triệu, từ 40 triệu) và sắp theo giá hoặc mới nhất. Khoảng giá đang chọn được giữ lại khi đổi cách sắp xếp hoặc tìm kiếm."),
   ...figure("4", "03-tim-kiem-loc-gia.png", "Tìm kiếm kết hợp lọc theo khoảng giá và sắp xếp"),
   h3("4.3.3. Trang cấu hình sản phẩm"),
   p("Mỗi cấu hình có trang riêng với các nút chọn màu và khu vực; giá, mã SKU và tồn kho đổi ngay khi chọn. Khi có khuyến mãi, giá cũ được gạch ngang và tên chương trình hiện bên cạnh."),
-  ...figure("4", "04-cau-hinh-san-pham.png", "Trang cấu hình sản phẩm có khuyến mãi"),
+  ...figure("4", "04-cau-hinh-san-pham-full.png", "Trang cấu hình sản phẩm có khuyến mãi (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.3.4. Đăng ký, xác thực OTP và đăng nhập"),
-  ...figure("4", "05-dang-ky.png", "Trang đăng ký tài khoản"),
+  ...figure("4", "05-dang-ky-full.png", "Trang đăng ký tài khoản (khung đỏ đánh dấu khối chính)", 10, 24),
   ...figure("4", "06-nhap-otp.png", "Trang nhập mã OTP gửi qua email"),
-  ...figure("4", "07-dang-nhap.png", "Trang đăng nhập"),
+  ...figure("4", "07-dang-nhap-full.png", "Trang đăng nhập (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.3.5. So sánh sản phẩm"),
   p("Khách (kể cả chưa đăng nhập) chọn tối đa 3 sản phẩm thuộc bất kỳ danh mục nào để so sánh giá, tình trạng còn hàng, cấu hình, màu, khu vực và điểm đánh giá."),
-  ...figure("4", "08-so-sanh.png", "Trang so sánh sản phẩm", 13),
+  ...figure("4", "08-so-sanh-full.png", "Trang so sánh sản phẩm (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.3.6. Giỏ hàng, thanh toán và đơn hàng"),
-  ...figure("4", "09-gio-hang.png", "Giỏ hàng"),
-  ...figure("4", "10-thanh-toan.png", "Trang thanh toán đã áp dụng voucher", 12),
-  ...figure("4", "11-don-hang.png", "Trang đơn hàng sau khi đặt", 13),
-  ...figure("4", "12-don-cua-toi.png", "Danh sách đơn hàng của khách"),
-  ...figure("4", "13-tra-cuu-don.png", "Tra cứu đơn hàng bằng mã đơn và số điện thoại"),
+  ...figure("4", "09-gio-hang-full.png", "Giỏ hàng (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "10-thanh-toan-full.png", "Trang thanh toán đã áp dụng voucher (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "11-don-hang-full.png", "Trang đơn hàng sau khi đặt (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "12-don-cua-toi-full.png", "Danh sách đơn hàng của khách (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "13-tra-cuu-don-full.png", "Tra cứu đơn hàng bằng mã đơn và số điện thoại (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.3.7. Đánh giá sản phẩm"),
   p("Chỉ khách đã nhận một đơn có sản phẩm đó mới được đánh giá; mỗi khách một đánh giá cho một sản phẩm và có thể sửa lại."),
-  ...figure("4", "24-danh-gia.png", "Khối đánh giá trên trang sản phẩm", 12),
+  ...figure("4", "24-danh-gia-full.png", "Khối đánh giá trên trang sản phẩm (khung đỏ đánh dấu khối chính)", 10, 24),
   h2("4.4. Giao diện trang quản trị"),
   p("Trang quản trị nằm trong Area Admin. Quản trị viên thấy đủ các mục; nhân viên chỉ thấy Đơn hàng, Báo cáo, Đánh giá, Khuyến mãi, Giá, Kho và Bán hàng."),
   h3("4.4.1. Tổng quan và xử lý đơn hàng"),
-  ...figure("4", "14-admin-tong-quan.png", "Trang tổng quan của quản trị viên"),
-  ...figure("4", "15-admin-don-hang.png", "Danh sách đơn hàng theo trạng thái"),
-  ...figure("4", "23-admin-chi-tiet-don.png", "Chi tiết đơn hàng và các nút xử lý theo trạng thái", 12),
+  ...figure("4", "14-admin-tong-quan-full.png", "Trang tổng quan của quản trị viên (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "15-admin-don-hang-full.png", "Danh sách đơn hàng theo trạng thái (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "23-admin-chi-tiet-don-full.png", "Chi tiết đơn hàng và các nút xử lý theo trạng thái (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.4.2. Nhập kho và tồn kho"),
   p("Nhân viên lập phiếu nhập với nhà cung cấp, sản phẩm, số lượng và giá nhập. Trang phiếu cho thấy tồn trước và tồn sau của từng dòng, đúng công thức tồn cuối = tồn đầu + nhập. Trang tồn kho liệt kê mọi biến thể, tồn thấp nhất lên đầu, tìm được theo SKU hoặc tên."),
-  ...figure("4", "25-nhap-kho.png", "Lập phiếu nhập kho", 13),
-  ...figure("4", "26-phieu-nhap.png", "Phiếu nhập đã lưu: tồn trước và tồn sau của từng dòng"),
-  ...figure("4", "27-ton-kho.png", "Danh sách tồn kho"),
+  ...figure("4", "25-nhap-kho-full.png", "Lập phiếu nhập kho (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "26-phieu-nhap-full.png", "Phiếu nhập đã lưu: tồn trước và tồn sau của từng dòng (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "27-ton-kho-full.png", "Danh sách tồn kho (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.4.3. Bán hàng tại quầy và in hóa đơn hàng loạt"),
   p("Nhân viên chọn sản phẩm, bấm Tính tiền để xem giá đang bán (có khuyến mãi và voucher), rồi bấm Hoàn tất bán. Lần bán trở thành một đơn hàng loại Tại quầy, đã thanh toán và hoàn tất. Từ danh sách đơn, nhân viên đánh dấu nhiều đơn và in tất cả hóa đơn cùng lúc."),
   ...figure("4", "28-ban-tai-quay.png", "Bán hàng tại quầy: bảng tính tiền trước khi hoàn tất", 12),
-  ...figure("4", "29-don-tai-quay.png", "Đơn bán tại quầy: kênh Tại quầy và nhân viên bán", 13),
+  ...figure("4", "29-don-tai-quay-full.png", "Đơn bán tại quầy: kênh Tại quầy và nhân viên bán (khung đỏ đánh dấu khối chính)", 10, 24),
   ...figure("4", "30-in-hoa-don-loat.png", "In nhiều hóa đơn cùng lúc"),
   h3("4.4.4. Sản phẩm, voucher, khuyến mãi và giá"),
-  ...figure("4", "16-admin-san-pham.png", "Quản lý sản phẩm"),
-  ...figure("4", "17-admin-voucher.png", "Quản lý voucher"),
-  ...figure("4", "18-admin-khuyen-mai.png", "Quản lý khuyến mãi"),
-  ...figure("4", "19-admin-gia.png", "Đổi giá hàng loạt và lịch sử đổi giá"),
+  ...figure("4", "16-admin-san-pham-full.png", "Quản lý sản phẩm (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "17-admin-voucher-full.png", "Quản lý voucher (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "18-admin-khuyen-mai-full.png", "Quản lý khuyến mãi (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "19-admin-gia-full.png", "Đổi giá hàng loạt và lịch sử đổi giá (khung đỏ đánh dấu khối chính)", 10, 24),
   h3("4.4.5. Báo cáo, đánh giá và tài khoản"),
-  ...figure("4", "20-admin-bao-cao.png", "Báo cáo doanh thu, xuất Excel và PDF"),
-  ...figure("4", "21-admin-danh-gia.png", "Quản lý đánh giá: trả lời và ẩn"),
-  ...figure("4", "22-admin-tai-khoan.png", "Quản lý tài khoản và vai trò"),
+  ...figure("4", "20-admin-bao-cao-full.png", "Báo cáo doanh thu, xuất Excel và PDF (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "21-admin-danh-gia-full.png", "Quản lý đánh giá: trả lời và ẩn (khung đỏ đánh dấu khối chính)", 10, 24),
+  ...figure("4", "22-admin-tai-khoan-full.png", "Quản lý tài khoản và vai trò (khung đỏ đánh dấu khối chính)", 10, 24),
   h2("4.5. Kiểm thử và đánh giá"),
   h3("4.5.1. Kiểm thử tự động"),
   p("Bộ test hiện có 647 test xUnit, tất cả đều đạt. Trước mỗi lần gộp mã, cổng kiểm tra gồm: dotnet build --no-incremental (0 cảnh báo, 0 lỗi), dotnet test, dotnet format --verify-no-changes và kịch bản kiểm tra trên trình duyệt của tính năng đó."),
