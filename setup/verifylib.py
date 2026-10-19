@@ -104,6 +104,9 @@ class Harness:
             proc.kill()
 
     def open_browser(self):
+        # A warm build server can report false Razor errors after git changed
+        # files under it (seen several times 2026-10-08 to 10-10); start clean.
+        subprocess.run(["dotnet", "build-server", "shutdown"], capture_output=True)
         subprocess.run(["dotnet", "build", "-v", "q", str(WEB)], check=True, capture_output=True)
         subprocess.run(["playwright-cli", "-s=" + self.session, "open"], capture_output=True, cwd=self.tmp)
 
