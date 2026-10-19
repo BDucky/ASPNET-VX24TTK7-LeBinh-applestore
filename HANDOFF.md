@@ -5,6 +5,230 @@ was decided and why, and exactly where to pick up next. Do not edit or delete ol
 entries when adding a new one, prepend instead, they are the record of how the
 project actually got here.
 
+## 2026-10-19: report cut from 92 to 69 pages, owner recalled a 50-60 page target
+
+**What landed on `docs/thesis-report`, not committed yet.** The owner recalled the
+course report should stay around 50-60 pages; it had grown to 92 after the
+2026-10-17 full-page screenshot work. Measured exactly where the pages were going
+(`pdftotext -layout`, mapped every page to its heading/figure captions) before
+cutting anything: front matter 12 pages (mostly fixed by the template), chapters
+1+2 nine pages, chapter 3 fifteen pages, chapter 4's screenshots (4.3+4.4) 44 of
+the 92 pages by themselves. Cut only came from the screenshots; chapters 1, 2, 3,
+5 are untouched.
+
+Three rounds, each measured and shown to the owner before the next:
+1. `figurePair()` added to `setup/report/build.js`: stacks a screen's full-page
+   shot and its cropped detail in one borderless, `cantSplit` table cell so both
+   land on the same page instead of two. First attempt capped both images by
+   *height* (9.5 cm) to force the pair onto one page: 92 to 80 pages, but this
+   was wrong and the owner caught it live (stock levels' full-page shot shrank
+   to a 5 cm sliver, URL bar unreadable) — capping by height instead of width
+   makes every full-page shot a different, inconsistent width, which defeats
+   the entire point of a full-page shot (recognizing it as a real browser
+   window). Fixed: cap by WIDTH (10 cm) instead, height follows the page's own
+   content length, same as a real website. 74 to 82 pages (tall pages like
+   stock levels now take their own page again, but every full-page shot reads
+   correctly).
+2. Of the 26 screens with a full+cropped pair, kept the pair for only the 12
+   most representative ones (category, product config, register, login, cart,
+   checkout, order placed, order tracking, admin dashboard, admin orders,
+   stock levels, admin reports); the other 14 went back to a cropped-only
+   single figure, no full-page companion. 80 to 74 pages.
+3. Owner's insight: a full-page shot already has the red highlight box marking
+   the relevant block, so the separate cropped "zoomed in" image next to it is
+   redundant *for the 12 kept screens specifically* (not the 14 that never had
+   a highlight). Dropped the cropped companion for those 12, one image per
+   screen instead of two. `figurePair()` became dead code and was removed (its
+   single remaining caller converted to a plain `figure()` call per screen with
+   `scaledImage()`'s new width-then-height-cap signature). 82 to 69 pages. The
+   14 orphaned `*-full.png` files this left behind (never committed, so no git
+   history lost) were deleted; `setup/screenshots/capture.py` still produces
+   them if ever needed again.
+
+After step 3 (69 pages), the owner asked why the other 14 screens couldn't
+also get the full-page treatment, pointing at one of the cropped-only shots
+(order detail, in-store sale) and asking directly whether it could look like
+the others. Answer: yes, nothing technical stopped it; those 14 screens had a
+full-page capture too, just not used, and the owner's instinct that all 26
+should look the same (not 12 "with URL bar" and 14 without) was right. Fixed:
+reran `setup/screenshots/capture.py` (regenerates every `*-full.png`,
+`highlight=True` was already set on all 26 calls from 2026-10-17, no script
+change needed) to replace the 14 `-full.png` files deleted in step 3, then
+converted all 14 remaining cropped-only `figure()` calls in `build.js` to the
+same full-page, 10 cm wide, highlighted single-image form as the other 12.
+Result: **67 pages**, every one of the 26 screens is now a single full-page,
+highlighted screenshot, no cropped-only or paired shots left; fewer pages
+than the 69-page version, not more, because consistent full-page shots pack
+two to a page more often than the mixed cropped/full sizes did. The 14
+screens' plain cropped PNGs (`08-so-sanh.png`, `29-don-tai-quay.png`, etc.)
+are no longer referenced by `build.js` but were left in place (they are
+tracked/committed from earlier sessions, not newly generated, so deleting
+them is the owner's call, not a cleanup default).
+
+**Verification done this session, not just "build succeeded":** rendered every
+page to an image (`pdftoppm -gray -r 40`, matches the sweep technique from
+2026-10-17) after each round and flagged any page over 97% white pixels as a
+possible repeat of the 2026-10-17 blank-page bug; the 69-page round flagged
+one page (confirmed by its extracted text to be a legitimately short page,
+not a bug), the final 67-page round flagged none. Also visually checked
+individual pages at 130-150 dpi after each round (a landscape full-page pair,
+the stock-levels page pre- and post- the width-vs-height fix, the two
+screens the owner asked about directly), catching the readability regression
+described in step 1 above before it reached the owner as a finished
+deliverable a second time.
+
+**New PDF export recipe used this session**, not yet written down anywhere
+else: the `topdf.py` UNO macro from the 2026-10-17 entry was recreated fresh
+(this machine's LibreOffice profile didn't have it) under a scratch profile,
+reading the input/output paths from `REPORT_DOCX`/`REPORT_PDF` env vars
+instead of being hardcoded, since the macro has no way to take command-line
+arguments directly. Same lossless-image-compression `FilterData` as before.
+
+**Pick up here:** `setup/report/build.js`, `thesis/doc/*.docx`,
+`thesis/pdf/*.pdf`, and `thesis/doc/hinh/*.png` (all 26 `-full.png` present
+and used; the 14 cropped-only PNGs for screens that no longer use them are
+untouched but unreferenced) are modified/untracked, not committed, on top of
+the 2026-10-17 entry's uncommitted work. Commit these, then resume task 11e
+(demo video redo, `docs/specs/demo-video.md`) before marking PR #31 ready.
+
+## 2026-10-17: ten more report figures/code listings, two real PDF bugs found via Preview (Quartz) and fixed
+
+**What landed on `docs/thesis-report`, not committed yet.** Ten figures added to
+the report (not yet in any HANDOFF entry): three ERD diagrams (3.4-3.6, split by
+table group instead of one 24-table diagram), a use-case-by-actor diagram (3.1),
+two flowcharts (order placement with voucher, order status transitions), and four
+C# code listings in a new 4.2.1 ("kèm mã minh họa"): `WholeDongAttribute`,
+`OrderTransitions`, `PriceService`, `UserStore`. Report now 69 pages.
+
+**Bug 1, code tables split across a page.** The owner, reviewing a claim that the
+report had been checked, opened the actual PDF in Preview and found a figure
+caption with nothing above it (also caught independently this session by
+rendering to page images first). The two longer code listings (`Mã 4.1`, `Mã
+4.3`) broke mid-table across a page boundary, leaving a two-line orphan (`}\n}`)
+at the top of the next page. Fix: `cantSplit: true` on the `TableRow` in the
+`code()` helper, `setup/report/build.js`. The caption's existing `keepNext` then
+carries the whole block to the next page instead of splitting it.
+
+**Bug 2, much bigger: about 15 screenshot figures across the whole report render
+blank in Preview, not just the two the owner found.** Root cause: LibreOffice's
+PDF export recompresses some (not all) embedded images as JPEG with a synthetic
+soft mask (an alpha channel the source PNGs do not have: checked every PNG's
+IHDR colour type, all are colortype 2/RGB, no alpha). Apple's CoreGraphics (the
+engine Preview.app and Quick Look use, confirmed by rendering the PDF with
+`CGPDFDocument`/`CGContext.drawPDFPage` via a small compiled Swift program, not
+just assuming) fails to composite that particular JPEG+SMask combination and
+draws nothing; poppler (`pdftoppm`, used for the first-pass check) and
+LibreOffice's own renderer are lenient and show the image fine. This is why
+earlier "rendering checked" claims in this file were wrong for this failure
+mode: checking with `pdftoppm` or LibreOffice itself does not prove Preview
+will render the same PDF correctly, because they use different, and in this
+case differently-buggy, PDF image decoders. **Any future report-rendering check
+must include a Quartz/Preview-engine render, not just poppler.**
+
+Fix: force lossless image compression on PDF export instead of LibreOffice's
+default JPEG recompression, which removes the soft mask entirely (confirmed
+`pdfimages -list` shows zero `smask` entries after the fix, versus 15 before).
+Swept all 69 pages after the fix (Quartz render of every page, white-pixel
+ratio per page with a figure caption) to confirm no page is silently still
+blank; none are.
+
+**Updated PDF export recipe** (supersedes the 2026-10-12 (later) entry's
+recipe, which used the default image compression and produces the Bug 2
+failure above): same `topdf.py` UNO macro structure (`<profile>/user/Scripts/
+python/topdf.py`, run via `soffice -env:UserInstallation=file://<profile>
+--headless 'vnd.sun.star.script:topdf.py$run?language=Python&location=user'`,
+updates the three document indexes before export so the TOC keeps page
+numbers), but the `storeToURL` call must now also pass `FilterData` with
+`UseLosslessCompression=True` and `ReduceImageResolution=False`:
+
+```python
+filter_data = (
+    _p("UseLosslessCompression", True),
+    _p("ReduceImageResolution", False),
+)
+doc.storeToURL(out_url, (
+    _p("FilterName", "writer_pdf_Export"),
+    _p("FilterData", uno.Any("[]com.sun.star.beans.PropertyValue", filter_data)),
+))
+```
+
+Lossless export makes the PDF bigger (4.95 MB to 10.4 MB for 69 pages); not
+checked against any submission size limit, ask if one exists.
+
+**Correction, same session:** the four "code listings" above were first typed
+as plain text into a shaded table (a `code()` helper in `build.js`, since
+removed). The owner pointed out the four `thesis/doc/hinh/38-41-code-*.png`
+files were already real IDE screenshots (editor chrome, syntax highlighting,
+tab bar) made for exactly this purpose and should be used as figures, not
+retyped as text. Fixed: the four `code()` calls replaced with `figure()`
+calls against those PNGs; the now-unused `code()` helper, `codeNo` counter,
+and `MaCaption` style removed. These four are now ordinary numbered figures
+(`Hình 4.1`-`Hình 4.4`, sharing the chapter's figure counter with the
+screenshots in 4.3), not a separate "Mã X.Y" numbering. Report now 70 pages.
+Re-verified the same way (Quartz render of all 70 pages, white-ratio sweep):
+no blank pages introduced.
+
+**Second correction, same session: every cropped UI screenshot now gets a
+full-page companion with the cropped block outlined in red.** The owner
+pointed out that `setup/screenshots/capture.py`'s existing shots (cropped
+tight to one block, decided 2026-10-09) made it impossible to picture what
+the real page looks like. Added a `highlight` option to the `shot()` helper:
+when set, it takes a second `<name>-full.png` shot first, full page at 2x,
+with a red-outlined `<div>` overlay positioned at the target selector's
+document (not viewport) coordinates so it lands correctly regardless of
+scroll, then takes the existing cropped shot as before, unaffected (the
+overlay sits outside the crop bounds). Applied to all 26 shots that take a
+`selector` (customer and admin pages); left alone the three that were
+already whole-page (`01-trang-chu`, `03-tim-kiem-loc-gia`, the already-
+`full=True` invoice print shot) and the two inline custom-flow shots
+(`06-nhap-otp`, the counter-sale quote), which stay cropped-only.
+`setup/report/build.js` updated to insert each `-full.png` as its own
+figure right before the matching cropped one (caption suffixed "toàn trang,
+khung đỏ là phần phóng to bên dưới" / "phóng to khung đỏ ở trên"), sharing
+the normal figure counter, not a separate numbering.
+
+**Re-hit the exact sliver bug from 2026-10-10, same root cause, new
+screenshots.** An uncapped `fullPage: true` on `/Admin/Stock/Levels` (every
+SKU, no pagination) produced a 2880x80752 PNG; `figure()`'s height cap
+(15.5 cm) then shrank it to an unreadably thin column once width followed
+height down. `/Admin/Products` hit a smaller version of the same thing
+(2880x13714). Fixed in `capture.py`, not `build.js`: the highlight shot now
+clips to `Math.min(scrollHeight, 2700)` CSS px (3x the 900px viewport) after
+placing the overlay, so a long list still shows meaningful context without
+the sliver. Re-verified: worst aspect ratio among all 26 full-page shots is
+now 1.88 (`16-admin-san-pham-full.png`, `27-ton-kho-full.png`, both exactly
+at the 2700px cap), everything else is under 1.6.
+
+**Third correction, same session: the full-page shots still didn't read as
+"a real website"**, even with the whole page visible — no URL, nothing to
+anchor it as a browser looking at a real address rather than a cropped
+image of dark UI. Added `CHROME_JS` to `capture.py`: a fake browser bar
+(three traffic-light dots, an address pill showing `location.href`)
+prepended as the first child of `body` before the highlight box is
+measured, so it pushes the page down by its own height and the highlight
+coordinates (measured after) land correctly below it. Same technique as the
+red outline: a plain DOM node, no real browser chrome capture (Playwright
+screenshots the page, not the OS window), analogous to why the four code
+listings show real editor chrome instead of retyped text. Shows the actual
+`http://localhost:5300/...` dev URL, not a fabricated production domain:
+honest given `docs/finish-plan.md`'s known gap "chưa triển khai lên máy
+chủ." Confirmed on a short page (cart) and the capped-tall stock-levels
+page that the bar and highlight both land correctly.
+
+Report now 92 pages (PDF about 25.5 MB, lossless images). Re-verified the
+same way as the earlier bugs: Quartz render of every page, white-ratio
+sweep flagged only the two pages already known to be legitimately mostly
+white (a vector flowchart, the short invoice-print page); both checked by
+eye.
+
+**Pick up here:** `thesis/doc/*.docx`, `thesis/pdf/*.pdf`, `setup/report/
+build.js`, `setup/screenshots/capture.py`, and `thesis/doc/hinh/*.png`
+(10 new content figures plus 26 new `-full.png` companions) are
+modified/untracked, not committed. Commit these (split sensibly: new content
+figures, the screenshot-pipeline change, the three bug fixes), then resume
+task 11e (demo video redo, `docs/specs/demo-video.md`) before marking PR #31
+ready.
+
 ## 2026-10-13 (later): report rendering bugs fixed, .pptx exported and corrected
 
 **What landed on `docs/thesis-report`, on top of the entry below.** The owner opened
